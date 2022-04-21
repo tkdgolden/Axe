@@ -17,31 +17,37 @@ print(df)
 position_set = {"ON CALL", "Axe Master 1", "Axe Master 2"}
 
 #all the possible session start times
-A = time(12, 0, 0)
-B = time(13, 0, 0)
-C = time(13, 15, 0)
-D = time(14, 0, 0)
-E = time(14, 30, 0)
-F = time(15, 0, 0)
-G = time(15, 45, 0)
-H = time(16, 0, 0)
-I = time(17, 0, 0)
-J = time(17, 15, 0)
-K = time(18, 0, 0)
-L = time(18, 15, 0)
-M = time(18, 30, 0)
-N = time(19, 0, 0)
-O = time(19, 30, 0)
-P = time(19, 45, 0)
-Q = time(20, 0, 0)
-R = time(20, 45, 0)
-S = time(21, 0, 0)
-T = time(22, 0, 0)
+A = time(12, 0)
+B = time(12, 30)
+C = time(13, 0)
+D = time(13, 15)
+E = time(13, 30)
+F = time(14, 0)
+G = time(14, 30)
+H = time(15, 0)
+I = time(15, 30)
+J = time(15, 45)
+K = time(16, 0)
+L = time(16, 30)
+M = time(17, 0)
+N = time(17, 15)
+O = time(17, 30)
+P = time(18, 0)
+Q = time(18, 15)
+R = time(18, 30)
+S = time(19, 0)
+T = time(19, 30)
+U = time(19, 45)
+V = time(20, 0)
+W = time(20, 30)
+X = time(20, 45)
+Y = time(21, 0)
+Z = time(22, 0)
 
 #standard start times based on the weekday
-weekday_start_times = [H, J, M, P, S]
-saturday_start_times = [A, C, E, G, I, L, O, R, T]
-sunday_start_times = [A, C, E, G, I, L]
+weekday_start_times = [K, N, R, U, Y]
+saturday_start_times = [A, D, G, J, M, Q, T, X, Z]
+sunday_start_times = [A, D, G, J, M, Q]
 
 #class object, holds each shift for each employee while info is being transferred from the wheniwork table into my own
 class Shift:
