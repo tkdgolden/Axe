@@ -101,7 +101,8 @@ for each in shift_set:
             #if the current shift will cover the current session
             if (each.start <= this) & (this <= each.last):
                 #put this employees name in the array
-                arr[dayindex][weekday_start_times.index(this)].append(each.name)
+                if (each.name not in arr[dayindex][weekday_start_times.index(this)]):
+                    arr[dayindex][weekday_start_times.index(this)].append(each.name)
     elif (wday == sat):
         for this in saturday_start_times:
             if (each.start <= this) & (this <= each.last):
@@ -111,5 +112,29 @@ for each in shift_set:
             if (each.start <= this) & (this <= each.last):
                 arr[dayindex][sunday_start_times.index(this)].append(each.name)
 
-print(arr)
+for i, each in enumerate(arr):
+    print (days[i])
+    dotw = days[i].weekday()
+    if (dotw in wdays):
+        c = 0
+        for each in weekday_start_times:
+            print (each, len(arr[i][c]))
+            print ("               ", arr[i][c])
+            c += 1
+        print ("")
+    if (dotw == sat):
+        c = 0
+        for each in saturday_start_times:
+            print (each, len(arr[i][c]))
+            print ("               ", arr[i][c])
+            c += 1
+        print ("")
+    if (dotw == sun):
+        c = 0
+        for each in sunday_start_times:
+            print (each, len(arr[i][c]))
+            print ("               ", arr[i][c])
+            c +=1
+        print ("")
+    print ("")
 
