@@ -7,11 +7,11 @@ from datetime import time
 #pandas reads an excel file
 print("Drag and drop the xlsx file here")
 filePath = input().strip()
-data = pd.read_excel(filePath, sheet_name='Schedule Summary')
+data = pd.read_excel(filePath, sheet_name='Schedule - Employee Schedule')
 df = pd.DataFrame(data, columns= ['Employee', 'Position', 'Start', 'End'])
 df = df.reset_index()
 
-print(df)
+# print(df)
 
 #positions that can be assigned sessions
 position_set = {"ON CALL", "Axe Master 1", "Axe Master 2"}
