@@ -1,2 +1,2 @@
 web: gunicorn app:app
-web: gunicorn run:axe-scoring
+web: gunicorn run:app.py
