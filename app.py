@@ -1,4 +1,5 @@
 import os
+import psycopg2
 
 from flask import Flask, render_template, request, session, redirect
 from flask_session import Session
@@ -14,8 +15,9 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 Session(app)
 
 
-DATABASE_URL=$(heroku config:get DATABASE_URL -a axe-scoring) web
+DATABASE_URL = os.environ['DATABASE_URL']
 
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 app.debug = False
 app.config['SQLALCHEMY_DATABASE_URI'] ='DATABASE_URL'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
