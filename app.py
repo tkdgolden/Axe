@@ -28,6 +28,10 @@ class Judges(db.Model):
     name = db.Column(db.String(200), unique=True)
     hash = db.Column(db.Text())
 
+    def __init__(self, name, password):
+        self.name = name
+        self.hash = generate_password_hash(password)
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
