@@ -18,7 +18,7 @@ pg_url = os.environ.get("PG_URL")
 
 app.debug = False
 app.config['SQLALCHEMY_DATABASE_URI'] ='{pg_url}'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] =False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
