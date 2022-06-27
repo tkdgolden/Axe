@@ -1,10 +1,10 @@
+import os
 import psycopg2
 
 from flask import Flask, render_template, request, session, redirect
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
-from config import config
 
 app = Flask(__name__)
 
@@ -13,9 +13,25 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 Session(app)
 
-dbParams = config('postgresql')
-con = psycopg2.connect(**dbParams)
-db = con.cursor()
+
+DATABASE_URL = os.environ['DATABASE_URL']
+
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+app.debug = False
+## app.config['SQLALCHEMY_DATABASE_URI'] ='DATABASE_URL'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+class Judges(db.Model):
+    __tablename__ = 'judges'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True)
+    hash = db.Column(db.Text())
+
+    def __init__(self, name, password):
+        self.name = name
+        self.hash = generate_password_hash(password)
 
 def login_required(f):
     @wraps(f)
@@ -49,6 +65,3 @@ def login():
 def logout():
     session["name"] = None
     return redirect("/")
-
-con.commit()
-con.close()
