@@ -50,6 +50,5 @@ def logout():
     session["name"] = None
     return redirect("/")
 
-
-db.commit()
-db.close()
+con.commit()
+con.close()
