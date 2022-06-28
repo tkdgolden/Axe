@@ -44,10 +44,10 @@ def login():
     if request.method == "POST":
         if not request.form.get("name") or not request.form.get("password"):
             return render_template("login.html")
-        rows = db.execute("SELECT * FROM judges WHERE judge_name = ?", request.form.get("name"))
-        if (len(rows) != 1) or (request.form.get("password") != rows[0]["pass_hash"]):
+        result = db.select([judges]).where(judges.c.judge_name == request.form.get("name"))
+        if (len(result) != 1) or (request.form.get("password") != judges[0]["pass_hash"]):
             return render_template("login.html")
-        session["user_id"] = rows[0]["judge_id"]
+        session["user_id"] = judges[0]["judge_id"]
         return redirect("/")
     return render_template("login.html")
 
