@@ -41,7 +41,7 @@ def login_required(f):
 
 @app.route("/")
 def index():
-    if not session.get("user_id"):
+    if session.get("user_id") is None:
         return render_template("index.html")
     return render_template("judgehome.html")
 
@@ -49,17 +49,21 @@ def index():
 def login():
     session.clear()
     if request.method == "POST":
-        if not request.form.get("name") or not request.form.get("password"):
+        user_name = request.form.get("name")
+        if not user_name or not request.form.get("password"):
             return render_template("login.html")
-        cur.execute("""SELECT pass_hash FROM judges WHERE judge_name = request.form.get("name")""")
+        cur.execute("""SELECT * FROM judges WHERE judge_name = '%s'""" % user_name)
         rows = cur.fetchall()
+        print(rows)
         if (len(rows) != 1) or (request.form.get("password") != rows[0]["pass_hash"]):
             return render_template("login.html")
-        session["user_id"] = rows[0]["judge_id"]
+        session["user_id"] = rows[0]['judge_id']
+        session["name"] = rows[0]["judge_name"]
         return redirect("/")
     return render_template("login.html")
 
 @app.route("/logout")
 def logout():
     session["name"] = None
+    session["user_id"] = None
     return redirect("/")
