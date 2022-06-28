@@ -23,16 +23,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-class Judges(db.Model):
-    __tablename__ = 'judges'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), unique=True)
-    hash = db.Column(db.Text())
-
-    def __init__(self, name, password):
-        self.name = name
-        self.hash = generate_password_hash(password)
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -54,10 +44,10 @@ def login():
     if request.method == "POST":
         if not request.form.get("name") or not request.form.get("password"):
             return render_template("login.html")
-        rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("name"))
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+        rows = db.execute("SELECT * FROM judges WHERE judge_name = ?", request.form.get("name"))
+        if (len(rows) != 1) or (request.form.get("password") != rows[0]["pass_hash"]):
             return render_template("login.html")
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = rows[0]["judge_id"]
         return redirect("/")
     return render_template("login.html")
 
