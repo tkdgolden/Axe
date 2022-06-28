@@ -1,9 +1,9 @@
 import os
 import psycopg2
+import psycopg2.extras
 
 from flask import Flask, render_template, request, session, redirect
 from flask_session import Session
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
 
@@ -14,14 +14,16 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 Session(app)
 
-
-DATABASE_URL = os.environ['DATABASE_URL']
-
 app.debug = False
-app.config['SQLALCHEMY_DATABASE_URI'] ='DATABASE_URL'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+SECRET = os.environ["SECRET"]
+
+try:
+    conn = psycopg2.connect("SECRET")
+except:
+    print("Unable to connect to database")
+
+cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 def login_required(f):
     @wraps(f)
@@ -44,10 +46,11 @@ def login():
     if request.method == "POST":
         if not request.form.get("name") or not request.form.get("password"):
             return render_template("login.html")
-        result = db.select([judges]).where(judges.c.judge_name == request.form.get("name"))
-        if (len(result) != 1) or (request.form.get("password") != judges[0]["pass_hash"]):
+        cur.execute("""SELECT pass_hash FROM judges WHERE judge_name = request.form.get("name")""")
+        rows = cur.fetchall()
+        if (len(rows) != 1) or (request.form.get("password") != rows[0]["pass_hash"]):
             return render_template("login.html")
-        session["user_id"] = judges[0]["judge_id"]
+        session["user_id"] = rows[0]["judge_id"]
         return redirect("/")
     return render_template("login.html")
 
