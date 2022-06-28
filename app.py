@@ -14,12 +14,17 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 Session(app)
 
-app.debug = False
-
-SECRET = os.environ["SECRET"]
+app.debug = True
 
 try:
-    conn = psycopg2.connect("SECRET")
+    SECRET = os.environ["SECRET"]
+except:
+    SECRET = os.environ["DATABASE_URL"]
+
+print(SECRET)
+
+try:
+    conn = psycopg2.connect(SECRET)
 except:
     print("Unable to connect to database")
 
