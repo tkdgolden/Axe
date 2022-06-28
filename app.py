@@ -18,10 +18,10 @@ app.debug = True
 
 try:
     SECRET = os.environ["SECRET"]
+    print("Heroku db access")
 except:
     SECRET = os.environ["DATABASE_URL"]
-
-print(SECRET)
+    print("local db access")
 
 try:
     conn = psycopg2.connect(SECRET)
@@ -54,8 +54,7 @@ def login():
             return render_template("login.html")
         cur.execute("""SELECT * FROM judges WHERE judge_name = %(user_name)s""", {'user_name': user_name})
         rows = cur.fetchall()
-        print(rows)
-        if (len(rows) != 1) or (request.form.get("password") != rows[0]["pass_hash"]):
+        if (len(rows) != 1) or not check_password_hash(rows[0]["pass_hash"], request.form.get("password")):
             return render_template("login.html")
         session["user_id"] = rows[0]['judge_id']
         session["name"] = rows[0]["judge_name"]
@@ -70,7 +69,6 @@ def logout():
     return redirect("/")
 
 @app.route("/newjudge", methods=["GET", "POST"])
-@login_required
 def newjudge():
     if request.method == "POST":
         if not request.form.get("name") or not request.form.get("password") or not request.form.get("confirmation"):
@@ -86,8 +84,8 @@ def newjudge():
         if pw != confirm:
             return render_template("newjudge.html")
         pwhash = generate_password_hash(pw)
-
-        cur.execute("""INSERT INTO judges (judge_name, pass_hash) VALUES (%(name)s, %(pwhash)s)""", {'name': name, 'pwhash': pwhash})
-        return render_template("/")
+        cur.execute("""INSERT INTO judges(judge_name, pass_hash) VALUES (%(name)s, %(pwhash)s)""", {'name': name, 'pwhash': pwhash})
+        conn.commit()
+        return redirect("/")
     else:
         return render_template("newjudge.html")
