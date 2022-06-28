@@ -52,7 +52,7 @@ def login():
         user_name = request.form.get("name")
         if not user_name or not request.form.get("password"):
             return render_template("login.html")
-        cur.execute("""SELECT * FROM judges WHERE judge_name = '%s'""" % user_name)
+        cur.execute("""SELECT * FROM judges WHERE judge_name = %(user_name)s""", {'user_name': user_name})
         rows = cur.fetchall()
         print(rows)
         if (len(rows) != 1) or (request.form.get("password") != rows[0]["pass_hash"]):
@@ -63,7 +63,31 @@ def login():
     return render_template("login.html")
 
 @app.route("/logout")
+@login_required
 def logout():
     session["name"] = None
     session["user_id"] = None
     return redirect("/")
+
+@app.route("/newjudge", methods=["GET", "POST"])
+@login_required
+def newjudge():
+    if request.method == "POST":
+        if not request.form.get("name") or not request.form.get("password") or not request.form.get("confirmation"):
+            return render_template("newjudge.html")
+        name = request.form.get("name")
+        pw = request.form.get("password")
+        confirm = request.form.get("confirmation")
+
+        cur.execute("""SELECT * FROM judges WHERE judge_name = %(name)s""", {'name': name})
+        rows = cur.fetchall()
+        if len(rows) > 0:
+            return render_template("newjudge.html")
+        if pw != confirm:
+            return render_template("newjudge.html")
+        pwhash = generate_password_hash(pw)
+
+        cur.execute("""INSERT INTO judges (judge_name, pass_hash) VALUES (%(name)s, %(pwhash)s)""", {'name': name, 'pwhash': pwhash})
+        return render_template("/")
+    else:
+        return render_template("newjudge.html")

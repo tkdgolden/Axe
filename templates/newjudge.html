@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <h1>Create a new Judge account:</h1>
+
+    <form action="/newjudge" method="post">
+        <input autocomplete="off" autofocus name="name" placeholder="Name" type="text">
+        <input autocomplete="off" name="password" placeholder="Password" type="text">
+        <input autocomplete="off" name="confirmation" placeholder="Confirm Password" type="text">
+        <input type="submit" value="Log In">
+    </form>
+
+{% endblock %}
