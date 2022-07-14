@@ -89,3 +89,17 @@ def newjudge():
         return redirect("/")
     else:
         return render_template("newjudge.html")
+
+
+@app.route("/newcompetitor", methods=["GET", "POST"])
+def newcompetitor():
+    if request.method == "POST":
+        if not request.form.get("firstname") or not request.form.get("lastname"):
+            return render_template("newcompetitor.html")
+        fname = request.form.get("firstname")
+        lname = request.form.get("lastname")
+
+        
+        return redirect("/")
+    else:
+        return render_template("newcompetitor.html")

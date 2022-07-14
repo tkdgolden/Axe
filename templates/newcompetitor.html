@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <h1>Create a new Competitor:</h1>
+
+    <form action="/newcompetitor" method="post">
+        <input autocomplete="off" autofocus name="firstname" placeholder="First Name" type="text">
+        <input autocomplete="off" name="lastname" placeholder="Last Name" type="text">
+        <input type="submit" value="Create">
+    </form>
+
+{% endblock %}
