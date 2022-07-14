@@ -99,7 +99,12 @@ def newcompetitor():
         fname = request.form.get("firstname")
         lname = request.form.get("lastname")
 
-        
+        cur.execute("""SELECT * FROM competitors WHERE competitor_first_name = %(fname)s AND competitor_last_name = %(lname)s)""", {'fname': fname, 'lname': lname})
+        rows = cur.fetchall()
+        if len(rows) > 0:
+            return render_template("newcompetitor.html")
+        cur.execute("""INSERT INTO competitors (competitor_first_name, competitor_last_name) VALUES (%(fname)s, %(lname)s)""", {'fname': fname, 'lname': lname})
+        conn.commit()
         return redirect("/")
     else:
         return render_template("newcompetitor.html")
