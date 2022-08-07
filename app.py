@@ -113,6 +113,15 @@ def newcompetitor():
 @app.route("/newseason", methods=["GET", "POST"])
 def newseason():
     if request.method == "POST":
+        if not request.form.get("season") or not request.form.get("year") or not request.form.get("discipline") or not request.form.get("startdate"):
+            return render_template("newseason.html")
+        season = request.form.get("season")
+        yearof = request.form.get("year")
+        discipline = request.form.get("discipline")
+        startdate = request.form.get("startdate")
 
+        cur.execute("""INSERT INTO seasons (season, yearof, discipline, startdate) VALUES (%(season)s, %(yearof)s, %(discipline)s, %(startdate)s)""", {'season': season, 'yearof': yearof, 'discipline': discipline, 'startdate': startdate})
+        conn.commit()
+        return redirect("/")
     else:
         return render_template("newseason.html")
