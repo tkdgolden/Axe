@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
+    <p>You are judging season {{ season.id }}.     <a href="/leaveseason">Leave Season</a></p>
+
+    <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
+
+{% endblock %}

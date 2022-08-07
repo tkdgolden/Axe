@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import psycopg2.extras
+import sys
 
 from flask import Flask, render_template, request, session, redirect
 from flask_session import Session
@@ -8,13 +9,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
 
 app = Flask(__name__)
+debug = True
+print("initiated the app with a name of:", __name__)
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 Session(app)
-
-app.debug = True
 
 try:
     SECRET = os.environ["SECRET"]
@@ -32,11 +33,11 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 def login_required(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def check_login(*args, **kwargs):
         if session.get("user_id") is None:
             return redirect("/")
-        return f(*args, **kwargs)
-    return decorated_function
+        return (f(*args, **kwargs))
+    return check_login
 
 
 @app.route("/")
@@ -64,11 +65,13 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
-    session["name"] = None
     session["user_id"] = None
+    session["name"] = None
+    session["selected_season"] = None
     return redirect("/")
 
 @app.route("/newjudge", methods=["GET", "POST"])
+@login_required
 def newjudge():
     if request.method == "POST":
         if not request.form.get("name") or not request.form.get("password") or not request.form.get("confirmation"):
@@ -92,6 +95,7 @@ def newjudge():
 
 
 @app.route("/newcompetitor", methods=["GET", "POST"])
+@login_required
 def newcompetitor():
     if request.method == "POST":
         if not request.form.get("firstname") or not request.form.get("lastname"):
@@ -111,6 +115,7 @@ def newcompetitor():
 
 
 @app.route("/newseason", methods=["GET", "POST"])
+@login_required
 def newseason():
     if request.method == "POST":
         if not request.form.get("season") or not request.form.get("year") or not request.form.get("discipline") or not request.form.get("startdate"):
@@ -125,3 +130,23 @@ def newseason():
         return redirect("/")
     else:
         return render_template("newseason.html")
+
+
+@app.route("/seasonview")
+@login_required
+def seasonview():
+    session["selected_season"] = request.form.get("selectedseason")
+    if session.get("selected_season") is None:
+        return render_template("/")
+    else:
+        return render_template("seasonview.html")
+
+@app.route("/leaveseason")
+@login_required
+def leaveseason():
+    session["selected_season"] = None
+    return redirect("/")
+
+
+if __name__ == '__main__':
+    app.run(debug=True, use_reloader=True)

@@ -12,7 +12,8 @@
         <li><a href="/newcompetitor">Create New Competitor</a></li>
         <li><a href="/newseason">Create New Season</a></li>
         <li><a href="/newtournament">Create New Tournament</a></li>
-        <li><a href="/scorematch">Score a Match</a></li>
+        <li><form action="/seasonview" method="get"><label for="selectedseason">Judge a Season:</label><select name="selectedseason" id="selectedseason"><option value="1">1</option><option value="2">2</option></select><input type="submit" value="Go"></form></li>
+        <li>Judge a Tournament</li>
     </ul>
 
 {% endblock %}
