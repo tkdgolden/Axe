@@ -108,3 +108,11 @@ def newcompetitor():
         return redirect("/")
     else:
         return render_template("newcompetitor.html")
+
+
+@app.route("/newseason", methods=["GET", "POST"])
+def newseason():
+    if request.method == "POST":
+
+    else:
+        return render_template("newseason.html")
