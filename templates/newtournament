@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <p>You are logged in as {{ session.name }}.</p>
+
+    <h1>Create a new Tournament:</h1>
+
+    <form action="/newtournament" method="post">
+        <input autocomplete="off" autofocus name="name" placeholder="Name" type="text">
+        <label for="discipline">Discipline:</label>
+        <select name="discipline" id="discipline">
+            <option value="hatchet">Hatchet</option>
+            <option value="bigaxe">Big Axe</option>
+            <option value="knives">Knives</option>
+            <option value="duals">Duals</option>
+        </select>
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" min="2022-08-08">
+        <input type="submit" value="Create">
+    </form>
+
+{% endblock %}

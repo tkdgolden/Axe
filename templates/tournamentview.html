@@ -2,7 +2,7 @@
 
 {% block body %}
     <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
-    <p>You are judging the {{ rows[0]["season"] }} {{ rows[0]["yearof"] }} {{ rows[0]["discipline"] }} season.     <a href="/">Leave Season/ Back to Judge Homepage</a></p>
+    <p>You are judging the {{ cols[0]["tournament_name"] }} {{ cols[0]["discipline"] }} tournament on {{ cols[0]["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
 
     <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
 

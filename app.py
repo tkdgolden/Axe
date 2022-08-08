@@ -46,7 +46,10 @@ def index():
         return render_template("index.html")
     cur.execute("""SELECT * FROM seasons""")
     rows = cur.fetchall()
-    return render_template("judgehome.html", rows=rows)
+    cur.execute("""SELECT * FROM tournaments""")
+    cols = cur.fetchall()
+    session["selected_season"] = None
+    return render_template("judgehome.html", rows=rows, cols=cols)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -137,8 +140,13 @@ def newseason():
 @app.route("/seasonview")
 @login_required
 def seasonview():
-    sess = request.args.get("season")
-    session["selected_season"] = sess
+    if request.args.get("season"):
+        sess = request.args.get("season")
+        session["selected_season"] = sess
+    elif session["selected_season"]:
+        sess = session["selected_season"]
+    else:
+        redirect("/")
     cur.execute("""SELECT * FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
     rows = cur.fetchall()
     if len(rows) != 1:
@@ -146,11 +154,39 @@ def seasonview():
     return render_template("seasonview.html", rows=rows)
 
 
-@app.route("/leaveseason")
+@app.route("/newtournament", methods=["GET", "POST"])
 @login_required
-def leaveseason():
-    session["selected_season"] = None
-    return redirect("/")
+def newtournament():
+    if request.method == "POST":
+        if not request.form.get("name") or not request.form.get("discipline") or not request.form.get("date"):
+            return render_template("newtournament.html")
+        name = request.form.get("name")
+        discipline = request.form.get("discipline")
+        date = request.form.get("date")
+
+        cur.execute("""INSERT INTO tournaments (tournament_name, discipline, tournament_date) VALUES (%(name)s, %(discipline)s, %(date)s)""", {'name': name, 'discipline': discipline, 'date': date})
+        conn.commit()
+        return redirect("/")
+    else:
+        return render_template("newtournament.html")
+
+
+@app.route("/tournamentview")
+@login_required
+def tournamentview():
+    if request.args.get("tournament"):
+        sess = request.args.get("tournament")
+        session["selected_season"] = sess
+    elif session["selected_season"]:
+        sess = session["selected_season"]
+    else:
+        redirect("/")
+    cur.execute("""SELECT * FROM tournaments WHERE tournament_id = %(sess)s""", {'sess':sess})
+    rows = cur.fetchall()
+    if len(rows) != 1:
+        return redirect("/")
+    return render_template("tournamentview.html", rows=rows)
+
 
 
 if __name__ == '__main__':
