@@ -12,8 +12,17 @@
         <li><a href="/newcompetitor">Create New Competitor</a></li>
         <li><a href="/newseason">Create New Season</a></li>
         <li><a href="/newtournament">Create New Tournament</a></li>
-        <li><form action="/seasonview" method="get"><label for="selectedseason">Judge a Season:</label><select name="selectedseason" id="selectedseason"><option value="1">1</option><option value="2">2</option></select><input type="submit" value="Go"></form></li>
+
+        <li>Judge a Season
+            <form action="/seasonview" method="get">
+                <select name="season" id="season">
+                    {% for x in rows %}
+                        <option value="{{ x['season_id'] }}">{{ x["season"] }} {{ x["yearof"] }} {{ x["discipline"] }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Begin">
+        </li>
+
         <li>Judge a Tournament</li>
     </ul>
-
 {% endblock %}

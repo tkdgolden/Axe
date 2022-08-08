@@ -44,7 +44,9 @@ def login_required(f):
 def index():
     if session.get("user_id") is None:
         return render_template("index.html")
-    return render_template("judgehome.html")
+    cur.execute("""SELECT * FROM seasons""")
+    rows = cur.fetchall()
+    return render_template("judgehome.html", rows=rows)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -135,11 +137,14 @@ def newseason():
 @app.route("/seasonview")
 @login_required
 def seasonview():
-    session["selected_season"] = request.form.get("selectedseason")
-    if session.get("selected_season") is None:
-        return render_template("/")
-    else:
-        return render_template("seasonview.html")
+    sess = request.args.get("season")
+    session["selected_season"] = sess
+    cur.execute("""SELECT * FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
+    rows = cur.fetchall()
+    if len(rows) != 1:
+        return redirect("/")
+    return render_template("seasonview.html", rows=rows)
+
 
 @app.route("/leaveseason")
 @login_required
