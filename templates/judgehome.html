@@ -21,16 +21,18 @@
                     {% endfor %}
                 </select>
                 <input type="submit" value="Begin">
+            </form>
         </li>
 
         <li>Judge a Tournament
             <form action="/tournamentview" method="get">
                 <select name="tournament" id="tournament">
                     {% for y in cols %}
-                        <option value="{{ x['tournament_id'] }}">{{ y["tournament_name"] }} {{ y["discipline"] }} tournament on {{ y["tournament_date"] }}</option>
+                        <option value="{{ y['tournament_id'] }}">{{ y["tournament_name"] }} {{ y["discipline"] }} tournament on {{ y["tournament_date"] }}</option>
                     {% endfor %}
                 </select>
                 <input type="submit" value="Begin">
+            </form>
         </li>
     </ul>
 {% endblock %}

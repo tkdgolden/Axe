@@ -182,10 +182,10 @@ def tournamentview():
     else:
         redirect("/")
     cur.execute("""SELECT * FROM tournaments WHERE tournament_id = %(sess)s""", {'sess':sess})
-    rows = cur.fetchall()
-    if len(rows) != 1:
+    cols = cur.fetchall()
+    if len(cols) != 1:
         return redirect("/")
-    return render_template("tournamentview.html", rows=rows)
+    return render_template("tournamentview.html", cols=cols)
 
 
 
