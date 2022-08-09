@@ -3,7 +3,30 @@
 {% block body %}
     <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
     <p>You are judging the {{ cols[0]["tournament_name"] }} {{ cols[0]["discipline"] }} tournament on {{ cols[0]["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
-
+    <h2>Suggested Matches</h2>
+    <h2>All Competitors</h2>
+        <table>
+            <head>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                </tr>
+            </head>
+            <tbody>
+                {% for x in players %}
+                <tr>
+                    <td>
+                        {{ x["competitor_first_name"] }}
+                    </td>
+                    <td>
+                        {{ x["competitor_last_name"] }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
+
+    <p><a href="/">Back to Judge Home</a></p>
 
 {% endblock %}

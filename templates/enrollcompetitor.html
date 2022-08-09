@@ -3,12 +3,12 @@
 {% block body %}
 <p>You are logged in as {{ session.name }}.</p>
 
-    <h1>Create a new Competitor:</h1>
+    <h1>Add a new Competitor to the {{ result }}.</h1>
 
-    <form action="/newcompetitor" method="post">
+    <form action="/enrollcompetitor" method="post">
         <input autocomplete="off" autofocus name="firstname" placeholder="First Name" type="text">
         <input autocomplete="off" name="lastname" placeholder="Last Name" type="text">
-        <input type="submit" value="Create">
+        <input type="submit" value="Add">
     </form>
 
     <p><a href="/">Back to Judge Home</a></p>
