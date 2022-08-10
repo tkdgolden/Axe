@@ -1,8 +1,12 @@
+<!--Form that asks for a competitor's first and last name.  Competitor must already exist.-->
 {% extends "layout.html" %}
 
 {% block body %}
+
+<!--Judge name:-->
 <p>You are logged in as {{ session.name }}.</p>
 
+    <!--Season or Tournament name:-->
     <h1>Add a new Competitor to the {{ result }}.</h1>
 
     <form action="/enrollcompetitor" method="post">
@@ -13,4 +17,5 @@
 
     <p><a href="/">Back to Judge Home</a></p>
 
+    <p><a href="{{ returnlink }}">Back to {{ result }}</a></p>
 {% endblock %}
