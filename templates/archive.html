@@ -1,0 +1,28 @@
+<!--Page to access older seasons and tournaments-->
+{% extends "layout.html" %}
+
+{% block body %}
+<p>You are logged in as {{ session.name }}.</p>
+
+    <h2>Archived Seasons:</h2>
+        <form action="/seasonview" method="get">
+            <select name="season" id="season">
+                {% for x in seasonarchive %}
+                    <option value="{{ x['season_id'] }}">{{ x["season"] }} {{ x["yearof"] }} {{ x["discipline"] }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Begin">
+        </form>
+
+    <h2>Archived Tournaments</h2>
+        <form action="/tournamentview" method="get">
+            <select name="tournament" id="tournament">
+                {% for y in tournamentarchive %}
+                    <option value="{{ y['tournament_id'] }}">{{ y["tournament_name"] }} {{ y["discipline"] }} tournament on {{ y["tournament_date"] }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Begin">
+        </form>
+    <p><a href="/">Back to Judge Home</a></p>
+
+{% endblock %}

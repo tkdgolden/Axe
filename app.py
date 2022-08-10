@@ -12,6 +12,10 @@ from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 # to create my own login_required wrap function
 from functools import wraps
+# to get today's date
+from datetime import date
+# to calculate date differences
+import datetime
 
 
 #initiate app
@@ -60,6 +64,8 @@ def login_required(f):
 # index page if not logged in, judgehome if they are
 @app.route("/")
 def index():
+    # clears from any season or tournament being selected
+    session["selected_season"] = None
 
     # not logged in:
     if session.get("user_id") is None:
@@ -67,14 +73,28 @@ def index():
 
     # logged in:
     # loads seasons and tournaments for dropdowns in judge home page
-    # TODO!!! Filter out seasons and tournaments that are finished
+    # Filter out seasons and tournaments that are finished
     cur.execute("""SELECT * FROM seasons""")
     rows = cur.fetchall()
+    today = date.today()
+    seasonarchive = []
+    for each in rows:
+        enddate = each["startdate"] + datetime.timedelta(days=70)
+        if (enddate < today):
+            seasonarchive.append(each)
+    for each in seasonarchive:
+        rows.remove(each)
     cur.execute("""SELECT * FROM tournaments""")
     cols = cur.fetchall()
+    tournamentarchive = []
+    for each in cols:
+        enddate = each["tournament_date"]  + datetime.timedelta(days=1)
+        if (enddate < today):
+            tournamentarchive.append(each)
+    for each in tournamentarchive:
+        cols.remove(each)
 
-    # clears from any season or tournament being selected
-    session["selected_season"] = None
+    # sends available season and tournament info to page to be displayed
     return render_template("judgehome.html", rows=rows, cols=cols)
 
 
@@ -186,8 +206,6 @@ def newcompetitor():
 @app.route("/newseason", methods=["GET", "POST"])
 @login_required
 def newseason():
-
-    # TODO!!! Edit table in database to include season end date
 
     # after form submission
     if request.method == "POST":
@@ -370,3 +388,30 @@ def enrollcompetitor():
 
     # the form:
     return render_template("enrollcompetitor.html", result=result, returnlink=returnlink)
+
+
+# archive page to access expired seasons and tournaments
+@app.route("/archive")
+@login_required
+def archive():
+
+    # loads archived seasons and tournaments
+    cur.execute("""SELECT * FROM seasons""")
+    rows = cur.fetchall()
+    today = date.today()
+    seasonarchive = []
+    for each in rows:
+        enddate = each["startdate"] + datetime.timedelta(days=70)
+        if (enddate < today):
+            seasonarchive.append(each)
+    cur.execute("""SELECT * FROM tournaments""")
+    cols = cur.fetchall()
+    tournamentarchive = []
+    for each in cols:
+        enddate = each["tournament_date"] + datetime.timedelta(days=1)
+        if (enddate < today):
+            tournamentarchive.append(each)
+
+     # sends available season and tournament info to page to be displayed
+    return render_template("archive.html", seasonarchive=seasonarchive, tournamentarchive=tournamentarchive)
+
