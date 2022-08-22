@@ -1,0 +1,273 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        options = ["Top", "Left", "Right", "Bottom"];
+        usedNumbers = [];
+        for (let i = 0; i < 4; i++) {
+            do {
+                randomNumber = Math.floor(Math.random() * 4);
+            } while (usedNumbers.includes(randomNumber));
+            usedNumbers.push(randomNumber);
+        }
+        document.getElementById("t1").innerHTML = (options[usedNumbers[0]]);
+        document.getElementById("t2").innerHTML = (options[usedNumbers[1]]);
+        document.getElementById("t3").innerHTML = (options[usedNumbers[2]]);
+        document.getElementById("t4").innerHTML = (options[usedNumbers[3]]);
+        usedNumbers = [];
+        for (let i = 0; i < 4; i++) {
+            do {
+                randomNumber = Math.floor(Math.random() * 4);
+            } while (usedNumbers.includes(randomNumber));
+            usedNumbers.push(randomNumber);
+        }
+        document.getElementById("t5").innerHTML = (options[usedNumbers[0]]);
+        document.getElementById("t6").innerHTML = (options[usedNumbers[1]]);
+        document.getElementById("t7").innerHTML = (options[usedNumbers[2]]);
+        document.getElementById("t8").innerHTML = (options[usedNumbers[3]]);
+    }, false);
+
+    function ShowRound(elem)
+    {
+        if (elem != "t1") {
+            if (document.getElementById(elem).parentNode.parentNode.previousElementSibling.lastElementChild.lastElementChild.value == "" || document.getElementById(elem).parentNode.parentNode.previousElementSibling.lastElementChild.previousElementSibling.lastElementChild.value == "")
+            {
+                alert("Score previous round to move on!");
+                return false;
+            }
+        }
+        document.getElementById(elem).setAttribute('style', 'display:inline');
+        document.getElementById(elem).previousElementSibling.setAttribute('style', 'display:none');
+        document.getElementById(elem).parentNode.nextElementSibling.firstElementChild.removeAttribute('disabled');
+        document.getElementById(elem).parentNode.nextElementSibling.nextElementSibling.firstElementChild.removeAttribute('disabled');
+    }
+</script>
+
+
+{% extends "layout.html" %}
+
+{% block body %}
+    <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
+    <h2>Score a Match</h2>
+        <h3>{{ array_competitors[0][0]["competitor_first_name"] }} {{ array_competitors[0][0]["competitor_last_name"] }} Versus {{ array_competitors[1][0]["competitor_first_name"] }} {{ array_competitors[1][0]["competitor_last_name"] }}</h3>
+    <p><a href="/seasonview">Return to Season View</a></p>
+    <form action="/scorematch" method="POST">
+        <table>
+            <colgroup>
+                <col span="2" style="background-color: beige">
+                <col span="2" style="background-color: cyan">
+            </colgroup>
+            <head>
+                <th></th><th></th>
+                <th>
+                    {{ array_competitors[0][0]["competitor_first_name"] }} {{ array_competitors[0][0]["competitor_last_name"] }}
+                </th>
+                <th>
+                    {{ array_competitors[1][0]["competitor_first_name"] }} {{ array_competitors[1][0]["competitor_last_name"] }}
+                </th>
+            </head>
+            <tbody>
+                <tr>
+                    <td>
+                        Throw 1:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t1');">Begin</button>
+                        <p id="t1" style="display:none"></p>
+                    </td>
+                    <td>
+                        <select name="p1t1" id="p1t1" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="p2t1" id="p2t1" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Throw 2:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t2');">Begin</button>
+                        <p id="t2" style="display:none"></p>
+                    </td>
+                    <td>
+                        <select name="p1t2" id="p1t2" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="p2t2" id="p2t2" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Throw 3:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t3');">Begin</button>
+                        <p id="t3" style="display:none"></p>
+                    </td>
+                    <td>
+                        <select name="p1t3" id="p1t3" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="p2t3" id="p2t3" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Throw 4:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t4');">Begin</button>
+                        <p id="t4" style="display:none"></p>
+                    </td>
+                    <td>
+                        <select name="p1t4" id="p1t4" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="p2t4" id="p2t4" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Throw 5:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t5');">Begin</button>
+                        <p id="t5" style="display:none"></p>
+                    </td>
+                    <td>
+                        <select name="p1t5" id="p1t5" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="p2t5" id="p2t5" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Throw 6:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t6');">Begin</button>
+                        <p id="t6" style="display:none"></p>
+                    </td>
+                    <td>
+                        <select name="p1t6" id="p1t6" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="p2t6" id="p2t6" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Throw 7:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t7');">Begin</button>
+                        <p id="t7" style="display:none"></p>
+                    </td>
+                    <td>
+                        <select name="p1t7" id="p1t7" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="p2t7" id="p2t7" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Throw 8:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t8');">Begin</button>
+                        <p id="t8" style="display:none"></p>
+                    </td>
+                    <td>
+                        <select name="p1t8" id="p1t8" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="p2t8" id="p2t8" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <input type="Submit" value="Submit Match Scores">
+    </form>
+{% endblock %}
+

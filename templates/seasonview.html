@@ -1,4 +1,47 @@
 <!--Page displaying a judge's options within a season (enroll competitor, start match, view players, recent matches)-->
+<script>
+    function NoMoreThanTwo()
+    {
+        var checkboxes = document.getElementsByName("competitor_selection");
+        var numberOfCheckedItems = 0;
+        for(var i = 0; i < checkboxes.length; i++)
+        {
+            if(checkboxes[i].checked)
+            {
+                numberOfCheckedItems++;
+            }
+        }
+        if(numberOfCheckedItems > 2)
+        {
+            alert("You can't select more than two competitors!");
+            return false;
+        }
+    }
+
+    function NoLessThanTwo()
+    {
+        var checkboxes = document.getElementsByName("competitor_selection");
+        var numberOfCheckedItems = 0;
+        for(var i = 0; i < checkboxes.length; i++)
+        {
+            if(checkboxes[i].checked)
+            {
+                numberOfCheckedItems++;
+            }
+        }
+        if(numberOfCheckedItems != 2){
+            alert("You must select two competitors.");
+            return false;
+        }
+    }
+</script>
+
+<style>
+    input[type="checkbox"]:checked + label {
+        background: brown;
+    }
+</style>
+
 {% extends "layout.html" %}
 
 {% block body %}
@@ -6,26 +49,28 @@
     <p>You are judging the {{ rows[0]["season"] }} {{ rows[0]["yearof"] }} {{ rows[0]["discipline"] }} season.     <a href="/">Leave Season/ Back to Judge Homepage</a></p>
     <h2>Suggested Matches</h2>
     <h2>All Competitors</h2>
-        <table>
-            <head>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                </tr>
-            </head>
-            <tbody>
-                {% for x in players %}
-                <tr>
-                    <td>
-                        {{ x["competitor_first_name"] }}
-                    </td>
-                    <td>
-                        {{ x["competitor_last_name"] }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <form method="get" action="/scorematch" onsubmit="return NoLessThanTwo();">
+            <table>
+                <head>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                    </tr>
+                </head>
+                <tbody>
+                    {% for x in players %}
+                    <tr>
+                        <td>
+                            <input style="visibility:hidden" type="checkbox" onclick="return NoMoreThanTwo();" name="competitor_selection" value="{{ x['competitor_id'] }}" id="{{ x['competitor_id'] }}">
+                            <label for="{{ x['competitor_id'] }}">{{ x["competitor_first_name"], x["competitor_last_name"] }}</label>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="submit" value="Score Match">
+        </form>
     <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
 
 {% endblock %}
+

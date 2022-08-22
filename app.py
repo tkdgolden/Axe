@@ -46,6 +46,9 @@ except:
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
+possible_scores = [0,1,2,3,4,6,7]
+
+
 # function to output error message and send the user back to what they were attempting so they can try again
 def errorpage(message, sendto):
     return render_template("errorpage.html", message=message, sendto=sendto)
@@ -256,11 +259,27 @@ def seasonview():
         return errorpage(sendto="/", message="You must select a valid season.")
 
     # get competitor info from database
-    cur.execute("""SELECT competitor_first_name, competitor_last_name FROM competitors JOIN enrollment ON competitors.competitor_id = enrollment.competitor_id WHERE season_id = %(sess)s""", {'sess':sess})
+    cur.execute("""SELECT * FROM competitors JOIN enrollment ON competitors.competitor_id = enrollment.competitor_id WHERE season_id = %(sess)s""", {'sess':sess})
     players = cur.fetchall()
 
     # send that info on to the page to be displayed
     return render_template("seasonview.html", rows=rows, players=players)
+
+
+@app.route("/scorematch", methods=["GET", "POST"])
+@login_required
+def scorematch():
+    if request.method == "POST":
+        return render_template("index.html")
+    else:
+        array_competitor_ids = request.args.getlist("competitor_selection")
+        print(array_competitor_ids)
+        array_competitors = []
+        for each in array_competitor_ids:
+            cur.execute("""SELECT * FROM competitors WHERE competitor_id = %(each)s""", {'each':each})
+            array_competitors.append(cur.fetchall())
+        print(array_competitors)
+        return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
 
 
 # form and validation for creating a new tournament
