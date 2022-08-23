@@ -46,7 +46,7 @@ except:
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
-possible_scores = [0,1,2,3,4,6,7]
+possible_scores = [0,1,2,3,6]
 
 
 # function to output error message and send the user back to what they were attempting so they can try again
@@ -273,12 +273,10 @@ def scorematch():
         return render_template("index.html")
     else:
         array_competitor_ids = request.args.getlist("competitor_selection")
-        print(array_competitor_ids)
         array_competitors = []
         for each in array_competitor_ids:
             cur.execute("""SELECT * FROM competitors WHERE competitor_id = %(each)s""", {'each':each})
             array_competitors.append(cur.fetchall())
-        print(array_competitors)
         return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
 
 

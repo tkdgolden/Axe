@@ -23,6 +23,50 @@
         document.getElementById("t6").innerHTML = (options[usedNumbers[1]]);
         document.getElementById("t7").innerHTML = (options[usedNumbers[2]]);
         document.getElementById("t8").innerHTML = (options[usedNumbers[3]]);
+
+        function calculateScores(){
+            p1sum = 0;
+            for (item of p1dropdowns){
+                if(item.value){
+                    p1sum += parseInt(item.value);
+                }
+            }
+            for (item of p1radios){
+                if(item.checked){
+                    p1sum += 1;
+                }
+            }
+            document.getElementById("p1score").innerHTML = p1sum;
+            p2sum = 0;
+            for (item of p2dropdowns){
+                if(item.value){
+                    p2sum += parseInt(item.value);
+                }
+            }
+            for (item of p2radios){
+                if(item.checked){
+                    p2sum += 1;
+                }
+            }
+            document.getElementById("p2score").innerHTML = p2sum;
+        }
+
+        p1dropdowns = document.getElementsByClassName('1');
+        p2dropdowns = document.getElementsByClassName('2');
+        p1radios = document.getElementsByClassName("1q");
+        p2radios = document.getElementsByClassName("2q");
+        radios = document.querySelectorAll('input[type=radio');
+        for (item of p1dropdowns){
+            item.onchange = calculateScores;
+        }
+        for (item of p2dropdowns){
+            item.onchange = calculateScores;
+        }
+        for (item of radios){
+            item.onchange = calculateScores;
+        }
+        
+
     }, false);
 
     function ShowRound(elem)
@@ -39,6 +83,10 @@
         document.getElementById(elem).parentNode.nextElementSibling.firstElementChild.removeAttribute('disabled');
         document.getElementById(elem).parentNode.nextElementSibling.nextElementSibling.firstElementChild.removeAttribute('disabled');
     }
+
+
+
+
 </script>
 
 
@@ -52,14 +100,15 @@
     <form action="/scorematch" method="POST">
         <table>
             <colgroup>
-                <col span="2" style="background-color: beige">
-                <col span="2" style="background-color: cyan">
+                <col span="1" style="background-color: red">
+                <col span="3" style="background-color: beige">
+                <col span="1" style="background-color: blue">
             </colgroup>
             <head>
-                <th></th><th></th>
                 <th>
                     {{ array_competitors[0][0]["competitor_first_name"] }} {{ array_competitors[0][0]["competitor_last_name"] }}
                 </th>
+                <th id="p1score">0</th><th></th><th id="p2score">0</th>
                 <th>
                     {{ array_competitors[1][0]["competitor_first_name"] }} {{ array_competitors[1][0]["competitor_last_name"] }}
                 </th>
@@ -67,14 +116,7 @@
             <tbody>
                 <tr>
                     <td>
-                        Throw 1:
-                    </td>
-                    <td>
-                        <button type="button" onclick="return ShowRound('t1');">Begin</button>
-                        <p id="t1" style="display:none"></p>
-                    </td>
-                    <td>
-                        <select name="p1t1" id="p1t1" required>
+                        <select name="p1t1" id="p1t1" class="1" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -82,7 +124,19 @@
                         </select>
                     </td>
                     <td>
-                        <select name="p2t1" id="p2t1" required>
+                        Throw 1:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t1')">Begin</button>
+                        <p id="t1" style="display:none"></p>
+                    </td>
+                    <td>
+                        <input type="radio" name="q1" class="1q" value="p1q1" style="accent-color:red">
+                        <input type="radio" name="q1" value="" style="accent-color:black">
+                        <input type="radio" name="q1" class="2q" value="p2q1" style="accent-color:blue">
+                    </td>
+                    <td>
+                        <select name="p2t1" id="p2t1" class="2" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -91,23 +145,28 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        <select name="p1t2" id="p1t2" class="1" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
                     <td>
                         Throw 2:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t2');">Begin</button>
+                        <button type="button" onclick="return ShowRound('t2')">Begin</button>
                         <p id="t2" style="display:none"></p>
                     </td>
                     <td>
-                        <select name="p1t2" id="p1t2" required>
-                            <option value="" disabled selected>Score</option>
-                            {% for i in possible_scores %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="radio" name="q2" class="1q" value="p1q2" style="accent-color:red">
+                        <input type="radio" name="q2" value="" style="accent-color:black">
+                        <input type="radio" name="q2" class="2q" value="p2q2" style="accent-color:blue">
                     </td>
                     <td>
-                        <select name="p2t2" id="p2t2" required>
+                        <select name="p2t2" id="p2t2" class="2" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -116,23 +175,28 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        <select name="p1t3" id="p1t3" class="1" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
                     <td>
                         Throw 3:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t3');">Begin</button>
+                        <button type="button" onclick="return ShowRound('t3')">Begin</button>
                         <p id="t3" style="display:none"></p>
                     </td>
                     <td>
-                        <select name="p1t3" id="p1t3" required>
-                            <option value="" disabled selected>Score</option>
-                            {% for i in possible_scores %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="radio" name="q3" class="1q" value="p1q3" style="accent-color:red">
+                        <input type="radio" name="q3" value="" style="accent-color:black">
+                        <input type="radio" name="q3" class="2q" value="p2q3" style="accent-color:blue">
                     </td>
                     <td>
-                        <select name="p2t3" id="p2t3" required>
+                        <select name="p2t3" id="p2t3" class="2" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -141,23 +205,28 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        <select name="p1t4" id="p1t4" class="1" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
                     <td>
                         Throw 4:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t4');">Begin</button>
+                        <button type="button" onclick="return ShowRound('t4')">Begin</button>
                         <p id="t4" style="display:none"></p>
                     </td>
                     <td>
-                        <select name="p1t4" id="p1t4" required>
-                            <option value="" disabled selected>Score</option>
-                            {% for i in possible_scores %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="radio" name="q4" class="1q" value="p1q4" style="accent-color:red">
+                        <input type="radio" name="q4" value="" style="accent-color:black">
+                        <input type="radio" name="q4" class="2q" value="p2q4" style="accent-color:blue">
                     </td>
                     <td>
-                        <select name="p2t4" id="p2t4" required>
+                        <select name="p2t4" id="p2t4" class="2" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -166,23 +235,28 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        <select name="p1t5" id="p1t5" class="1" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
                     <td>
                         Throw 5:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t5');">Begin</button>
+                        <button type="button" onclick="return ShowRound('t5')">Begin</button>
                         <p id="t5" style="display:none"></p>
                     </td>
                     <td>
-                        <select name="p1t5" id="p1t5" required>
-                            <option value="" disabled selected>Score</option>
-                            {% for i in possible_scores %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="radio" name="q5" class="1q" value="p1q5" style="accent-color:red">
+                        <input type="radio" name="q5" value="" style="accent-color:black">
+                        <input type="radio" name="q5" class="2q" value="p2q5" style="accent-color:blue">
                     </td>
                     <td>
-                        <select name="p2t5" id="p2t5" required>
+                        <select name="p2t5" id="p2t5" class="2" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -191,23 +265,28 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        <select name="p1t6" id="p1t6" class="1" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
                     <td>
                         Throw 6:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t6');">Begin</button>
+                        <button type="button" onclick="return ShowRound('t6')">Begin</button>
                         <p id="t6" style="display:none"></p>
                     </td>
                     <td>
-                        <select name="p1t6" id="p1t6" required>
-                            <option value="" disabled selected>Score</option>
-                            {% for i in possible_scores %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="radio" name="q6" class="1q" value="p1q6" style="accent-color:red">
+                        <input type="radio" name="q6" value="" style="accent-color:black">
+                        <input type="radio" name="q6" class="2q" value="p2q6" style="accent-color:blue">
                     </td>
                     <td>
-                        <select name="p2t6" id="p2t6" required>
+                        <select name="p2t6" id="p2t6" class="2" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -216,23 +295,28 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        <select name="p1t7" id="p1t7" class="1" required>
+                            <option value="" disabled selected>Score</option>
+                            {% for i in possible_scores %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
                     <td>
                         Throw 7:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t7');">Begin</button>
+                        <button type="button" onclick="return ShowRound('t7')">Begin</button>
                         <p id="t7" style="display:none"></p>
                     </td>
                     <td>
-                        <select name="p1t7" id="p1t7" required>
-                            <option value="" disabled selected>Score</option>
-                            {% for i in possible_scores %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="radio" name="q7" class="1q" value="p1q7" style="accent-color:red">
+                        <input type="radio" name="q7" value="" style="accent-color:black">
+                        <input type="radio" name="q7" class="2q" value="p2q7" style="accent-color:blue">
                     </td>
                     <td>
-                        <select name="p2t7" id="p2t7" required>
+                        <select name="p2t7" id="p2t7" class="2" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -242,14 +326,7 @@
                 </tr>
                 <tr>
                     <td>
-                        Throw 8:
-                    </td>
-                    <td>
-                        <button type="button" onclick="return ShowRound('t8');">Begin</button>
-                        <p id="t8" style="display:none"></p>
-                    </td>
-                    <td>
-                        <select name="p1t8" id="p1t8" required>
+                        <select name="p1t8" id="p1t8" class="1" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -257,7 +334,19 @@
                         </select>
                     </td>
                     <td>
-                        <select name="p2t8" id="p2t8" required>
+                        Throw 8:
+                    </td>
+                    <td>
+                        <button type="button" onclick="return ShowRound('t8')">Begin</button>
+                        <p id="t8" style="display:none"></p>
+                    </td>
+                    <td>
+                        <input type="radio" name="q8" class="1q" value="p1q8" style="accent-color:red">
+                        <input type="radio" name="q8" value="" style="accent-color:black">
+                        <input type="radio" name="q8" class="2q" value="p2q8" style="accent-color:blue">
+                    </td>
+                    <td>
+                        <select name="p2t8" id="p2t8" class="2" required>
                             <option value="" disabled selected>Score</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
