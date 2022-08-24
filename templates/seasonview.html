@@ -1,5 +1,34 @@
 <!--Page displaying a judge's options within a season (enroll competitor, start match, view players, recent matches)-->
+
 <script>
+    player_match_count = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        logged_matches = '{{ logged_matches }}';
+        console.log(logged_matches);
+        array_matches = document.getElementsByClassName("matches");
+        for (each of logged_matches){
+            if (each.player_1_id in player_match_count){
+                i = player_match_count.indexOf(each.player_1_id);
+                count = parseInt(player_match_count[i][1]);
+                count += 1;
+                player_match_count[i][1] = count;
+            }
+            else {
+                player_match_count.push([each.player_1_id, 1]);
+            }
+            if (each.player_2_id in player_match_count){
+                i = player_match_count.indexOf(each.player_2_id);
+                count = parseInt(player_match_count[i][1]);
+                count += 1;
+                player_match_count[i][1] = count;
+            }
+            else {
+                player_match_count.push([each.player_2_id, 1]);
+            }
+        }  
+    })
+
     function NoMoreThanTwo()
     {
         var checkboxes = document.getElementsByName("competitor_selection");
@@ -53,16 +82,18 @@
             <table>
                 <head>
                     <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
+                        <th>Name</th>
+                        <th>Matches Played</th>
                     </tr>
                 </head>
                 <tbody>
                     {% for x in players %}
                     <tr>
                         <td>
-                            <input style="visibility:hidden" type="checkbox" onclick="return NoMoreThanTwo();" name="competitor_selection" value="{{ x['competitor_id'] }}" id="{{ x['competitor_id'] }}">
-                            <label for="{{ x['competitor_id'] }}">{{ x["competitor_first_name"], x["competitor_last_name"] }}</label>
+                            <input style="visibility:hidden" type="checkbox" onclick="return NoMoreThanTwo();" name="competitor_selection" value="{{ x['competitor_id'] }}" id="{{ x['competitor_id'] }}name">
+                            <label for="{{ x['competitor_id'] }}name">{{ x["competitor_first_name"] }} {{ x["competitor_last_name"] }}</label>
+                        </td>
+                        <td id="{{ x['competitor_id'] }}matches" class="matches">
                         </td>
                     </tr>
                     {% endfor %}

@@ -12,6 +12,7 @@
         document.getElementById("t2").innerHTML = (options[usedNumbers[1]]);
         document.getElementById("t3").innerHTML = (options[usedNumbers[2]]);
         document.getElementById("t4").innerHTML = (options[usedNumbers[3]]);
+        sequence = [options[usedNumbers[0]], (options[usedNumbers[1]]), (options[usedNumbers[2]]), (options[usedNumbers[3]])];
         usedNumbers = [];
         for (let i = 0; i < 4; i++) {
             do {
@@ -23,12 +24,28 @@
         document.getElementById("t6").innerHTML = (options[usedNumbers[1]]);
         document.getElementById("t7").innerHTML = (options[usedNumbers[2]]);
         document.getElementById("t8").innerHTML = (options[usedNumbers[3]]);
+        sequence.push([options[usedNumbers[0]], (options[usedNumbers[1]]), (options[usedNumbers[2]]), (options[usedNumbers[3]])]);
+        document.getElementById("sequence").value = sequence;
+        console.log(document.getElementById("sequence").value);
 
         function calculateScores(){
             p1sum = 0;
             for (item of p1dropdowns){
                 if(item.value){
-                    p1sum += parseInt(item.value);
+                    if(!isNaN(item.value)){
+                        p1sum += parseInt(item.value);
+                        here = item.parentNode.parentNode.getElementsByClassName('1q');
+                        for (each of here){
+                            each.removeAttribute('disabled');
+                        }
+                    }
+                    else{
+                        here = item.parentNode.parentNode.getElementsByClassName('1q');
+                        for (each of here){
+                            each.checked = false;
+                            each.setAttribute('disabled', true);
+                        }
+                    }
                 }
             }
             for (item of p1radios){
@@ -40,7 +57,20 @@
             p2sum = 0;
             for (item of p2dropdowns){
                 if(item.value){
-                    p2sum += parseInt(item.value);
+                    if(!isNaN(item.value)){
+                        p2sum += parseInt(item.value);
+                        here = item.parentNode.parentNode.getElementsByClassName('2q');
+                        for (each of here){
+                            each.removeAttribute('disabled');
+                        }
+                    }
+                    else{
+                        here = item.parentNode.parentNode.getElementsByClassName('2q');
+                        for (each of here){
+                            each.checked = false;
+                            each.setAttribute('disabled', true);
+                        }
+                    }
                 }
             }
             for (item of p2radios){
@@ -55,7 +85,7 @@
         p2dropdowns = document.getElementsByClassName('2');
         p1radios = document.getElementsByClassName("1q");
         p2radios = document.getElementsByClassName("2q");
-        radios = document.querySelectorAll('input[type=radio');
+        radios = document.querySelectorAll('input[type=radio]');
         for (item of p1dropdowns){
             item.onchange = calculateScores;
         }
@@ -84,7 +114,21 @@
         document.getElementById(elem).parentNode.nextElementSibling.nextElementSibling.firstElementChild.removeAttribute('disabled');
     }
 
-
+    function CheckTie(){
+        console.log("here");
+        p1score = document.getElementById("p1score").innerHTML;
+        p2score = document.getElementById("p2score").innerHTML;
+        if (p1score == p2score){
+            document.getElementById("winner").removeAttribute("hidden");
+            event.preventDefault();
+        }
+        if (document.getElementById("winner").value){
+            forms = document.getElementsByTagName('form');
+            for (each of forms){
+                each.submit();
+            }
+        }
+    }
 
 
 </script>
@@ -97,7 +141,8 @@
     <h2>Score a Match</h2>
         <h3>{{ array_competitors[0][0]["competitor_first_name"] }} {{ array_competitors[0][0]["competitor_last_name"] }} Versus {{ array_competitors[1][0]["competitor_first_name"] }} {{ array_competitors[1][0]["competitor_last_name"] }}</h3>
     <p><a href="/seasonview">Return to Season View</a></p>
-    <form action="/scorematch" method="POST">
+    <form action="/scorematch" method="POST" onsubmit="CheckTie()">
+        <input type="hidden" id="sequence" name="sequence">
         <table>
             <colgroup>
                 <col span="1" style="background-color: red">
@@ -118,6 +163,8 @@
                     <td>
                         <select name="p1t1" id="p1t1" class="1" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -131,13 +178,15 @@
                         <p id="t1" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q1" class="1q" value="p1q1" style="accent-color:red">
+                        <input type="radio" name="q1" class="1q" value="p1" style="accent-color:red" disabled>
                         <input type="radio" name="q1" value="" style="accent-color:black">
-                        <input type="radio" name="q1" class="2q" value="p2q1" style="accent-color:blue">
+                        <input type="radio" name="q1" class="2q" value="p2" style="accent-color:blue" disabled>
                     </td>
                     <td>
                         <select name="p2t1" id="p2t1" class="2" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -148,6 +197,8 @@
                     <td>
                         <select name="p1t2" id="p1t2" class="1" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -161,13 +212,15 @@
                         <p id="t2" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q2" class="1q" value="p1q2" style="accent-color:red">
+                        <input type="radio" name="q2" class="1q" value="p1" style="accent-color:red" disabled>
                         <input type="radio" name="q2" value="" style="accent-color:black">
-                        <input type="radio" name="q2" class="2q" value="p2q2" style="accent-color:blue">
+                        <input type="radio" name="q2" class="2q" value="p2" style="accent-color:blue" disabled>
                     </td>
                     <td>
                         <select name="p2t2" id="p2t2" class="2" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -178,6 +231,8 @@
                     <td>
                         <select name="p1t3" id="p1t3" class="1" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -191,13 +246,15 @@
                         <p id="t3" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q3" class="1q" value="p1q3" style="accent-color:red">
+                        <input type="radio" name="q3" class="1q" value="p1" style="accent-color:red" disabled>
                         <input type="radio" name="q3" value="" style="accent-color:black">
-                        <input type="radio" name="q3" class="2q" value="p2q3" style="accent-color:blue">
+                        <input type="radio" name="q3" class="2q" value="p2" style="accent-color:blue" disabled>
                     </td>
                     <td>
                         <select name="p2t3" id="p2t3" class="2" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -208,6 +265,8 @@
                     <td>
                         <select name="p1t4" id="p1t4" class="1" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -221,13 +280,15 @@
                         <p id="t4" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q4" class="1q" value="p1q4" style="accent-color:red">
+                        <input type="radio" name="q4" class="1q" value="p1" style="accent-color:red" disabled>
                         <input type="radio" name="q4" value="" style="accent-color:black">
-                        <input type="radio" name="q4" class="2q" value="p2q4" style="accent-color:blue">
+                        <input type="radio" name="q4" class="2q" value="p2" style="accent-color:blue" disabled>
                     </td>
                     <td>
                         <select name="p2t4" id="p2t4" class="2" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -238,6 +299,8 @@
                     <td>
                         <select name="p1t5" id="p1t5" class="1" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -251,13 +314,15 @@
                         <p id="t5" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q5" class="1q" value="p1q5" style="accent-color:red">
+                        <input type="radio" name="q5" class="1q" value="p1" style="accent-color:red" disabled>
                         <input type="radio" name="q5" value="" style="accent-color:black">
-                        <input type="radio" name="q5" class="2q" value="p2q5" style="accent-color:blue">
+                        <input type="radio" name="q5" class="2q" value="p2" style="accent-color:blue" disabled>
                     </td>
                     <td>
                         <select name="p2t5" id="p2t5" class="2" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -268,6 +333,8 @@
                     <td>
                         <select name="p1t6" id="p1t6" class="1" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -281,13 +348,15 @@
                         <p id="t6" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q6" class="1q" value="p1q6" style="accent-color:red">
+                        <input type="radio" name="q6" class="1q" value="p1" style="accent-color:red" disabled>
                         <input type="radio" name="q6" value="" style="accent-color:black">
-                        <input type="radio" name="q6" class="2q" value="p2q6" style="accent-color:blue">
+                        <input type="radio" name="q6" class="2q" value="p2" style="accent-color:blue" disabled>
                     </td>
                     <td>
                         <select name="p2t6" id="p2t6" class="2" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -298,6 +367,8 @@
                     <td>
                         <select name="p1t7" id="p1t7" class="1" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -311,13 +382,15 @@
                         <p id="t7" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q7" class="1q" value="p1q7" style="accent-color:red">
+                        <input type="radio" name="q7" class="1q" value="p1" style="accent-color:red" disabled>
                         <input type="radio" name="q7" value="" style="accent-color:black">
-                        <input type="radio" name="q7" class="2q" value="p2q7" style="accent-color:blue">
+                        <input type="radio" name="q7" class="2q" value="p2" style="accent-color:blue" disabled>
                     </td>
                     <td>
                         <select name="p2t7" id="p2t7" class="2" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -328,6 +401,8 @@
                     <td>
                         <select name="p1t8" id="p1t8" class="1" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -341,13 +416,15 @@
                         <p id="t8" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q8" class="1q" value="p1q8" style="accent-color:red">
+                        <input type="radio" name="q8" class="1q" value="p1" style="accent-color:red" disabled>
                         <input type="radio" name="q8" value="" style="accent-color:black">
-                        <input type="radio" name="q8" class="2q" value="p2q8" style="accent-color:blue">
+                        <input type="radio" name="q8" class="2q" value="p2" style="accent-color:blue" disabled>
                     </td>
                     <td>
                         <select name="p2t8" id="p2t8" class="2" required>
                             <option value="" disabled selected>Score</option>
+                            <option value="D">Drop</option>
+                            <option value="F">Fault</option>
                             {% for i in possible_scores %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -356,6 +433,11 @@
                 </tr>
             </tbody>
         </table>
+        <select name="winner" id="winner" hidden>
+            <option value="" disabled selected>Winner of the Tie Breaker:</option>
+            <option value="{{ array_competitors[0][0]['competitor_id'] }}">{{ array_competitors[0][0]['competitor_first_name'] }} {{ array_competitors[0][0]['competitor_last_name'] }}</option>
+            <option value="{{ array_competitors[1][0]['competitor_id'] }}">{{ array_competitors[1][0]['competitor_first_name'] }} {{ array_competitors[1][0]['competitor_last_name'] }}</option>
+        </select>
         <input type="Submit" value="Submit Match Scores">
     </form>
 {% endblock %}

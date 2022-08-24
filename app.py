@@ -1,5 +1,7 @@
 # to keep database credentials secure
+from distutils.log import error
 import os
+from sqlite3 import Timestamp
 # to connect to postgresql
 import psycopg2
 # to be able to run sql code in the app
@@ -243,6 +245,8 @@ def newseason():
 @login_required
 def seasonview():
 
+    session["array_competitor_ids"] = None
+
     # get the selected season to be displayed
     if request.args.get("season"):
         sess = request.args.get("season")
@@ -262,19 +266,161 @@ def seasonview():
     cur.execute("""SELECT * FROM competitors JOIN enrollment ON competitors.competitor_id = enrollment.competitor_id WHERE season_id = %(sess)s""", {'sess':sess})
     players = cur.fetchall()
 
+    cur.execute("""SELECT * FROM matches WHERE season_id = %(sess)s""", {'sess':sess})
+    logged_matches = cur.fetchall()
+
+    print(logged_matches)
     # send that info on to the page to be displayed
-    return render_template("seasonview.html", rows=rows, players=players)
+    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches)
 
 
 @app.route("/scorematch", methods=["GET", "POST"])
 @login_required
 def scorematch():
     if request.method == "POST":
-        return render_template("index.html")
+        if not request.form.get("p1t1") or not request.form.get("p2t1") or not request.form.get("p1t2") or not request.form.get("p2t2") or not request.form.get("p1t3") or not request.form.get("p2t3") or not request.form.get("p1t4") or not request.form.get("p2t4") or not request.form.get("p1t5") or not request.form.get("p2t5") or not request.form.get("p1t6") or not request.form.get("p2t6") or not request.form.get("p1t7") or not request.form.get("p2t7") or not request.form.get("p1t8") or not request.form.get("p2t8") or not request.form.get("sequence"):
+            return errorpage(sendto="scorematch", message="THE APOCALYPSE, your match was submitted incompletely, and therefore wasn't saved.")
+        ts = datetime.datetime.now()
+        try:
+            pAtone = int(request.form.get("p1t1"))
+        except ValueError:
+            pAtone = 0
+        try:
+            pBtone = int(request.form.get("p2t1"))
+        except ValueError:
+            pBtone = 0
+        try:
+            pAttwo = int(request.form.get("p1t2"))
+        except ValueError:
+            pAttwo = 0
+        try:
+            pBttwo = int(request.form.get("p2t2"))
+        except ValueError:
+            pBttwo = 0
+        try:
+            pAtthree = int(request.form.get("p1t3"))
+        except ValueError:
+            pAtthree = 0
+        try:
+            pBtthree = int(request.form.get("p2t3"))
+        except ValueError:
+            pBtthree = 0
+        try:
+            pAtfour = int(request.form.get("p1t4"))
+        except ValueError:
+            pAtfour = 0
+        try:
+            pBtfour = int(request.form.get("p2t4"))
+        except ValueError:
+            pBtfour = 0
+        try:
+            pAtfive = int(request.form.get("p1t5"))
+        except ValueError:
+            pAtfive = 0
+        try:
+            pBtfive = int(request.form.get("p2t5"))
+        except ValueError:
+            pBtfive = 0
+        try:
+            pAtsix = int(request.form.get("p1t6"))
+        except ValueError:
+            pAtsix = 0
+        try:
+            pBtsix = int(request.form.get("p2t6"))
+        except ValueError:
+            pBtsix = 0
+        try:
+            pAtseven = int(request.form.get("p1t7"))
+        except ValueError:
+            pAtseven = 0
+        try:
+            pBtseven = int(request.form.get("p2t7"))
+        except ValueError:
+            pBtseven = 0
+        try:
+            pAteight = int(request.form.get("p1t8"))
+        except ValueError:
+            pAteight = 0
+        try:
+            pBteight = int(request.form.get("p2t8"))
+        except ValueError:
+            pBteight = 0
+        q1 = request.form.get("q1")
+        q2 = request.form.get("q2")
+        q3 = request.form.get("q3")
+        q4 = request.form.get("q4")
+        q5 = request.form.get("q5")
+        q6 = request.form.get("q6")
+        q7 = request.form.get("q7")
+        q8 = request.form.get("q8")
+        sequence = request.form.get("sequence")
+
+        qs = [q1, q2, q3, q4, q5, q6, q7, q8]
+        pAqt = 0;
+        pBqt = 0;
+        for each in qs:
+            if each == "p1":
+                pAqt += 1
+            elif each == "p2":
+                pBqt += 1
+        
+        pAtotal = pAtone + pAttwo + pAtthree + pAtfour + pAtfive + pAtsix + pAtseven + pAteight + pAqt
+        pBtotal = pBtone + pBttwo + pBtthree + pBtfour + pBtfive + pBtsix + pBtseven + pBteight + pBqt
+        winner = ""
+        if pAtotal > pBtotal:
+            winner = session["array_competitor_ids"][0]
+        elif pAtotal < pBtotal:
+            winner = session["array_competitor_ids"][1]
+        else:
+            if not request.form.get("winner"):
+                return errorpage(message="No Tiebreaker selected, scores NOT recoreded.", sendto="seasonview")
+            winner = request.form.get("winner")
+
+        playerA = session["array_competitor_ids"][0]
+        playerB = session["array_competitor_ids"][1]
+        if winner == playerA:
+            pAwin = True
+            pBwin = False
+        else:
+            pBwin = True
+            pAwin = False
+        sess = session["selected_season"]
+        judge = session["user_id"]
+        cur.execute("""SELECT tournament_id, discipline FROM tournaments WHERE tournament_id = %(sess)s""", {'sess':sess})
+        cols = cur.fetchall()
+        if len(cols) == 0:
+            t = None
+            s = sess
+            cur.execute("""SELECT discipline FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
+            dis = cur.fetchall()
+            discipline = dis[0]["discipline"]
+        else:
+            t = sess
+            s = None
+            discipline = cols[0]["discipline"]
+
+        try:
+            cur.execute("""INSERT INTO matches (player_1_id, player_2_id, season_id, tournament_id, winner_id, player1total, player2total, discipline, judge_id, dt) VALUES (%(playerA)s, %(playerB)s, %(s)s, %(t)s, %(winner)s, %(pAtotal)s, %(pBtotal)s, %(discipline)s, %(judge)s, %(ts)s) RETURNING match_id""", {'playerA': playerA, 'playerB': playerB, 's': s, 't': t, 'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts})
+            m = cur.fetchall()
+            conn.commit()
+            mid = m[0][0]
+            print(mid)
+            print("match created")
+            cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerA)s, %(mid)s, %(pAqt)s, %(sequence)s, %(pAtone)s, %(pAttwo)s, %(pAtthree)s, %(pAtfour)s, %(pAtfive)s, %(pAtsix)s, %(pAtseven)s, %(pAteight)s, %(pAtotal)s, %(pAwin)s)""", {'playerA': playerA, 'mid': mid, 'pAqt': pAqt, 'sequence': sequence, 'pAtone': pAtone, 'pAttwo': pAttwo, 'pAtthree': pAtthree, 'pAtfour': pAtfour, 'pAtfive': pAtfive, 'pAtsix': pAtsix, 'pAtseven': pAtseven, 'pAteight': pAteight, 'pAtotal': pAtotal, 'pAwin': pAwin})
+            conn.commit()
+            print("player1score created")
+            cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerB)s, %(mid)s, %(pBqt)s, %(sequence)s, %(pBtone)s, %(pBttwo)s, %(pBtthree)s, %(pBtfour)s, %(pBtfive)s, %(pBtsix)s, %(pBtseven)s, %(pBteight)s, %(pBtotal)s, %(pBwin)s)""", {'playerB': playerB, 'mid': mid, 'pBqt': pBqt, 'sequence': sequence, 'pBtone': pBtone, 'pBttwo': pBttwo, 'pBtthree': pBtthree, 'pBtfour': pBtfour, 'pBtfive': pBtfive, 'pBtsix': pBtsix, 'pBtseven': pBtseven, 'pBteight': pBteight, 'pBtotal': pBtotal, 'pBwin': pBwin})
+            conn.commit()
+            print("player2score created")
+        except:
+            return errorpage(message="DATABASE INSERT FAILED, SCORES NOT RECORDED", sendto="seasonview")
+
+        session["array_competitor_ids"] = None
+        return redirect("/")
     else:
-        array_competitor_ids = request.args.getlist("competitor_selection")
+        session["array_competitor_ids"] = request.args.getlist("competitor_selection")
         array_competitors = []
-        for each in array_competitor_ids:
+        for each in session["array_competitor_ids"]:
             cur.execute("""SELECT * FROM competitors WHERE competitor_id = %(each)s""", {'each':each})
             array_competitors.append(cur.fetchall())
         return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
@@ -316,6 +462,8 @@ def newtournament():
 @app.route("/tournamentview")
 @login_required
 def tournamentview():
+
+    session["array_competitor_ids"] = None
 
     # find the selected tournament
     if request.args.get("tournament"):
