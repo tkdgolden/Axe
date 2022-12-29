@@ -1,4 +1,4 @@
-<!--<!--Page displaying a judge's options within a tournament (enroll competitor, start match, view players, recent matches)-->
+<!--Page displaying a judge's options within a tournament (enroll competitor, start match, view players, recent matches)-->
 {% extends "layout.html" %}
 
 {% block body %}
@@ -26,6 +26,11 @@
                 {% endfor %}
             </tbody>
         </table>
-    <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
+        <p>cols[0]["enrollment_open"]</p>
+    <!--
+    {% if cols[0]["enrollment_open"] %}
+        <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
+    {% endif %}
+    -->
 
 {% endblock %}
