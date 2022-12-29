@@ -49,6 +49,12 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
 possible_scores = [0,1,2,3,6]
+bracket_A_seed_order = [0,1]
+bracket_B_seed_order = [0,3,1,2]
+bracket_C_seed_order = [0,7,3,4,2,5,1,6]
+bracket_D_seed_order = [0,15,7,8,3,12,4,11,1,14,6,9,2,13,5,10]
+bracket_E_seed_order = [0,31,15,16,8,23,7,24,3,28,12,19,11,20,4,27,1,30,14,17,9,22,6,25,2,29,13,18,10,21,5,26]
+bracket_F_seed_order = [0,63,31,32,16,47,15,48,8,55,23,40,24,39,7,56,3,60,28,35,19,44,12,51,11,52,20,43,27,36,4,59,1,62,30,33,17,46,14,49,9,54,22,41,25,38,6,57,2,61,29,34,18,45,13,50,10,53,21,42,26,37,5,58]
 
 
 # function to output error message and send the user back to what they were attempting so they can try again
@@ -269,7 +275,6 @@ def seasonview():
     cur.execute("""SELECT * FROM matches WHERE season_id = %(sess)s""", {'sess':sess})
     logged_matches = cur.fetchall()
 
-    print(logged_matches)
     # send that info on to the page to be displayed
     return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches)
 
@@ -508,6 +513,18 @@ def newtournament():
 @login_required
 def tournamentview():
 
+    # calls refreshtournament function
+    results = refreshtournament()
+    players = results[0]
+    cols = results[1]
+
+    # send info to page to be displayed
+    return render_template("tournamentview.html", cols=cols, players=players)
+
+
+# updates tournament data for a variety of routes
+def refreshtournament():
+
     session["array_competitor_ids"] = None
 
     # find the selected tournament
@@ -518,19 +535,79 @@ def tournamentview():
         sess = session["selected_season"]
     else:
         return errorpage(sendto="/", message="You must select a tournament.")
-
+    
     # get the tournament info from database
     cur.execute("""SELECT * FROM tournaments WHERE tournament_id = %(sess)s""", {'sess':sess})
     cols = cur.fetchall()
     if len(cols) != 1:
         return errorpage(sendto="/", message="You must select a valid tournament.")
-
+    
     # get competitor info from database
-    cur.execute("""SELECT competitor_first_name, competitor_last_name FROM competitors JOIN enrollment ON competitors.competitor_id = enrollment.competitor_id WHERE tournament_id = %(sess)s""", {'sess':sess})
+    cur.execute("""SELECT competitors.competitor_id, competitor_first_name, competitor_last_name FROM competitors JOIN enrollment ON competitors.competitor_id = enrollment.competitor_id WHERE tournament_id = %(sess)s""", {'sess':sess})
     players = cur.fetchall()
 
-    # send info to page to be displayed
-    return render_template("tournamentview.html", cols=cols, players=players)
+    # returns players and cols (tournament info) to the route that called refresh
+    return players, cols
+
+
+# will seed players in first round, change tournament status to started
+@app.route("/begintournament")
+@login_required
+def begintournament():
+
+    # calls refreshtournament function
+    results = refreshtournament()
+    players = results[0]
+    # cols = results[1]
+
+    playercount = len(players)
+
+    playerids = []
+    for each in players:
+        playerids.append(each[0])
+
+    # TODO sort players
+    cur.execute("""SELECT competitor_id FROM scores WHERE competitor_id = ANY(%(playerids)s) GROUP BY competitor_id ORDER BY AVG(COALESCE(total, 0)) DESC""", {'playerids':playerids})
+    rows = cur.fetchall()
+
+    sortedplayers = []
+    for each in rows:
+        sortedplayers.append(each[0])
+    for each in playerids:
+        if each not in sortedplayers:
+            sortedplayers.append(each)
+
+    print(sortedplayers)
+
+    if playercount < 2:
+        return errorpage(sendto="tournamentview", message="Tournaments must include at least two players.")
+    # starts at round A
+    elif playercount == 2:
+        # TODO create matches
+        # TODO insert round entry to database
+        return tournamentview()
+    # starts at round B
+    elif playercount < 5:
+        while len(sortedplayers) < 4:
+            sortedplayers.append(0)
+        print(sortedplayers)
+        print(sortedplayers[3])
+        cur.execute("""INSERT INTO matches (player_1_id, player_2_id) VALUES (%(sortedplayers[2])s, %(sortedplayers[1])s)""", {'sortedplayers[2]': sortedplayers[2], 'sortedplayers[1]': sortedplayers[1]})
+        return tournamentview()
+    # starts at round C
+    elif playercount < 9:
+        return tournamentview()
+    # starts at round D
+    elif playercount < 17:
+        return tournamentview()
+    # starts at round E
+    elif playercount <33:
+        return tournamentview()
+    # starts at round F
+    elif playercount <65:
+        return tournamentview()
+    else:
+        return errorpage(sendto="newtournament", message="Tournaments can have 2 to 64 players.")
 
 
 # form and validation for adding an already existing player to an already existing season or tournament

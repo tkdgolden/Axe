@@ -4,41 +4,37 @@
 {% block body %}
     <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
     <p>You are judging the {{ cols[0]["tournament_name"] }} {{ cols[0]["discipline"] }} tournament on {{ cols[0]["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
-    
-    <p>{{ cols[0]["started"] }}</p>
-        
-    {% if {{ cols[0]["started"] }} %}
+            
+    {% if cols[0]["started"] %}
         <h2>Suggested Matches</h2>
     {% else %}
         <form action="/begintournament" method="get">
-            <input type="submit" value="Begin Tournament">
+            <input type="submit" value="Begin Tournament">Note: this may block enrollment to the tournament.
         </form>
-        <p>Note: this may block enrollment to the tournament.</p>
     {% endif %}
 
-    
-        <h2>All Competitors</h2>
-        <table>
-            <head>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                </tr>
-            </head>
-            <tbody>
-                {% for x in players %}
-                <tr>
-                    <td>
-                        {{ x["competitor_first_name"] }}
-                    </td>
-                    <td>
-                        {{ x["competitor_last_name"] }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% if {{ cols[0]["enrollment_open"] }} %}
+    <h2>All Competitors</h2>
+    <table>
+        <head>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+        </head>
+        <tbody>
+            {% for x in players %}
+            <tr>
+                <td>
+                    {{ x["competitor_first_name"] }}
+                </td>
+                <td>
+                    {{ x["competitor_last_name"] }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if cols[0]["enrollment_open"] %}
         <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
     {% endif %}
 
