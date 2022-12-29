@@ -4,6 +4,7 @@
 {% block body %}
     <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
     <p>You are judging the {{ cols[0]["tournament_name"] }} {{ cols[0]["discipline"] }} tournament on {{ cols[0]["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
+    <!--
     {% if {{ cols[0]["started"] }} is FALSE %}
         <form action="/begintournament" method="get">
             <input type="submit" value="Begin Tournament">
@@ -13,6 +14,8 @@
     {% if {{ cols[0]["started"] }} is TRUE %}
         <h2>Suggested Matches</h2>
     {% endif %}
+    -->
+    <p>{{ cols[0]["started"] }}</p>
     <h2>All Competitors</h2>
         <table>
             <head>
