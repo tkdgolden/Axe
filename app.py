@@ -554,19 +554,22 @@ def refreshtournament():
 @app.route("/begintournament")
 @login_required
 def begintournament():
+    #   if (session["current_round"]):
+    #       return errorpage(sendto="/tournamentview", message="There is already a tournament in play.")
 
     # calls refreshtournament function
     results = refreshtournament()
     players = results[0]
-    # cols = results[1]
-
-    playercount = len(players)
+    cols = results[1]
+    tournamentid = cols[0]["tournament_id"]
 
     playerids = []
     for each in players:
         playerids.append(each[0])
 
-    # TODO sort players
+    playercount = len(playerids)
+
+    # sort players
     cur.execute("""SELECT competitor_id FROM scores WHERE competitor_id = ANY(%(playerids)s) GROUP BY competitor_id ORDER BY AVG(COALESCE(total, 0)) DESC""", {'playerids':playerids})
     rows = cur.fetchall()
 
@@ -577,35 +580,394 @@ def begintournament():
         if each not in sortedplayers:
             sortedplayers.append(each)
 
-    print(sortedplayers)
-
     if playercount < 2:
         return errorpage(sendto="tournamentview", message="Tournaments must include at least two players.")
+    
     # starts at round A
     elif playercount == 2:
-        # TODO create matches
+        # create matches
+        playerone = None
+        playertwo = None
+        for each in bracket_A_seed_order:
+            if playerone is None:
+                playerone = sortedplayers[each]
+            else:
+                playertwo = sortedplayers[each]
+                cur.execute("""INSERT INTO matches (player_1_id, player_2_id) VALUES (%(playerone)s, %(playertwo)s) RETURNING match_id""", {'playerone': playerone, 'playertwo': playertwo})
+                conn.commit()
+                match_id = cur.fetchall()[0][0]
+
         # TODO insert round entry to database
+        cur.execute("""INSERT INTO round_A (tournament_id, match_id) VALUES (%(tournament_id)s, %(match_id)s) RETURNING round_id""", {'tournament_id': tournamentid})
+        conn.commit()
+        round_id = cur.fetchall()
+        session["current_round"] = round_id
         return tournamentview()
+
     # starts at round B
     elif playercount < 5:
-        while len(sortedplayers) < 4:
+        # handle not full seeding
+        bye_array = []
+        if playercount < 4:
             sortedplayers.append(0)
-        print(sortedplayers)
-        print(sortedplayers[3])
-        cur.execute("""INSERT INTO matches (player_1_id, player_2_id) VALUES (%(sortedplayers[2])s, %(sortedplayers[1])s)""", {'sortedplayers[2]': sortedplayers[2], 'sortedplayers[1]': sortedplayers[1]})
+
+        # create matches
+        playerone = None
+        playertwo = None
+        match1 = None
+        match2 = None
+        count = 0
+        for each in bracket_B_seed_order:
+            match_id = None
+            if playerone is None:
+                playerone = sortedplayers[each]
+            else:
+                if sortedplayers[each]:
+                    playertwo = sortedplayers[each]
+                    cur.execute("""INSERT INTO matches (player_1_id, player_2_id) VALUES (%(playerone)s, %(playertwo)s) RETURNING match_id""", {'playerone': playerone, 'playertwo': playertwo})
+                    conn.commit()
+                    match_id = cur.fetchall()[0][0]
+                    bye_array.append(0)
+                else:
+                    bye_array.append(playerone)
+                if (match_id):
+                    if count == 0:
+                        match1 = match_id
+                    else:
+                        match2 = match_id
+                count += 1
+                playerone = None
+                playertwo = None
+        cur.execute("""INSERT INTO round_b (bye_competitors, match_1_id, match_2_id, tournament_id) VALUES (%(bye_array)s, %(match1)s, %(match2)s, %(tournamentid)s) RETURNING round_id""", {'bye_array': bye_array, 'match1': match1, 'match2': match2, 'tournamentid': tournamentid})
+        conn.commit()
+        round_id = cur.fetchall()[0][0]
+        session["current_round"] = round_id
         return tournamentview()
+
     # starts at round C
     elif playercount < 9:
+        # handle not full seeding
+        bye_array = []
+        count = playercount
+        while count < 8:
+            sortedplayers.append(0)
+            count += 1
+        
+        # create matches
+        playerone = None
+        playertwo = None
+        match1 = None
+        match2 = None
+        match3 = None
+        match4 = None
+        count = 0
+        for each in bracket_B_seed_order:
+            match_id = None
+            if playerone is None:
+                playerone = sortedplayers[each]
+            else:
+                if sortedplayers[each]:
+                    playertwo = sortedplayers[each]
+                    cur.execute("""INSERT INTO matches (player_1_id, player_2_id) VALUES (%(playerone)s, %(playertwo)s) RETURNING match_id""", {'playerone': playerone, 'playertwo': playertwo})
+                    conn.commit()
+                    match_id = cur.fetchall()[0][0]
+                    bye_array.append(0)
+                else:
+                    bye_array.append(playerone)
+                if (match_id):
+                    if count == 0:
+                        match1 = match_id
+                    elif count == 1:
+                        match2 = match_id
+                    elif count ==2:
+                        match3 = match_id
+                    else:
+                        match4 = match_id
+                count += 1
+                playerone = None
+                playertwo = None
+        cur.execute("""INSERT INTO round_b (bye_competitors, match_1_id, match_2_id, match_3_id, match_4_id, tournament_id) VALUES (%(bye_array)s, %(match1)s, %(match2)s, %(match3)s, %(match4)s, %(tournamentid)s) RETURNING round_id""", {'bye_array': bye_array, 'match1': match1, 'match2': match2, 'match3': match3, 'match4': match4, 'tournamentid': tournamentid})
+        conn.commit()
+        round_id = cur.fetchall()[0][0]
+        session["current_round"] = round_id
         return tournamentview()
+
     # starts at round D
     elif playercount < 17:
+        # handle not full seeding
+        bye_array = []
+        count = playercount
+        while count < 6:
+            sortedplayers.append(0)
+            count += 1
+        
+        # create matches
+        playerone = None
+        playertwo = None
+        match1 = None
+        match2 = None
+        match3 = None
+        match4 = None
+        match5 = None
+        match6 = None
+        match7 = None
+        match8 = None
+        count = 0
+        for each in bracket_B_seed_order:
+            match_id = None
+            if playerone is None:
+                playerone = sortedplayers[each]
+            else:
+                if sortedplayers[each]:
+                    playertwo = sortedplayers[each]
+                    cur.execute("""INSERT INTO matches (player_1_id, player_2_id) VALUES (%(playerone)s, %(playertwo)s) RETURNING match_id""", {'playerone': playerone, 'playertwo': playertwo})
+                    conn.commit()
+                    match_id = cur.fetchall()[0][0]
+                    bye_array.append(0)
+                else:
+                    bye_array.append(playerone)
+                if (match_id):
+                    if count == 0:
+                        match1 = match_id
+                    elif count == 1:
+                        match2 = match_id
+                    elif count == 2:
+                        match3 = match_id
+                    elif count == 3:
+                        match4 = match_id
+                    elif count == 4:
+                        match5 = match_id
+                    elif count == 5:
+                        match6 = match_id
+                    elif count == 6:
+                        match7 = match_id
+                    else:
+                        match8 = match_id
+                count += 1
+                playerone = None
+                playertwo = None
+        cur.execute("""INSERT INTO round_b (bye_competitors, match_1_id, match_2_id, match_3_id, match_4_id, match_5_id, match_6_id, match_7_id, match_8_id, tournament_id) VALUES (%(bye_array)s, %(match1)s, %(match2)s, %(match3)s, %(match4)s, %(match5)s, %(match6)s, %(match7)s, %(match8)s, %(tournamentid)s) RETURNING round_id""", {'bye_array': bye_array, 'match1': match1, 'match2': match2, 'match3': match3, 'match4': match4, 'match5': match5, 'match6': match6, 'match7': match7, 'match8': match8, 'tournamentid': tournamentid})
+        conn.commit()
+        round_id = cur.fetchall()[0][0]
+        session["current_round"] = round_id
         return tournamentview()
+
     # starts at round E
     elif playercount <33:
+        # handle not full seeding
+        bye_array = []
+        count = playercount
+        while count < 32:
+            sortedplayers.append(0)
+            count += 1
+        
+        # create matches
+        playerone = None
+        playertwo = None
+        match1 = None
+        match2 = None
+        match3 = None
+        match4 = None
+        match5 = None
+        match6 = None
+        match7 = None
+        match8 = None
+        match9 = None
+        match10 = None
+        match11 = None
+        match12 = None
+        match13 = None
+        match14 = None
+        match15 = None
+        match16 = None
+        count = 0
+        for each in bracket_B_seed_order:
+            match_id = None
+            if playerone is None:
+                playerone = sortedplayers[each]
+            else:
+                if sortedplayers[each]:
+                    playertwo = sortedplayers[each]
+                    cur.execute("""INSERT INTO matches (player_1_id, player_2_id) VALUES (%(playerone)s, %(playertwo)s) RETURNING match_id""", {'playerone': playerone, 'playertwo': playertwo})
+                    conn.commit()
+                    match_id = cur.fetchall()[0][0]
+                    bye_array.append(0)
+                else:
+                    bye_array.append(playerone)
+                if (match_id):
+                    if count == 0:
+                        match1 = match_id
+                    elif count == 1:
+                        match2 = match_id
+                    elif count == 2:
+                        match3 = match_id
+                    elif count == 3:
+                        match4 = match_id
+                    elif count == 4:
+                        match5 = match_id
+                    elif count == 5:
+                        match6 = match_id
+                    elif count == 6:
+                        match7 = match_id
+                    elif count == 7:
+                        match8 = match_id
+                    elif count == 8:
+                        match9 = match_id
+                    elif count == 9:
+                        match10 = match_id
+                    elif count == 10:
+                        match11 = match_id
+                    elif count == 11:
+                        match12 = match_id
+                    elif count == 12:
+                        match13 = match_id
+                    elif count == 13:
+                        match14 = match_id
+                    elif count == 14:
+                        match15 = match_id
+                    else:
+                        match16 = match_id
+                count += 1
+                playerone = None
+                playertwo = None
+        cur.execute("""INSERT INTO round_b (bye_competitors, match_1_id, match_2_id, match_3_id, match_4_id, match_5_id, match_6_id, match_7_id, match_8_id, match_9_id, match_10_id, match_11_id, match_12_id, match_13_id, match_14_id, match_15_id, match_16_id, tournament_id) VALUES (%(bye_array)s, %(match1)s, %(match2)s, %(match3)s, %(match4)s, %(match5)s, %(match6)s, %(match7)s, %(match8)s, %(match9)s, %(match10)s, %(match11)s, %(match12)s, %(match13)s, %(match14)s, %(match15)s, %(match16)s, %(tournamentid)s) RETURNING round_id""", {'bye_array': bye_array, 'match1': match1, 'match2': match2, 'match3': match3, 'match4': match4, 'match5': match5, 'match6': match6, 'match7': match7, 'match8': match8, 'match9': match9, 'match10': match10, 'match11': match11, 'match12': match12, 'match13': match13, 'match14': match14, 'match15': match15, 'match16': match16, 'tournamentid': tournamentid})
+        conn.commit()
+        round_id = cur.fetchall()[0][0]
+        session["current_round"] = round_id
         return tournamentview()
+
     # starts at round F
     elif playercount <65:
+        # handle not full seeding
+        bye_array = []
+        count = playercount
+        while count < 32:
+            sortedplayers.append(0)
+            count += 1
+        
+        # create matches
+        playerone = None
+        playertwo = None
+        match1 = None
+        match2 = None
+        match3 = None
+        match4 = None
+        match5 = None
+        match6 = None
+        match7 = None
+        match8 = None
+        match9 = None
+        match10 = None
+        match11 = None
+        match12 = None
+        match13 = None
+        match14 = None
+        match15 = None
+        match16 = None
+        match17 = None
+        match18 = None
+        match19 = None
+        match20 = None
+        match21 = None
+        match22 = None
+        match23 = None
+        match24 = None
+        match25 = None
+        match26 = None
+        match27 = None
+        match28 = None
+        match29 = None
+        match30 = None
+        match31 = None
+        match32 = None
+        count = 0
+        for each in bracket_B_seed_order:
+            match_id = None
+            if playerone is None:
+                playerone = sortedplayers[each]
+            else:
+                if sortedplayers[each]:
+                    playertwo = sortedplayers[each]
+                    cur.execute("""INSERT INTO matches (player_1_id, player_2_id) VALUES (%(playerone)s, %(playertwo)s) RETURNING match_id""", {'playerone': playerone, 'playertwo': playertwo})
+                    conn.commit()
+                    match_id = cur.fetchall()[0][0]
+                    bye_array.append(0)
+                else:
+                    bye_array.append(playerone)
+                if (match_id):
+                    if count == 0:
+                        match1 = match_id
+                    elif count == 1:
+                        match2 = match_id
+                    elif count == 2:
+                        match3 = match_id
+                    elif count == 3:
+                        match4 = match_id
+                    elif count == 4:
+                        match5 = match_id
+                    elif count == 5:
+                        match6 = match_id
+                    elif count == 6:
+                        match7 = match_id
+                    elif count == 7:
+                        match8 = match_id
+                    elif count == 8:
+                        match9 = match_id
+                    elif count == 9:
+                        match10 = match_id
+                    elif count == 10:
+                        match11 = match_id
+                    elif count == 11:
+                        match12 = match_id
+                    elif count == 12:
+                        match13 = match_id
+                    elif count == 13:
+                        match14 = match_id
+                    elif count == 14:
+                        match15 = match_id
+                    elif count == 15:
+                        match16 = match_id
+                    elif count == 16:
+                        match17 = match_id
+                    elif count == 17:
+                        match18 = match_id
+                    elif count == 18:
+                        match19 = match_id
+                    elif count == 19:
+                        match20 = match_id
+                    elif count == 20:
+                        match21 = match_id
+                    elif count == 21:
+                        match22 = match_id
+                    elif count == 22:
+                        match23 = match_id
+                    elif count == 23:
+                        match24 = match_id
+                    elif count == 24:
+                        match25 = match_id
+                    elif count == 25:
+                        match26 = match_id
+                    elif count == 26:
+                        match27 = match_id
+                    elif count == 27:
+                        match28 = match_id
+                    elif count == 28:
+                        match29 = match_id
+                    elif count == 29:
+                        match30 = match_id
+                    elif count == 30:
+                        match31 = match_id
+                    else:
+                        match32 = match_id
+                count += 1
+                playerone = None
+                playertwo = None
+        cur.execute("""INSERT INTO round_b (bye_competitors, match_1_id, match_2_id, match_3_id, match_4_id, match_5_id, match_6_id, match_7_id, match_8_id, match_9_id, match_10_id, match_11_id, match_12_id, match_13_id, match_14_id, match_15_id, match_16_id, match_17_id, match_18_id, match_19_id, match_20_id, match_21_id, match_22_id, match_23_id, match_24_id, match_25_id, match_26_id, match_27_id, match_28_id, match_29_id, match_30_id, match_31_id, match_32_id, tournament_id) VALUES (%(bye_array)s, %(match1)s, %(match2)s, %(match3)s, %(match4)s, %(match5)s, %(match6)s, %(match7)s, %(match8)s, %(match9)s, %(match10)s, %(match11)s, %(match12)s, %(match13)s, %(match14)s, %(match15)s, %(match16)s, %(match17)s, %(match18)s, %(match19)s, %(match20)s, %(match21)s, %(match22)s, %(match23)s, %(match24)s, %(match25)s, %(match26)s, %(match27)s, %(match28)s, %(match29)s, %(match30)s, %(match31)s, %(match32)s, %(tournamentid)s) RETURNING round_id""", {'bye_array': bye_array, 'match1': match1, 'match2': match2, 'match3': match3, 'match4': match4, 'match5': match5, 'match6': match6, 'match7': match7, 'match8': match8, 'match9': match9, 'match10': match10, 'match11': match11, 'match12': match12, 'match13': match13, 'match14': match14, 'match15': match15, 'match16': match16, 'match17': match17, 'match18': match18, 'match19': match19, 'match20': match20, 'match21': match21, 'match22': match22, 'match23': match23, 'match24': match24, 'match25': match25, 'match26': match26, 'match27': match27, 'match28': match28, 'match29': match29, 'match30': match30, 'match31': match31, 'match32': match32, 'tournamentid': tournamentid})
+        conn.commit()
+        round_id = cur.fetchall()[0][0]
+        session["current_round"] = round_id
         return tournamentview()
+
     else:
         return errorpage(sendto="newtournament", message="Tournaments can have 2 to 64 players.")
 
