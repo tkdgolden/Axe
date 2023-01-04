@@ -3,10 +3,17 @@
 
 {% block body %}
     <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
-    <p>You are judging the {{ cols[0]["tournament_name"] }} {{ cols[0]["discipline"] }} tournament on {{ cols[0]["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
+    <p>You are judging the {{ cols["tournament_name"] }} {{ cols["discipline"] }} tournament on {{ cols["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
             
-    {% if cols[0]["current_round"] %}
-        <h2>Suggested Matches</h2>
+    {% if cols["current_round"] %}
+        <h2>Upcoming Matches</h2>
+        {% for each in match_info %}
+            {% if each == "bye" %}
+                <p>{{ match_info[match_info.index(each) + 1] }} has a bye.</p>
+            {% elif each == "match" %}
+                <p>{{ match_info[match_info.index(each) + 1] }} versus {{ match_info[match_info.index(each) + 2] }}</p>
+            {% endif %}
+        {% endfor %}
     {% else %}
         <form action="/begintournament" method="get">
             <input type="submit" value="Begin Tournament">Note: this may block enrollment to the tournament.
@@ -34,7 +41,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if cols[0]["enrollment_open"] %}
+    {% if cols["enrollment_open"] %}
         <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
     {% endif %}
 
