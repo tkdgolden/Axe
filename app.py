@@ -278,15 +278,47 @@ def seasonview():
     # send that info on to the page to be displayed
     return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches)
 
+@app.route("/creatematch")
+@login_required
+def creatematch():
+
+    # take the selected competitors from season view or tournament view page
+    session["array_competitor_ids"] = request.args.getlist("competitor_selection")
+        
+    # make an array with those competitors and their information from competitor database table
+    array_competitors = []
+    for each in session["array_competitor_ids"]:
+        cur.execute("""SELECT * FROM competitors WHERE competitor_id = %(each)s""", {'each':each})
+        array_competitors.append(cur.fetchall())
+
+    # get player ids
+    playerA = session["array_competitor_ids"][0]
+    playerB = session["array_competitor_ids"][1]
+
+    # get session values to be stored
+    sess = session["selected_season"]
+
+    # insert into matches, returns primary key match id for use in scores inserts
+    cur.execute("""INSERT INTO matches (player_1_id, player_2_id, season_id) VALUES (%(playerA)s, %(playerB)s, %(sess)s) RETURNING match_id""", {'playerA': playerA, 'playerB': playerB, 'sess': sess})
+    match = cur.fetchall()
+    conn.commit()
+    session["match_id"] = match[0][0]
+
+    # send competitor info to scorematch form
+    return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
+
+
+
 
 # form and validation for scoring a match
-@app.route("/scorematch", methods=["GET", "POST"])
+@app.route("/scorematch", methods=["POST"])
 @login_required
 def scorematch():
 
     # after form submission
     if request.method == "POST":
 
+        match_id = session["match_id"]
         # check all required fields were submitted
         if not request.form.get("p1t1") or not request.form.get("p2t1") or not request.form.get("p1t2") or not request.form.get("p2t2") or not request.form.get("p1t3") or not request.form.get("p2t3") or not request.form.get("p1t4") or not request.form.get("p2t4") or not request.form.get("p1t5") or not request.form.get("p2t5") or not request.form.get("p1t6") or not request.form.get("p2t6") or not request.form.get("p1t7") or not request.form.get("p2t7") or not request.form.get("p1t8") or not request.form.get("p2t8") or not request.form.get("sequence"):
             return errorpage(sendto="scorematch", message="THE APOCALYPSE, your match was submitted incompletely, and therefore wasn't saved.")
@@ -410,7 +442,7 @@ def scorematch():
         playerB = session["array_competitor_ids"][1]
 
         # determine win boolean for each player
-        if winner == playerA:
+        if winner == session["array_competitor_ids"][0]:
             pAwin = True
             pBwin = False
         else:
@@ -421,33 +453,27 @@ def scorematch():
         sess = session["selected_season"]
         judge = session["user_id"]
 
-        # get season, tournament, and discipline values from database
-        cur.execute("""SELECT tournament_id, discipline FROM tournaments WHERE tournament_id = %(sess)s""", {'sess':sess})
+        # get discipline values from database
+        cur.execute("""SELECT discipline FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
         cols = cur.fetchall()
+        view = 'season'
         if len(cols) == 0:
-            t = None
-            s = sess
-            cur.execute("""SELECT discipline FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
-            dis = cur.fetchall()
-            discipline = dis[0]["discipline"]
-        else:
-            t = sess
-            s = None
-            discipline = cols[0]["discipline"]
+            cur.execute("""SELECT discipline FROM tournaments WHERE season_id = %(sess)s""", {'sess':sess})
+            cols = cur.fetchall()
+            view = 'tournament'
+        discipline = cols[0]
 
         # three database inserts: one to matches, and one for each player into scores
         try:
-
+            print(match_id)
             # insert into matches, returns primary key match id for use in scores inserts
-            cur.execute("""INSERT INTO matches (player_1_id, player_2_id, season_id, tournament_id, winner_id, player1total, player2total, discipline, judge_id, dt) VALUES (%(playerA)s, %(playerB)s, %(s)s, %(t)s, %(winner)s, %(pAtotal)s, %(pBtotal)s, %(discipline)s, %(judge)s, %(ts)s) RETURNING match_id""", {'playerA': playerA, 'playerB': playerB, 's': s, 't': t, 'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts})
-            m = cur.fetchall()
+            cur.execute("""UPDATE matches SET winner_id = %(winner)s, player1total = %(pAtotal)s, player2total = %(pBtotal)s, discipline = %(discipline)s, judge_id = %(judge)s, dt = %(ts)s WHERE match_id = %(match_id)s""", {'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts, 'match_id': match_id})
             conn.commit()
-            mid = m[0][0]
 
             # inserts into scores for each player
-            cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerA)s, %(mid)s, %(pAqt)s, %(sequence)s, %(pAtone)s, %(pAttwo)s, %(pAtthree)s, %(pAtfour)s, %(pAtfive)s, %(pAtsix)s, %(pAtseven)s, %(pAteight)s, %(pAtotal)s, %(pAwin)s)""", {'playerA': playerA, 'mid': mid, 'pAqt': pAqt, 'sequence': sequence, 'pAtone': pAtone, 'pAttwo': pAttwo, 'pAtthree': pAtthree, 'pAtfour': pAtfour, 'pAtfive': pAtfive, 'pAtsix': pAtsix, 'pAtseven': pAtseven, 'pAteight': pAteight, 'pAtotal': pAtotal, 'pAwin': pAwin})
+            cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerA)s, %(match_id)s, %(pAqt)s, %(sequence)s, %(pAtone)s, %(pAttwo)s, %(pAtthree)s, %(pAtfour)s, %(pAtfive)s, %(pAtsix)s, %(pAtseven)s, %(pAteight)s, %(pAtotal)s, %(pAwin)s)""", {'playerA': playerA, 'match_id': match_id, 'pAqt': pAqt, 'sequence': sequence, 'pAtone': pAtone, 'pAttwo': pAttwo, 'pAtthree': pAtthree, 'pAtfour': pAtfour, 'pAtfive': pAtfive, 'pAtsix': pAtsix, 'pAtseven': pAtseven, 'pAteight': pAteight, 'pAtotal': pAtotal, 'pAwin': pAwin})
             conn.commit()
-            cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerB)s, %(mid)s, %(pBqt)s, %(sequence)s, %(pBtone)s, %(pBttwo)s, %(pBtthree)s, %(pBtfour)s, %(pBtfive)s, %(pBtsix)s, %(pBtseven)s, %(pBteight)s, %(pBtotal)s, %(pBwin)s)""", {'playerB': playerB, 'mid': mid, 'pBqt': pBqt, 'sequence': sequence, 'pBtone': pBtone, 'pBttwo': pBttwo, 'pBtthree': pBtthree, 'pBtfour': pBtfour, 'pBtfive': pBtfive, 'pBtsix': pBtsix, 'pBtseven': pBtseven, 'pBteight': pBteight, 'pBtotal': pBtotal, 'pBwin': pBwin})
+            cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerB)s, %(match_id)s, %(pBqt)s, %(sequence)s, %(pBtone)s, %(pBttwo)s, %(pBtthree)s, %(pBtfour)s, %(pBtfive)s, %(pBtsix)s, %(pBtseven)s, %(pBteight)s, %(pBtotal)s, %(pBwin)s)""", {'playerB': playerB, 'match_id': match_id, 'pBqt': pBqt, 'sequence': sequence, 'pBtone': pBtone, 'pBttwo': pBttwo, 'pBtthree': pBtthree, 'pBtfour': pBtfour, 'pBtfive': pBtfive, 'pBtsix': pBtsix, 'pBtseven': pBtseven, 'pBteight': pBteight, 'pBtotal': pBtotal, 'pBwin': pBwin})
             conn.commit()
         
         # error if the inserts fail
@@ -457,23 +483,13 @@ def scorematch():
         # clear the selected competitors from session
         session["array_competitor_ids"] = None
 
-        # redirect to current season
-        return redirect("seasonview")
+        # redirect to current season/ tournament
+        if (view == 'season'):
+            return redirect("seasonview")
+        elif (view == 'tournament'):
+            return redirect("tournamentview")
 
-    # the form:
-    else:
 
-        # take the selected competitors from season view or tournament view page
-        session["array_competitor_ids"] = request.args.getlist("competitor_selection")
-        
-        # make an array with those competitors and their information from competitor database table
-        array_competitors = []
-        for each in session["array_competitor_ids"]:
-            cur.execute("""SELECT * FROM competitors WHERE competitor_id = %(each)s""", {'each':each})
-            array_competitors.append(cur.fetchall())
-
-        # send competitor info to scorematch form
-        return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
 
 
 # form and validation for creating a new tournament
@@ -593,7 +609,7 @@ def begintournament():
                 playerone = sortedplayers[each]
             else:
                 playertwo = sortedplayers[each]
-                cur.execute("""INSERT INTO matches (player_1_id, player_2_id) VALUES (%(playerone)s, %(playertwo)s) RETURNING match_id""", {'playerone': playerone, 'playertwo': playertwo})
+                cur.execute("""INSERT INTO matches (player_1_id, player_2_id, tournament_id) VALUES (%(playerone)s, %(playertwo)s, %(tournament_id)s) RETURNING match_id""", {'playerone': playerone, 'playertwo': playertwo, 'tournament_id': tournamentid})
                 conn.commit()
                 match_id = cur.fetchall()[0][0]
 
