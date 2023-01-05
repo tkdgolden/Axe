@@ -529,47 +529,69 @@ def tournamentview():
     # calls refreshtournament function
     results = refreshtournament()
     players = results[0]
-    print(players, "players")
     cols = results[1][0]
-    round_info = results[2][0]
-    print(round_info, "round info")
+    print(results[2][0], "results 2,0")
     match_info = []
     player_info = []
-    count = 0
-    for each in round_info[1]:
-        if each != 0:
-            match_info.append("bye")
-            for x in players:
-                if x[0] == each:
-                    player_id = x[0]
-                    player_first_name = x[1]
-                    player_last_name = x[2]
-                    player_info = [player_id, player_first_name, player_last_name]
-            match_info.append(player_info)
-        else:
-            match = round_info[2][count]
-            match_info.append("match")
-            cur.execute("""SELECT player_1_id, player_2_id FROM matches WHERE match_id = %(match)s""", {'match': match})
-            two_competitors = cur.fetchall()[0]
-            for competitor in two_competitors:
+    if (results[2]):
+        round_info = results[2][0]
+        print(round_info, "round info")
+        count = 0
+        for each in round_info[1]:
+            print("here")
+            if each != 0:
+                match_info.append("bye")
                 for x in players:
-                    if x[0] == competitor:
+                    if x[0] == each:
                         player_id = x[0]
                         player_first_name = x[1]
                         player_last_name = x[2]
                         player_info = [player_id, player_first_name, player_last_name]
                 match_info.append(player_info)
-            count += 1
-    print(match_info)
-    
+            else:
+                match = round_info[2][count]
+                print(match, "match")
+                cur.execute("""SELECT player_1_id, player_2_id, winner_id FROM matches WHERE match_id = %(match)s""", {'match': match})
+                two_competitors = cur.fetchall()[0]
+                print(two_competitors, "two competitors")
+                print(two_competitors[2], "two competitors, 2, aka winner")
+                if two_competitors[2] == None:
+                    match_count = ["match", count]
+                    match_info.append(match_count)
+                    iteration = 0
+                    while iteration < 2:
+                        competitor = two_competitors[iteration]
+                        for x in players:
+                            if x[0] == competitor:
+                                player_id = x[0]
+                                player_first_name = x[1]
+                                player_last_name = x[2]
+                                player_info = [player_id, player_first_name, player_last_name]
+                        match_info.append(player_info)
+                        iteration += 1
+                else:
+                    match_info.append("completed_match")
+                    iteration = 0
+                    while iteration < 2:
+                        competitor = two_competitors[iteration]
+                        for x in players:
+                            if x[0] == competitor:
+                                player_id = x[0]
+                                player_first_name = x[1]
+                                player_last_name = x[2]
+                                player_info = [player_id, player_first_name, player_last_name]
+                        match_info.append(player_info)
+                        iteration += 1
+                count += 1
+            print(match_info, "match info")
+
     # send info to page to be displayed
     return render_template("tournamentview.html", cols=cols, players=players, match_info=match_info)
 
 
 # updates tournament data for a variety of routes
 def refreshtournament():
-
-    session["array_competitor_ids"] = None
+    session["current_round"] = None
 
     # find the selected tournament
     if request.args.get("tournament"):
@@ -590,7 +612,7 @@ def refreshtournament():
     cur.execute("""SELECT competitors.competitor_id, competitor_first_name, competitor_last_name FROM competitors JOIN enrollment ON competitors.competitor_id = enrollment.competitor_id WHERE tournament_id = %(sess)s""", {'sess':sess})
     players = cur.fetchall()
 
-    round_id = session["current_round"]
+    round_id = cols[0][5]
     cur.execute("""SELECT * FROM rounds WHERE round_id = %(round_id)s""", {'round_id': round_id})
     round_info = cur.fetchall()
 
@@ -602,8 +624,8 @@ def refreshtournament():
 @app.route("/begintournament")
 @login_required
 def begintournament():
-    #   if (session["current_round"]):
-    #       return errorpage(sendto="/tournamentview", message="There is already a tournament in play.")
+    if (session["current_round"]):
+        return errorpage(sendto="/tournamentview", message="There is already a tournament in play.")
 
     # calls refreshtournament function
     results = refreshtournament()
@@ -629,10 +651,27 @@ def begintournament():
         if each not in sortedplayers:
             sortedplayers.append(each)
 
+    if playercount < 2:
+        return errorpage(sendto="newtournament", message="Tournaments can have 2 to 64 players.")
+    elif playercount > 64:
+        return errorpage(sendto="newtournament", message="Tournaments can have 2 to 64 players.")
+
+    cur.execute("""UPDATE tournaments SET enrollment_open = FALSE WHERE tournament_id = %(tournament_id)s""", {'tournament_id': tournamentid})
+
+    createround(sortedplayers, tournamentid)
+
+    return tournamentview()
+
+
+def createround(sorted_players, tournamentid):
     matches_array = []
     bye_array = []
     playerone = None
     playertwo = None
+    sortedplayers = list(sorted_players)
+    tournamentid = tournamentid
+    print(sortedplayers)
+    playercount = len(sorted_players)
 
     if playercount < 2:
         return errorpage(sendto="tournamentview", message="Tournaments must include at least two players.")
@@ -652,8 +691,6 @@ def begintournament():
                 matches_array.append(match_id)
 
         bye_array = [0,0]
-
-
 
     # starts at round B
     elif playercount < 5:
@@ -676,6 +713,8 @@ def begintournament():
                     matches_array.append(match_id)
                 else:
                     bye_array.append(playerone)
+                playerone = None
+                playertwo = None
 
     # starts at round C
     elif playercount < 9:
@@ -728,6 +767,8 @@ def begintournament():
                     matches_array.append(match_id)
                 else:
                     bye_array.append(playerone)
+                playerone = None
+                playertwo = None
 
     # starts at round E
     elif playercount <33:
@@ -753,6 +794,8 @@ def begintournament():
                     matches_array.append(match_id)
                 else:
                     bye_array.append(playerone)
+                playerone = None
+                playertwo = None
 
     # starts at round F
     elif playercount <65:
@@ -778,9 +821,8 @@ def begintournament():
                     matches_array.append(match_id)
                 else:
                     bye_array.append(playerone)
-
-    else:
-        return errorpage(sendto="newtournament", message="Tournaments can have 2 to 64 players.")
+                playerone = None
+                playertwo = None
 
     # insert round entry to database
     cur.execute("""INSERT INTO rounds (tournament_id, matches, round_id, bye_competitors) VALUES (%(tournament_id)s, %(matches_array)s, nextval('round_increment'), %(bye_array)s) RETURNING round_id""", {'tournament_id': tournamentid, 'matches_array': matches_array, 'bye_array': bye_array})
@@ -789,7 +831,35 @@ def begintournament():
     cur.execute("""UPDATE tournaments SET current_round = %(round_id)s WHERE tournament_id = %(tournament_id)s""", {'round_id': round_id, 'tournament_id': tournamentid})
     conn.commit()
     session["current_round"] = round_id
+
     return tournamentview()
+
+
+
+@app.route("/nextround")
+@login_required
+def nextround():
+    tournament = session["selected_season"]
+    cur.execute("""SELECT current_round FROM tournaments WHERE tournament_id = %(tournament)s""", {'tournament': tournament})
+    previous_round = cur.fetchall()[0][0]
+    print(previous_round)
+    cur.execute("""SELECT * FROM rounds WHERE round_id = %(previous_round)s""", {'previous_round': previous_round})
+    previous_round_info = cur.fetchall()[0]
+    print(previous_round_info)
+    player_id_array = []
+    count = 0
+    for each in previous_round_info[1]:
+        if each != 0:
+            player_id_array.append(each)
+        else:
+            match = previous_round_info[2][count]
+            cur.execute("""SELECT winner_id FROM matches WHERE match_id = %(match)s""", {'match': match})
+            winner_id = cur.fetchall()[0][0]
+            player_id_array.append(winner_id)
+            count += 1
+    print(player_id_array, "player id array")
+
+    return createround(player_id_array, tournament)
 
 
 # form and validation for adding an already existing player to an already existing season or tournament

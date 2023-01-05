@@ -7,11 +7,19 @@
             
     {% if cols["current_round"] %}
         <h2>Upcoming Matches</h2>
+            <p class="nextround">All matches for this round are complete.</p>
+            <form action="/nextround" method="get" class="nextround">
+                <input type="submit" value="Next Round">
+            </form>
         {% for each in match_info %}
-            {% if each == "bye" %}
-                <p>{{ match_info[match_info.index(each) + 1] }} has a bye.</p>
-            {% elif each == "match" %}
+            {% if "match" in each %}
                 <p>{{ match_info[match_info.index(each) + 1] }} versus {{ match_info[match_info.index(each) + 2] }}</p>
+                <script>
+                    const list = document.querySelectorAll(".nextround");
+                    for (var i = 0; i < list.length; i++) {
+                        list[i].hidden = true;
+                    }
+                </script>
             {% endif %}
         {% endfor %}
     {% else %}
@@ -41,7 +49,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if cols["enrollment_open"] %}
+    {% if cols["enrollment_open"] == TRUE %}
         <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
     {% endif %}
 
