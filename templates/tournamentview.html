@@ -11,17 +11,23 @@
             <form action="/nextround" method="get" class="nextround">
                 <input type="submit" value="Next Round">
             </form>
-        {% for each in match_info %}
-            {% if "match" in each %}
-                <p>{{ match_info[match_info.index(each) + 1] }} versus {{ match_info[match_info.index(each) + 2] }}</p>
-                <script>
-                    const list = document.querySelectorAll(".nextround");
-                    for (var i = 0; i < list.length; i++) {
-                        list[i].hidden = true;
-                    }
-                </script>
-            {% endif %}
-        {% endfor %}
+        <form class="thisround" action="/editmatch" method="get">
+            <select multiple size="any number" name="match" id="match">
+                {% for each in match_info %}
+                    {% if "match" in each %}
+                        <option value="{{ each[1] }}">{{ match_info[match_info.index(each) + 1] }} versus {{ match_info[match_info.index(each) + 2] }}</option>
+                        <script>
+                            const list = document.querySelectorAll(".nextround");
+                            for (var i = 0; i < list.length; i++) {
+                                list[i].hidden = true;
+                            }
+                        </script>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <input type="submit" value="Score a Match">
+        </form>   
+
     {% else %}
         <form action="/begintournament" method="get">
             <input type="submit" value="Begin Tournament">Note: this may block enrollment to the tournament.
@@ -49,7 +55,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if cols["enrollment_open"] == TRUE %}
+    {% if cols["enrollment_open"] == True %}
         <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
     {% endif %}
 

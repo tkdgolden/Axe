@@ -139,7 +139,7 @@
 {% block body %}
     <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
     <h2>Score a Match</h2>
-        <h3>{{ array_competitors[0][0]["competitor_first_name"] }} {{ array_competitors[0][0]["competitor_last_name"] }} Versus {{ array_competitors[1][0]["competitor_first_name"] }} {{ array_competitors[1][0]["competitor_last_name"] }}</h3>
+        <h3>{{ array_competitors[0][1] }} {{ array_competitors[0][2] }} Versus {{ array_competitors[1][1] }} {{ array_competitors[1][2] }}</h3>
     <p><a href="/seasonview">Return to Season View</a></p>
     <form action="/scorematch" method="POST" onsubmit="CheckTie()">
         <input type="hidden" id="sequence" name="sequence">
@@ -151,11 +151,11 @@
             </colgroup>
             <head>
                 <th>
-                    {{ array_competitors[0][0]["competitor_first_name"] }} {{ array_competitors[0][0]["competitor_last_name"] }}
+                    {{ array_competitors[0][1] }} {{ array_competitors[0][2] }}
                 </th>
                 <th id="p1score">0</th><th></th><th id="p2score">0</th>
                 <th>
-                    {{ array_competitors[1][0]["competitor_first_name"] }} {{ array_competitors[1][0]["competitor_last_name"] }}
+                    {{ array_competitors[1][1] }} {{ array_competitors[1][2] }}
                 </th>
             </head>
             <tbody>
@@ -435,8 +435,8 @@
         </table>
         <select name="winner" id="winner" hidden>
             <option value="" disabled selected>Winner of the Tie Breaker:</option>
-            <option value="{{ array_competitors[0][0]['competitor_id'] }}">{{ array_competitors[0][0]['competitor_first_name'] }} {{ array_competitors[0][0]['competitor_last_name'] }}</option>
-            <option value="{{ array_competitors[1][0]['competitor_id'] }}">{{ array_competitors[1][0]['competitor_first_name'] }} {{ array_competitors[1][0]['competitor_last_name'] }}</option>
+            <option value="{{ array_competitors[0][0] }}">{{ array_competitors[0][1] }} {{ array_competitors[0][2] }}</option>
+            <option value="{{ array_competitors[1][0] }}">{{ array_competitors[1][1] }} {{ array_competitors[1][2] }}</option>
         </select>
         <input type="Submit" value="Submit Match Scores">
     </form>
