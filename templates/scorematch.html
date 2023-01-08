@@ -1,5 +1,3 @@
-<script src="scorematch.js"></script>
-
 
 {% extends "layout.html" %}
 
@@ -307,5 +305,9 @@
         </select>
         <input type="Submit" value="Submit Match Scores">
     </form>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/scorematch.js') }}"></script>
+
+
 {% endblock %}
 
