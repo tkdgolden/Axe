@@ -1,7 +1,6 @@
 # to keep database credentials secure
 from distutils.log import error
 import os
-from sqlite3 import Timestamp
 # to connect to postgresql
 import psycopg2
 # to be able to run sql code in the app
@@ -77,6 +76,7 @@ def login_required(f):
 def index():
     # clears from any season or tournament being selected
     session["selected_season"] = None
+    session["selected_tournament"] = None
 
     # not logged in:
     if session.get("user_id") is None:
