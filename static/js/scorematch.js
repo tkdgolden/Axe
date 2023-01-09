@@ -1,5 +1,10 @@
+// dont do anything until the page is loaded
 document.addEventListener('DOMContentLoaded', function() {
+
+    // there are four targets on the target that will be "hot" on different throws of the round
     options = ["Top", "Left", "Right", "Bottom"];
+
+    // randomly ordering the numbers that refer to the indexes of the options array
     usedNumbers = [];
     for (let i = 0; i < 4; i++) {
         do {
@@ -7,11 +12,17 @@ document.addEventListener('DOMContentLoaded', function() {
         } while (usedNumbers.includes(randomNumber));
         usedNumbers.push(randomNumber);
     }
+
+    // displaying which target is "hot"
     document.getElementById("t1").innerHTML = (options[usedNumbers[0]]);
     document.getElementById("t2").innerHTML = (options[usedNumbers[1]]);
     document.getElementById("t3").innerHTML = (options[usedNumbers[2]]);
     document.getElementById("t4").innerHTML = (options[usedNumbers[3]]);
+
+    // recording the sequence
     sequence = [options[usedNumbers[0]], (options[usedNumbers[1]]), (options[usedNumbers[2]]), (options[usedNumbers[3]])];
+    
+    // repeating the above for throws 5-8
     usedNumbers = [];
     for (let i = 0; i < 4; i++) {
         do {
@@ -27,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("sequence").value = sequence;
     console.log(document.getElementById("sequence").value);
 
+    // add up each players scores from the dropdowns and whether they got the quickpoint
     function calculateScores(){
         p1sum = 0;
         for (item of p1dropdowns){
@@ -80,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("p2score").innerHTML = p2sum;
     }
 
+    // automatically recalculate scores when anything is changed
     p1dropdowns = document.getElementsByClassName('1');
     p2dropdowns = document.getElementsByClassName('2');
     p1radios = document.getElementsByClassName("1q");
@@ -98,19 +111,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
 }, false);
 
+// wont show the "hot" target without a recorded score for both players 
 function ShowRound(elem)
 {
     if (elem != "t1") {
-        if (document.getElementById(elem).parentNode.parentNode.previousElementSibling.lastElementChild.lastElementChild.value == "" || document.getElementById(elem).parentNode.parentNode.previousElementSibling.lastElementChild.previousElementSibling.lastElementChild.value == "")
-        {
+        if (document.getElementById(elem).parentNode.parentNode.previousElementSibling.lastElementChild.lastElementChild.value == ""){
+            alert("Score previous round to move on!");
+            return false;
+        }
+        if (document.getElementById(elem).parentNode.parentNode.previousElementSibling.firstElementChild.lastElementChild.value == ""){
             alert("Score previous round to move on!");
             return false;
         }
     }
     document.getElementById(elem).setAttribute('style', 'display:inline');
     document.getElementById(elem).previousElementSibling.setAttribute('style', 'display:none');
-    document.getElementById(elem).parentNode.nextElementSibling.firstElementChild.removeAttribute('disabled');
-    document.getElementById(elem).parentNode.nextElementSibling.nextElementSibling.firstElementChild.removeAttribute('disabled');
+    document.getElementById(elem).parentNode.parentNode.firstElementChild.lastElementChild.classList.remove("wait");
+    document.getElementById(elem).parentNode.parentNode.lastElementChild.lastElementChild.classList.remove("wait");
 }
 
 function CheckTie(){
