@@ -5,15 +5,52 @@
 
     <a href="/login">Judge Log In</a>
 
+    <table id="playerstats" class="display" style="width:95%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Average Score</th>
+                <th>Win Ratio</th>
+                <th>Games Played</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for each in player_list %}
+                <tr role="button" data-href="player_view?player_id={{ each[0] }}">
+                    <td>{{ each[0] }}</td>
+                    <td>{{ each[1] }}</td>
+                    <td>{{ each[2] }}</td>
+                    <td>{{ each[3] }}</td>
+                    <td>{{ each[4] }}</td>
+                    <td>{{ each[5] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     <p>You can view player stats by:</p>
 
     <ul>
         <li><a href="/overall">Overall</a></li>
         <li><a href="/discipline">Discipline</a></li>
-        <li><a href="/season">Season</a></li>
+        <!--Drop down menu of available seasons-->
+        <li>Season
+            <form action="/season_stats_view" method="get">
+                <select name="season" id="season">
+                    {% for x in rows %}
+                        <option value="{{ x['season_id'] }}">{{ x["season"] }} {{ x["yearof"] }} {{ x["discipline"] }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="View Stats">
+            </form>
+        </li>
         <li><a href="/competitor">Competitor</a></li>
         <li><a href="/tournament">Tournament</a></li>
         <li><a href="/challenges">Challenges</a></li>
     </ul>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/statview.js') }}"></script>
 
 {% endblock %}

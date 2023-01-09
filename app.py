@@ -19,6 +19,8 @@ from datetime import date
 import datetime
 
 
+
+
 #initiate app
 app = Flask(__name__)
 
@@ -80,7 +82,12 @@ def index():
 
     # not logged in:
     if session.get("user_id") is None:
-        return render_template("index.html")
+        player_list = render_player_stats()
+
+        cur.execute("""SELECT * FROM seasons""")
+        rows = cur.fetchall()
+
+        return render_template("index.html", player_list=player_list, rows=rows)
 
     # logged in:
     # loads seasons and tournaments for dropdowns in judge home page
@@ -1101,3 +1108,115 @@ def archive():
      # sends available season and tournament info to page to be displayed
     return render_template("archive.html", seasonarchive=seasonarchive, tournamentarchive=tournamentarchive)
 
+def render_player_stats():
+    cur.execute("""SELECT * FROM competitors""")
+    player_list = cur.fetchall()
+    for each in player_list:
+        player_id = each[0]
+        cur.execute("""SELECT ROUND(AVG(total), 2), COUNT(*) FROM scores WHERE competitor_id = %(player_id)s""", {'player_id':player_id})
+        output = cur.fetchall()
+        average = output[0][0]
+        games_played = output[0][1]
+        cur.execute("""SELECT COUNT(*) FROM scores WHERE competitor_id = %(player_id)s AND won = true""", {'player_id':player_id})
+        output = cur.fetchall()
+        games_won = output[0][0]
+        win_rate = round((games_won / games_played), 2)
+        each.append(average)
+        each.append(win_rate)
+        each.append(games_played)
+    return(player_list)
+
+
+@app.route("/player_view")
+def player_view():
+    player_id = request.args.get("player_id")
+
+    cur.execute("""SELECT * FROM competitors WHERE competitor_id = %(player_id)s""", {'player_id':player_id})
+    player_stats = cur.fetchall()[0]
+    player_id = player_stats[0]
+
+    cur.execute("""SELECT ROUND(AVG(total), 2), COUNT(*) FROM scores WHERE competitor_id = %(player_id)s""", {'player_id':player_id})
+    output = cur.fetchall()
+    average = output[0][0]
+    games_played = output[0][1]
+    cur.execute("""SELECT COUNT(*) FROM scores WHERE competitor_id = %(player_id)s AND won = true""", {'player_id':player_id})
+    output = cur.fetchall()
+    games_won = output[0][0]
+    win_rate = round((games_won / games_played), 2)
+    player_stats.append(average)
+    player_stats.append(win_rate)
+    player_stats.append(games_played)
+
+    cur.execute("""SELECT player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE (player_1_id = %(player_id)s OR player_2_id = %(player_id)s) AND winner_id IS NOT NULL""", {'player_id': player_id})
+    match_list = cur.fetchall()
+
+    cur.execute("""SELECT * FROM competitors""")
+    player_list = cur.fetchall()
+
+    for each in match_list:
+        player1_id = each[0]
+        player2_id = each[1]
+        winner_id = each[2]
+        for x in player_list:
+            if x[0] == player1_id:
+                each.append(x[1])
+                each.append(x[2])
+        for x in player_list:
+            if x[0] == player2_id:
+                each.append(x[1])
+                each.append(x[2])
+        for x in player_list:
+            if x[0] == winner_id:
+                each.append(x[1])
+                each.append(x[2])
+
+    return render_template("player_view.html", player_stats=player_stats, match_list=match_list)
+
+@app.route("/season_stats_view")
+def season_stats_view():
+    # get the selected season to be displayed
+    if request.args.get("season"):
+        season_id = request.args.get("season")
+    else:
+        return errorpage(sendto="/", message="You must select a season.")
+
+    cur.execute("""SELECT enrollment.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name FROM enrollment JOIN competitors ON competitors.competitor_id = enrollment.competitor_id WHERE season_id = %(season_id)s""", {'season_id': season_id} )
+    player_list = cur.fetchall()
+
+    cur.execute("""SELECT player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE season_id = %(season_id)s AND winner_id IS NOT NULL""", {'season_id':season_id})
+    match_list = cur.fetchall()
+
+    for each in player_list:
+        player_id = each[0]
+        cur.execute("""SELECT ROUND(AVG(total), 2), COUNT(*) FROM scores JOIN matches ON scores.match_id = matches.match_id WHERE scores.competitor_id = %(player_id)s AND matches.season_id = %(season_id)s""", {'player_id':player_id, 'season_id': season_id})
+        output = cur.fetchall()
+        average = output[0][0]
+        games_played = output[0][1]
+        cur.execute("""SELECT COUNT(*) FROM scores JOIN matches ON scores.match_id = matches.match_id WHERE competitor_id = %(player_id)s AND won = true AND matches.season_id = %(season_id)s""", {'player_id':player_id, 'season_id': season_id})
+        output = cur.fetchall()
+        games_won = output[0][0]
+        win_rate = 0
+        if (games_played > 0):
+            win_rate = round((games_won / games_played), 2)
+        each.append(average)
+        each.append(win_rate)
+        each.append(games_played)
+
+    for each in match_list:
+        player1_id = each[0]
+        player2_id = each[1]
+        winner_id = each[2]
+        for x in player_list:
+            if x[0] == player1_id:
+                each.append(x[1])
+                each.append(x[2])
+        for x in player_list:
+            if x[0] == player2_id:
+                each.append(x[1])
+                each.append(x[2])
+        for x in player_list:
+            if x[0] == winner_id:
+                each.append(x[1])
+                each.append(x[2])
+
+    return render_template("season_stats_view.html", player_list=player_list, match_list=match_list)

@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <table id="playerstats" class="display" style="width:95%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Average Score</th>
+                <th>Win Ratio</th>
+                <th>Games Played</th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td>{{ player_stats[0] }}</td>
+                    <td>{{ player_stats[1] }}</td>
+                    <td>{{ player_stats[2] }}</td>
+                    <td>{{ player_stats[3] }}</td>
+                    <td>{{ player_stats[4] }}</td>
+                    <td>{{ player_stats[5] }}</td>
+                </tr>
+        </tbody>
+    </table>
+
+    <table id="player_matches" class="display" style="width:95%">
+        <thead>
+            <tr>
+                <th>Winner First Name</th>
+                <th>Winner Last Name</th>
+                <th>Player 1 First Name</th>
+                <th>Player 1 Last Name</th>
+                <th>Player 1 Score</th>
+                <th>Player 2 First Name</th>
+                <th>Player 2 Last Name</th>
+                <th>Player 2 Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for each in match_list %}
+                <tr>
+                    <td>{{ each[9] }}</td>
+                    <td>{{ each[10] }}</td>
+                    <td>{{ each[5] }}</td>
+                    <td>{{ each[6] }}</td>
+                    <td>{{ each[3] }}</td>
+                    <td>{{ each[7] }}</td>
+                    <td>{{ each[8] }}</td>
+                    <td>{{ each[4] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/statview.js') }}"></script>
+
+{% endblock %}
