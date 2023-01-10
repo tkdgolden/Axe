@@ -6,7 +6,7 @@ import psycopg2
 # to be able to run sql code in the app
 import psycopg2.extras
 # flask framework for lots of things that make apps easy
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, jsonify
 # to store session variables
 from flask_session import Session
 # to hash and unhash judge passwords
@@ -17,6 +17,8 @@ from functools import wraps
 from datetime import date
 # to calculate date differences
 import datetime
+
+import json
 
 
 
@@ -457,6 +459,10 @@ def scorematch():
             if not request.form.get("winner"):
                 return errorpage(message="No Tiebreaker selected, scores NOT recoreded.", sendto="seasonview")
             winner = request.form.get("winner")
+            if winner == session["array_competitor_ids"][0]:
+                pAtotal += 1
+            elif winner == session["array_competitor_ids"][1]:
+                pBtotal += 1
 
         # get player ids
         playerA = session["array_competitor_ids"][0]
@@ -1198,79 +1204,184 @@ def tournament_stats_view():
     cur.execute("""SELECT enrollment.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name FROM enrollment JOIN competitors ON competitors.competitor_id = enrollment.competitor_id WHERE tournament_id = %(tournament_id)s""", {'tournament_id': tournament_id} )
     player_list = cur.fetchall()
 
-    cur.execute("""SELECT player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE tournament_id = %(tournament_id)s AND winner_id IS NOT NULL""", {'tournament_id':tournament_id})
+    cur.execute("""SELECT match_id, player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE tournament_id = %(tournament_id)s AND winner_id IS NOT NULL""", {'tournament_id':tournament_id})
     match_list = cur.fetchall()
 
     cur.execute("""SELECT * FROM rounds WHERE tournament_id = %(tournament_id)s""", {'tournament_id': tournament_id})
     round_list = cur.fetchall()
 
-    new_table = True
+    first_round_found = False
+    first_round = []
+    results = []
+
     for each in round_list:
         if each["which_round"] == "F":
-            # TODO display
-            new_table = False
+            if first_round_found == False:
+                first_round = each
+                first_round_found = True
+            round_f_results = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
+            results_count = 0
+            matches_count = 0
+            for x in each["bye_competitors"]:
+                if x != 0:
+                    results_count += 1
+                else:
+                    for y in match_list:
+                        if y["match_id"] == each["matches"][matches_count]:
+                            p1total = y["player1total"]
+                            p2total = y["player2total"]
+                            round_f_results[results_count] = [p1total, p2total]
+                    matches_count += 1
+                    results_count += 1
+            results.append(round_f_results)
 
     for each in round_list:
         if each["which_round"] == "E":
-            # TODO display
-            if new_table:
-                # TODO create table
-                print(match_list)
-            else:
-                # TODO add column to table
-                print(match_list)
-
-            new_table = False
+            if first_round_found == False:
+                first_round_found = True
+                first_round = each
+            round_e_results = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
+            results_count = 0
+            matches_count = 0
+            for x in each["bye_competitors"]:
+                if x != 0:
+                    results_count += 1
+                else:
+                    for y in match_list:
+                        if y["match_id"] == each["matches"][matches_count]:
+                            p1total = y["player1total"]
+                            p2total = y["player2total"]
+                            round_e_results[results_count] = [p1total, p2total]
+                    matches_count += 1
+                    results_count += 1
+            results.append(round_e_results)
 
     for each in round_list:
         if each["which_round"] == "D":
-            # TODO display
-            if new_table:
-                # TODO create table
-                print(match_list)
-            else:
-                # TODO add column to table
-                print(match_list)
+            if first_round_found == False:
+                first_round = each
+                first_round_found = True
+            round_d_results = [[],[],[],[],[],[],[],[]]
+            results_count = 0
+            matches_count = 0
+            for x in each["bye_competitors"]:
+                if x != 0:
+                    results_count += 1
+                else:
+                    for y in match_list:
+                        if y["match_id"] == each["matches"][matches_count]:
+                            p1total = y["player1total"]
+                            p2total = y["player2total"]
+                            round_d_results[results_count] = [p1total, p2total]
+                    matches_count += 1
+                    results_count += 1
+            results.append(round_d_results)
 
-            new_table = False
-    
+    print(round_d_results, "round d")
+        
     for each in round_list:
         if each["which_round"] == "C":
-            # TODO display
-            if new_table:
-                # TODO create table
-                print(match_list)
-            else:
-                # TODO add column to table
-                print(match_list)
+            if first_round_found == False:
+                first_round = each
+                first_round_found = True
+            round_c_results = [[],[],[],[]]
+            results_count = 0
+            matches_count = 0
+            for x in each["bye_competitors"]:
+                if x != 0:
+                    results_count += 1
+                else:
+                    for y in match_list:
+                        if y["match_id"] == each["matches"][matches_count]:
+                            p1total = y["player1total"]
+                            p2total = y["player2total"]
+                            round_c_results[results_count] = [p1total, p2total]
+                    matches_count += 1
+                    results_count += 1
+            results.append(round_c_results)
 
-            new_table = False
+    print(round_c_results, "round c")
 
     for each in round_list:
         if each["which_round"] == "B":
-            # TODO display
-            if new_table:
-                # TODO create table
-                print(match_list)
-            else:
-                # TODO add column to table
-                print(match_list)
+            if first_round_found == False:
+                first_round = each
+                first_round_found = True
+            round_b_results = [[],[]]
+            results_count = 0
+            matches_count = 0
+            for x in each["bye_competitors"]:
+                if x != 0:
+                    results_count += 1
+                else:
+                    for y in match_list:
+                        if y["match_id"] == each["matches"][matches_count]:
+                            p1total = y["player1total"]
+                            p2total = y["player2total"]
+                            round_b_results[results_count] = [p1total, p2total]
+                    matches_count += 1
+                    results_count += 1
+            results.append(round_b_results)
 
-            new_table = False
-    
+    print(round_b_results, "round b")
+        
     for each in round_list:
         if each["which_round"] == "A":
-            # TODO display
-            if new_table:
-                # TODO create table
-                print(match_list)
-            else:
-                # TODO add column to table
-                print(match_list)
+            if first_round_found == False:
+                first_round = each
+                first_round_found = True
+            round_a_results = [[]]
+            results_count = 0
+            matches_count = 0
+            for x in each["bye_competitors"]:
+                if x != 0:
+                    results_count += 1
+                else:
+                    for y in match_list:
+                        if y["match_id"] == each["matches"][matches_count]:
+                            p1total = y["player1total"]
+                            p2total = y["player2total"]
+                            round_a_results[results_count] = [p1total, p2total]
+                    matches_count += 1
+                    results_count += 1
+            results.append(round_a_results)
+    print(round_a_results, "round a")
 
-            new_table = False
+    print(results, "results")
 
-    return render_template("tournament_stats_view.html")
+    bye_list = first_round["bye_competitors"]
+    teams_array = []
+    match_count = 0
+    for each in bye_list:
+        if each != 0:
+            for x in player_list:
+                if x["competitor_id"] == each:
+                    name = x["competitor_first_name"] +  " " + x["competitor_last_name"]
+                    name_pair = [name, None]
+                    teams_array.append(name_pair)
+        else:
+            match = first_round["matches"][match_count]
+            for x in match_list:
+                if x["match_id"] == match:
+                    p1 = x["player_1_id"]
+                    for y in player_list:
+                        if y["competitor_id"] == p1:
+                            p1name = y["competitor_first_name"] + " " + y["competitor_last_name"]
+                    p2 = x["player_2_id"]
+                    for y in player_list:
+                        if y["competitor_id"] == p2:
+                            p2name = y["competitor_first_name"] + " " + y["competitor_last_name"]
+                    name_pair = [p1name, p2name]
+                    teams_array.append(name_pair)
+            match_count += 1
+    teams_array = json.dumps(teams_array)
+
+    print(first_round, "first round")
+    print(round_list, "round list")
+    print(player_list, "player list")
+    print(match_list, "match list")
+
+    return render_template("tournament_stats_view.html", teams_array=teams_array, results=results)
 
 
 @app.route("/season_stats_view")

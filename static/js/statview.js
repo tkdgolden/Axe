@@ -10,12 +10,5 @@ $(document).ready( function () {
    });
 
    $('.display').DataTable();
-
-    $(function() {
-        $('.tourney').bracket(resizeParameters)
-    })
-
-
-    
 } );
 
