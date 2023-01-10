@@ -5,10 +5,21 @@
     <head>
         <meta name="viewport" content="initial-scale=1, width=device-width">
         <title>Tap That AXE</title>
+
+        <!-- custom sytlesheet -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
-        <link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+        
+        <!-- adding jquery ... might not need both links...? -->
         <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+        <!-- jquery datatables plugin -->
+        <link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
         <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
+
+        <!-- jquery bracket plugin -->
+        <link rel="stylesheet" type="text/css" href="static\css\jquery.bracket.min.css" />
+        <script type="text/javascript" src="static\js\jquery.bracket.min.js"></script>
     </head>
     <body>
         <h1>Tap That Axe</h1>

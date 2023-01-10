@@ -47,7 +47,16 @@
             </form>
         </li>
         <li><a href="/competitor">Competitor</a></li>
-        <li><a href="/tournament">Tournament</a></li>
+        <li>Tournament
+            <form action="/tournament_stats_view" method="get">
+                <select name="tournament" id="tournament">
+                    {% for x in cols %}
+                        <option value="{{ x['tournament_id'] }}">{{ x["tournament_name"] }} {{ x["discipline"] }} tournament on {{ x["tournament_date"] }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="View Stats">
+            </form>
+        </li>
         <li><a href="/challenges">Challenges</a></li>
     </ul>
 

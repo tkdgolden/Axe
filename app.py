@@ -87,7 +87,10 @@ def index():
         cur.execute("""SELECT * FROM seasons""")
         rows = cur.fetchall()
 
-        return render_template("index.html", player_list=player_list, rows=rows)
+        cur.execute("""SELECT * FROM tournaments""")
+        cols = cur.fetchall()
+
+        return render_template("index.html", player_list=player_list, rows=rows, cols=cols)
 
     # logged in:
     # loads seasons and tournaments for dropdowns in judge home page
@@ -520,11 +523,12 @@ def newtournament():
     if request.method == "POST":
 
         # check for empty fields
-        if not request.form.get("name") or not request.form.get("discipline") or not request.form.get("date"):
+        if not request.form.get("name") or not request.form.get("discipline") or not request.form.get("date") or not request.form.get("double_elimination"):
             return errorpage(sendto="newtournament", message="Please fill in all fields.")
         name = request.form.get("name")
         discipline = request.form.get("discipline")
         date = request.form.get("date")
+        double_elimination = request.form.get("double_eliminaiton")
 
         # check that the tournament doesnt exist already
         cur.execute("""SELECT tournament_id FROM tournaments WHERE tournament_name = %(name)s AND discipline = %(discipline)s AND tournament_date = %(date)s""", {'name': name, 'discipline': discipline, 'date': date})
@@ -533,7 +537,7 @@ def newtournament():
             return errorpage(sendto="newtournament", message="A {name} {discipline} tournament on {date} already exists.".format(name=name, discipline=discipline, date=date))
         
         # put the new tournament into the database
-        cur.execute("""INSERT INTO tournaments (tournament_name, discipline, tournament_date) VALUES (%(name)s, %(discipline)s, %(date)s)""", {'name': name, 'discipline': discipline, 'date': date})
+        cur.execute("""INSERT INTO tournaments (tournament_name, discipline, tournament_date, double_elimination) VALUES (%(name)s, %(discipline)s, %(date)s, %(double_elimination)s)""", {'name': name, 'discipline': discipline, 'date': date, 'double_elimination': double_elimination})
         conn.commit()
         return redirect("/")
 
@@ -768,6 +772,7 @@ def createround(sorted_players, tournamentid):
 
     # starts at round A
     elif playercount == 2:
+        which_round = "A"
 
         # create matches
         for each in bracket_A_seed_order:
@@ -785,6 +790,7 @@ def createround(sorted_players, tournamentid):
 
     # starts at round B
     elif playercount < 5:
+        which_round = "B"
 
         # handle not full seeding
         if playercount < 4:
@@ -810,6 +816,8 @@ def createround(sorted_players, tournamentid):
 
     # starts at round C
     elif playercount < 9:
+        which_round = "C"
+
         # handle not full seeding
         bye_array = []
         count = playercount
@@ -837,6 +845,8 @@ def createround(sorted_players, tournamentid):
 
     # starts at round D
     elif playercount < 17:
+        which_round = "D"
+
         # handle not full seeding
         bye_array = []
         count = playercount
@@ -864,6 +874,8 @@ def createround(sorted_players, tournamentid):
 
     # starts at round E
     elif playercount <33:
+        which_round = "E"
+
         # handle not full seeding
         bye_array = []
         count = playercount
@@ -891,6 +903,8 @@ def createround(sorted_players, tournamentid):
 
     # starts at round F
     elif playercount <65:
+        which_round = "F"
+
         # handle not full seeding
         bye_array = []
         count = playercount
@@ -917,7 +931,7 @@ def createround(sorted_players, tournamentid):
                 playertwo = None
 
     # insert round entry to database
-    cur.execute("""INSERT INTO rounds (tournament_id, matches, round_id, bye_competitors) VALUES (%(tournament_id)s, %(matches_array)s, nextval('round_increment'), %(bye_array)s) RETURNING round_id""", {'tournament_id': tournamentid, 'matches_array': matches_array, 'bye_array': bye_array})
+    cur.execute("""INSERT INTO rounds (tournament_id, matches, round_id, bye_competitors, which_round) VALUES (%(tournament_id)s, %(matches_array)s, nextval('round_increment'), %(bye_array)s, %(which_round)s) RETURNING round_id""", {'tournament_id': tournamentid, 'matches_array': matches_array, 'bye_array': bye_array, 'which_round': which_round})
     conn.commit()
     round_id = cur.fetchall()[0][0]
 
@@ -1171,6 +1185,93 @@ def player_view():
                 each.append(x[2])
 
     return render_template("player_view.html", player_stats=player_stats, match_list=match_list)
+
+
+@app.route("/tournament_stats_view")
+def tournament_stats_view():
+    # get the selected tournament to be displayed
+    if request.args.get("tournament"):
+        tournament_id = request.args.get("tournament")
+    else:
+        return errorpage(sendto="/", message="You must select a tournament.")
+
+    cur.execute("""SELECT enrollment.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name FROM enrollment JOIN competitors ON competitors.competitor_id = enrollment.competitor_id WHERE tournament_id = %(tournament_id)s""", {'tournament_id': tournament_id} )
+    player_list = cur.fetchall()
+
+    cur.execute("""SELECT player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE tournament_id = %(tournament_id)s AND winner_id IS NOT NULL""", {'tournament_id':tournament_id})
+    match_list = cur.fetchall()
+
+    cur.execute("""SELECT * FROM rounds WHERE tournament_id = %(tournament_id)s""", {'tournament_id': tournament_id})
+    round_list = cur.fetchall()
+
+    new_table = True
+    for each in round_list:
+        if each["which_round"] == "F":
+            # TODO display
+            new_table = False
+
+    for each in round_list:
+        if each["which_round"] == "E":
+            # TODO display
+            if new_table:
+                # TODO create table
+                print(match_list)
+            else:
+                # TODO add column to table
+                print(match_list)
+
+            new_table = False
+
+    for each in round_list:
+        if each["which_round"] == "D":
+            # TODO display
+            if new_table:
+                # TODO create table
+                print(match_list)
+            else:
+                # TODO add column to table
+                print(match_list)
+
+            new_table = False
+    
+    for each in round_list:
+        if each["which_round"] == "C":
+            # TODO display
+            if new_table:
+                # TODO create table
+                print(match_list)
+            else:
+                # TODO add column to table
+                print(match_list)
+
+            new_table = False
+
+    for each in round_list:
+        if each["which_round"] == "B":
+            # TODO display
+            if new_table:
+                # TODO create table
+                print(match_list)
+            else:
+                # TODO add column to table
+                print(match_list)
+
+            new_table = False
+    
+    for each in round_list:
+        if each["which_round"] == "A":
+            # TODO display
+            if new_table:
+                # TODO create table
+                print(match_list)
+            else:
+                # TODO add column to table
+                print(match_list)
+
+            new_table = False
+
+    return render_template("tournament_stats_view.html")
+
 
 @app.route("/season_stats_view")
 def season_stats_view():

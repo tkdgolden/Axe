@@ -1,6 +1,6 @@
 $(document).ready( function () {
     $('#player_stats').DataTable({
-        order: [[3, 'desc']],
+        order: [[3, 'desc']]
     });
 
     $(function(){
@@ -10,5 +10,12 @@ $(document).ready( function () {
    });
 
    $('.display').DataTable();
+
+    $(function() {
+        $('.tourney').bracket(resizeParameters)
+    })
+
+
+    
 } );
 
