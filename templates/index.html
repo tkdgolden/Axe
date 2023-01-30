@@ -33,8 +33,6 @@
     <p>You can view player stats by:</p>
 
     <ul>
-        <li><a href="/overall">Overall</a></li>
-        <li><a href="/discipline">Discipline</a></li>
         <!--Drop down menu of available seasons-->
         <li>Season
             <form action="/season_stats_view" method="get">
@@ -46,7 +44,6 @@
                 <input type="submit" value="View Stats">
             </form>
         </li>
-        <li><a href="/competitor">Competitor</a></li>
         <li>Tournament
             <form action="/tournament_stats_view" method="get">
                 <select name="tournament" id="tournament">
@@ -57,7 +54,6 @@
                 <input type="submit" value="View Stats">
             </form>
         </li>
-        <li><a href="/challenges">Challenges</a></li>
     </ul>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/statview.js') }}"></script>

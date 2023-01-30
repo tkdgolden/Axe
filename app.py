@@ -50,7 +50,7 @@ except:
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
-possible_scores = [0,1,2,3,6]
+possible_scores = [0,1,2,3,4,6,12]
 
 # when compared against a sorted list of players, it sets the matches so that players are seeded correctly
 bracket_A_seed_order = [0,1]
@@ -497,11 +497,15 @@ def scorematch():
             cur.execute("""UPDATE matches SET winner_id = %(winner)s, player1total = %(pAtotal)s, player2total = %(pBtotal)s, discipline = %(discipline)s, judge_id = %(judge)s, dt = %(ts)s WHERE match_id = %(match_id)s""", {'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts, 'match_id': match_id})
             conn.commit()
 
+
             # inserts into scores for each player
             cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerA)s, %(match_id)s, %(pAqt)s, %(sequence)s, %(pAtone)s, %(pAttwo)s, %(pAtthree)s, %(pAtfour)s, %(pAtfive)s, %(pAtsix)s, %(pAtseven)s, %(pAteight)s, %(pAtotal)s, %(pAwin)s)""", {'playerA': playerA, 'match_id': match_id, 'pAqt': pAqt, 'sequence': sequence, 'pAtone': pAtone, 'pAttwo': pAttwo, 'pAtthree': pAtthree, 'pAtfour': pAtfour, 'pAtfive': pAtfive, 'pAtsix': pAtsix, 'pAtseven': pAtseven, 'pAteight': pAteight, 'pAtotal': pAtotal, 'pAwin': pAwin})
             conn.commit()
+
+
             cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerB)s, %(match_id)s, %(pBqt)s, %(sequence)s, %(pBtone)s, %(pBttwo)s, %(pBtthree)s, %(pBtfour)s, %(pBtfive)s, %(pBtsix)s, %(pBtseven)s, %(pBteight)s, %(pBtotal)s, %(pBwin)s)""", {'playerB': playerB, 'match_id': match_id, 'pBqt': pBqt, 'sequence': sequence, 'pBtone': pBtone, 'pBttwo': pBttwo, 'pBtthree': pBtthree, 'pBtfour': pBtfour, 'pBtfive': pBtfive, 'pBtsix': pBtsix, 'pBtseven': pBtseven, 'pBteight': pBteight, 'pBtotal': pBtotal, 'pBwin': pBwin})
             conn.commit()
+
         
         # error if the inserts fail
         except:

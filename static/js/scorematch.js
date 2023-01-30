@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // there are four targets on the target that will be "hot" on different throws of the round
-    options = ["Top", "Left", "Right", "Bottom"];
+    options = ["A (Top Left)", "B (Top Right)", "C (Bottom Left)", "D (Bottom Right)"];
 
     // randomly ordering the numbers that refer to the indexes of the options array
     usedNumbers = [];
