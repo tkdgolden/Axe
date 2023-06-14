@@ -1280,8 +1280,6 @@ def tournament_stats_view():
                     matches_count += 1
                     results_count += 1
             results.append(round_d_results)
-
-    print(round_d_results, "round d")
         
     for each in round_list:
         if each["which_round"] == "C":
