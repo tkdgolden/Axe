@@ -1198,7 +1198,7 @@ def tournament_stats_view():
     cur.execute("""SELECT enrollment.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name FROM enrollment JOIN competitors ON competitors.competitor_id = enrollment.competitor_id WHERE tournament_id = %(tournament_id)s""", {'tournament_id': tournament_id} )
     player_list = cur.fetchall()
 
-    cur.execute("""SELECT match_id, player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE tournament_id = %(tournament_id)s AND winner_id IS NOT NULL""", {'tournament_id':tournament_id})
+    cur.execute("""SELECT match_id, player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE tournament_id = %(tournament_id)s""", {'tournament_id':tournament_id})
     match_list = cur.fetchall()
 
     cur.execute("""SELECT * FROM rounds WHERE tournament_id = %(tournament_id)s""", {'tournament_id': tournament_id})
@@ -1224,7 +1224,10 @@ def tournament_stats_view():
                         if y["match_id"] == each["matches"][matches_count]:
                             p1total = y["player1total"]
                             p2total = y["player2total"]
-                            round_f_results[results_count] = [p1total, p2total]
+                            if (p1total == None or p2total == None):
+                                round_f_results[results_count] = []
+                            else:
+                                round_f_results[results_count] = [p1total, p2total]                    
                     matches_count += 1
                     results_count += 1
             results.append(round_f_results)
@@ -1245,7 +1248,10 @@ def tournament_stats_view():
                         if y["match_id"] == each["matches"][matches_count]:
                             p1total = y["player1total"]
                             p2total = y["player2total"]
-                            round_e_results[results_count] = [p1total, p2total]
+                            if (p1total == None or p2total == None):
+                                round_e_results[results_count] = []
+                            else:
+                                round_e_results[results_count] = [p1total, p2total]                    
                     matches_count += 1
                     results_count += 1
             results.append(round_e_results)
@@ -1266,7 +1272,10 @@ def tournament_stats_view():
                         if y["match_id"] == each["matches"][matches_count]:
                             p1total = y["player1total"]
                             p2total = y["player2total"]
-                            round_d_results[results_count] = [p1total, p2total]
+                            if (p1total == None or p2total == None):
+                                round_d_results[results_count] = []
+                            else:
+                                round_d_results[results_count] = [p1total, p2total]
                     matches_count += 1
                     results_count += 1
             results.append(round_d_results)
@@ -1287,7 +1296,10 @@ def tournament_stats_view():
                         if y["match_id"] == each["matches"][matches_count]:
                             p1total = y["player1total"]
                             p2total = y["player2total"]
-                            round_c_results[results_count] = [p1total, p2total]
+                            if (p1total == None or p2total == None):
+                                round_c_results[results_count] = []
+                            else:
+                                round_c_results[results_count] = [p1total, p2total]
                     matches_count += 1
                     results_count += 1
             results.append(round_c_results)
@@ -1308,7 +1320,10 @@ def tournament_stats_view():
                         if y["match_id"] == each["matches"][matches_count]:
                             p1total = y["player1total"]
                             p2total = y["player2total"]
-                            round_b_results[results_count] = [p1total, p2total]
+                            if (p1total == None or p2total == None):
+                                round_b_results[results_count] = []
+                            else:
+                                round_b_results[results_count] = [p1total, p2total]                    
                     matches_count += 1
                     results_count += 1
             results.append(round_b_results)
@@ -1329,7 +1344,10 @@ def tournament_stats_view():
                         if y["match_id"] == each["matches"][matches_count]:
                             p1total = y["player1total"]
                             p2total = y["player2total"]
-                            round_a_results[results_count] = [p1total, p2total]
+                            if (p1total == None or p2total == None):
+                                round_a_results[results_count] = []
+                            else:
+                                round_a_results[results_count] = [p1total, p2total]                    
                     matches_count += 1
                     results_count += 1
             results.append(round_a_results)
