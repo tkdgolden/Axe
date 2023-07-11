@@ -325,8 +325,6 @@ def creatematch():
     conn.commit()
     session["match_id"] = match[0][0]
 
-    print(array_competitors)    
-
     # send competitor info to scorematch form
     return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
 
@@ -492,7 +490,6 @@ def scorematch():
 
         # three database inserts: one to matches, and one for each player into scores
         try:
-            print(match_id)
             # insert into matches, returns primary key match id for use in scores inserts
             cur.execute("""UPDATE matches SET winner_id = %(winner)s, player1total = %(pAtotal)s, player2total = %(pBtotal)s, discipline = %(discipline)s, judge_id = %(judge)s, dt = %(ts)s WHERE match_id = %(match_id)s""", {'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts, 'match_id': match_id})
             conn.commit()
@@ -608,9 +605,6 @@ def tournamentview():
             
             # if there is no bye (0), there must be a match
             else:
-
-                print(round_info, "round info")
-                print(count, "count")
                 # get the match id
                 match = round_info[2][count]
 
@@ -658,8 +652,6 @@ def tournamentview():
                         match_info.append(player_info)
                         iteration += 1
                 count += 1
-    
-    print(match_info, "match info")
 
     # send info to page to be displayed
     return render_template("tournamentview.html", cols=cols, players=players, match_info=match_info)
@@ -694,7 +686,6 @@ def refreshtournament():
     # get the current round id from the tournament info
     round_id = cols[0][5]
 
-    print(round_id, "round id")
     # get the round info
     cur.execute("""SELECT * FROM rounds WHERE round_id = %(round_id)s""", {'round_id': round_id})
     round_info = cur.fetchall()
@@ -993,7 +984,6 @@ def nextround():
 def editmatch():
     
     match_id = request.args.get("match")
-    print(match_id)
 
     # make sure there is a valid tournament selected
     if not session["selected_tournament"]:
@@ -1024,9 +1014,6 @@ def editmatch():
 
     # store players in array
     array_competitors = [player_one_info, player_two_info]
-
-    print(array_competitors)
-    
 
     # send competitor info to scorematch form
     return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
@@ -1144,7 +1131,10 @@ def render_player_stats():
         cur.execute("""SELECT COUNT(*) FROM scores WHERE competitor_id = %(player_id)s AND won = true""", {'player_id':player_id})
         output = cur.fetchall()
         games_won = output[0][0]
-        win_rate = round((games_won / games_played), 2)
+        if (games_played == 0):
+            win_rate = 0
+        else:
+            win_rate = round((games_won / games_played), 2)
         each.append(average)
         each.append(win_rate)
         each.append(games_played)
@@ -1302,8 +1292,6 @@ def tournament_stats_view():
                     results_count += 1
             results.append(round_c_results)
 
-    print(round_c_results, "round c")
-
     for each in round_list:
         if each["which_round"] == "B":
             if first_round_found == False:
@@ -1324,8 +1312,6 @@ def tournament_stats_view():
                     matches_count += 1
                     results_count += 1
             results.append(round_b_results)
-
-    print(round_b_results, "round b")
         
     for each in round_list:
         if each["which_round"] == "A":
@@ -1347,9 +1333,6 @@ def tournament_stats_view():
                     matches_count += 1
                     results_count += 1
             results.append(round_a_results)
-    print(round_a_results, "round a")
-
-    print(results, "results")
 
     bye_list = first_round["bye_competitors"]
     teams_array = []
@@ -1377,11 +1360,6 @@ def tournament_stats_view():
                     teams_array.append(name_pair)
             match_count += 1
     teams_array = json.dumps(teams_array)
-
-    print(first_round, "first round")
-    print(round_list, "round list")
-    print(player_list, "player list")
-    print(match_list, "match list")
 
     return render_template("tournament_stats_view.html", teams_array=teams_array, results=results)
 
