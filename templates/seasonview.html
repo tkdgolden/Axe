@@ -90,10 +90,24 @@
                     {% for x in players %}
                     <tr>
                         <td>
-                            <input style="visibility:hidden" type="checkbox" onclick="return NoMoreThanTwo();" name="competitor_selection" value="{{ x['competitor_id'] }}" id="{{ x['competitor_id'] }}name">
-                            <label for="{{ x['competitor_id'] }}name">{{ x["competitor_first_name"] }} {{ x["competitor_last_name"] }}</label>
+                            {{ x["competitor_first_name"] }} {{ x["competitor_last_name"] }}
                         </td>
-                        <td id="{{ x['competitor_id'] }}matches" class="matches">
+                        <td>
+                            {% for each in logged_matches %}
+                                {% if x["competitor_id"] == each["player_1_id"] %}
+                                    {% for y in players %}
+                                        {% if y["competitor_id"] == each["player_2_id"] %}
+                                            {{ y["competitor_first_name"]}} {{ y["competitor_last_name"]}}, 
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif x["competitor_id"] == each["player_2_id"] %}
+                                    {% for y in players %}
+                                        {% if y["competitor_id"] == each["player_1_id"] %}
+                                            {{ y["competitor_first_name"]}} {{ y["competitor_last_name"]}}, 
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
                         </td>
                     </tr>
                     {% endfor %}
