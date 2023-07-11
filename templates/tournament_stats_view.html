@@ -1,25 +1,23 @@
 <!--Index page when NOT LOGGED IN for purposes of COMPETITOR viewing of results not judges-->
+
+<!-- NEEDS 6 PROBLEMS! DONT TRY TO FIX THEM! -->
 {% extends "layout.html" %}
 
 {% block body %}
     <div class="tourney" style="width:95%"></div>
     <div>
         <label class="rangePicker">
-            Team Width<br>
-            <input oninput="resize(this, 'teamWidth')" type="range" min="30" max="100" step="1" value="60">
-        </label><br>
-        <label class="rangePicker">
-            Score Width<br>
-            <input oninput="resize(this, 'scoreWidth')" type="range" min="20" max="100" step="1" value="40">
-        </label><br>
+            Name Width
+            <input oninput="resize(this, 'teamWidth')" type="range" min="30" max="200" step="1" value="60">
+        </label>
         <label>
-            Match Margin<br>
-            <input  oninput="resize(this, 'matchMargin')" type="range" min="3" max="100" step="1" value="20">
-        </label><br>
-        <label>
-            Round Margin<br>
+            Bracket Width
             <input  oninput="resize(this, 'roundMargin')" type="range" min="3" max="100" step="1" value="20">
-        </label><br>
+        </label>
+        <label>
+            Bracket Height
+            <input  oninput="resize(this, 'matchMargin')" type="range" min="3" max="100" step="1" value="20">
+        </label>
     </div>
 
     <script type="text/javascript">
@@ -38,18 +36,17 @@
 
         var resizeParameters = {
             skipConsolationRound: true, 
+            scoreWidth: 20,
             init: bigData
         };
 
         function resize(target, propName) {
             resizeParameters[propName] = parseInt(target.value);
-            updateResizeDemo();
+            $('.tourney').bracket(resizeParameters);        
         }
 
 
-        function updateResizeDemo() {
-            $('.tourney').bracket(resizeParameters);
-        }
+
     </script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/statview.js') }}"></script>
 
