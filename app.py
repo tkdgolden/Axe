@@ -1070,6 +1070,23 @@ def enrollcompetitor():
                     return errorpage(sendto="enrollcompetitor", message="That competitor is already enrolled in this season.")
             cur.execute("""INSERT INTO enrollment (competitor_id, season_id) VALUES (%(compid)s, %(sid)s)""", {'compid':compid, 'sid':sid})
             conn.commit()
+
+            # retrieve this seasons matchup data, add new thrower and matchups to it, put it back in database
+            cur.execute("""SELECT * FROM matchups WHERE season_id = %(sid)s""", {'sid':sid})
+            exists = cur.fetchall()
+            match len(exists):
+                case 0:
+                    throwers = [compid]
+                    array = []
+                case _:
+                    array = exists[0]["todo"]
+                    throwers = exists[0]["throwers"]
+                    for each in throwers:
+                        array.append([each, compid])
+                    throwers.append(compid)
+            cur.execute("""INSERT INTO matchups (season_id, throwers, todo) VALUES (%(sid)s, %(throwers)s, %(array)s) ON CONFLICT (season_id) DO UPDATE SET (throwers, todo) = (excluded.throwers, excluded.todo)""", {'sid':sid, 'throwers':throwers, 'array':array})
+            conn.commit()
+
             return redirect("/seasonview")
         else:
             tid = cols[0]["tournament_id"]
