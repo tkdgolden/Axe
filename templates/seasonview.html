@@ -1,70 +1,5 @@
 <!--Page displaying a judge's options within a season (enroll competitor, start match, view players, recent matches)-->
 
-<script>
-    player_match_count = [];
-
-    document.addEventListener('DOMContentLoaded', function() {
-        logged_matches = '{{ logged_matches }}';
-        console.log(logged_matches);
-        array_matches = document.getElementsByClassName("matches");
-        for (each of logged_matches){
-            if (each.player_1_id in player_match_count){
-                i = player_match_count.indexOf(each.player_1_id);
-                count = parseInt(player_match_count[i][1]);
-                count += 1;
-                player_match_count[i][1] = count;
-            }
-            else {
-                player_match_count.push([each.player_1_id, 1]);
-            }
-            if (each.player_2_id in player_match_count){
-                i = player_match_count.indexOf(each.player_2_id);
-                count = parseInt(player_match_count[i][1]);
-                count += 1;
-                player_match_count[i][1] = count;
-            }
-            else {
-                player_match_count.push([each.player_2_id, 1]);
-            }
-        }  
-    })
-
-    function NoMoreThanTwo()
-    {
-        var checkboxes = document.getElementsByName("competitor_selection");
-        var numberOfCheckedItems = 0;
-        for(var i = 0; i < checkboxes.length; i++)
-        {
-            if(checkboxes[i].checked)
-            {
-                numberOfCheckedItems++;
-            }
-        }
-        if(numberOfCheckedItems > 2)
-        {
-            alert("You can't select more than two competitors!");
-            return false;
-        }
-    }
-
-    function NoLessThanTwo()
-    {
-        var checkboxes = document.getElementsByName("competitor_selection");
-        var numberOfCheckedItems = 0;
-        for(var i = 0; i < checkboxes.length; i++)
-        {
-            if(checkboxes[i].checked)
-            {
-                numberOfCheckedItems++;
-            }
-        }
-        if(numberOfCheckedItems != 2){
-            alert("You must select two competitors.");
-            return false;
-        }
-    }
-</script>
-
 <style>
     input[type="checkbox"]:checked + label {
         background: skyblue;
@@ -77,44 +12,60 @@
     <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
     <p>You are judging the {{ rows[0]["season"] }} {{ rows[0]["yearof"] }} {{ rows[0]["discipline"] }} season.     <a href="/">Leave Season/ Back to Judge Homepage</a></p>
     <h2>Suggested Matches</h2>
-    <h2>All Competitors</h2>
         <form method="get" action="/creatematch">
-            <table>
-                <head>
-                    <tr>
-                        <th>Name</th>
-                        <th>Matches Played</th>
-                    </tr>
-                </head>
-                <tbody>
+            {% for each in matchups[3] %}
+                <label for="competitor_selection">
                     {% for x in players %}
-                    <tr>
-                        <td>
-                            {{ x["competitor_first_name"] }} {{ x["competitor_last_name"] }}
-                        </td>
-                        <td>
-                            {% for each in logged_matches %}
-                                {% if x["competitor_id"] == each["player_1_id"] %}
-                                    {% for y in players %}
-                                        {% if y["competitor_id"] == each["player_2_id"] %}
-                                            {{ y["competitor_first_name"]}} {{ y["competitor_last_name"]}}, 
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif x["competitor_id"] == each["player_2_id"] %}
-                                    {% for y in players %}
-                                        {% if y["competitor_id"] == each["player_1_id"] %}
-                                            {{ y["competitor_first_name"]}} {{ y["competitor_last_name"]}}, 
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            {% endfor %}
-                        </td>
-                    </tr>
+                        {% if each[0] == x["competitor_id"] %}
+                            {{ x["competitor_first_name"] }} {{ x["competitor_last_name"]}}
+                        {% endif %}
                     {% endfor %}
-                </tbody>
-            </table>
-            <input type="submit" value="Score Match" onclick="return NoLessThanTwo();">
+                    Versus
+                    {% for x in players %}
+                        {% if each[1] == x["competitor_id"] %}
+                            {{ x["competitor_first_name"] }} {{ x["competitor_last_name"]}}
+                        {% endif %}
+                    {% endfor %}
+                </label>
+                <input type="radio" id="competitor_selection" name="competitor_selection" value="{{ each }}">
+            {% endfor %}
+        <br><button>Score Match</button>
         </form>
+    <h2>All Competitors</h2>
+        <table>
+            <head>
+                <tr>
+                    <th>Name</th>
+                    <th>Matches Played</th>
+                </tr>
+            </head>
+            <tbody>
+                {% for x in players %}
+                <tr>
+                    <td>
+                        {{ x["competitor_first_name"] }} {{ x["competitor_last_name"] }}
+                    </td>
+                    <td>
+                        {% for each in logged_matches %}
+                            {% if x["competitor_id"] == each["player_1_id"] %}
+                                {% for y in players %}
+                                    {% if y["competitor_id"] == each["player_2_id"] %}
+                                        {{ y["competitor_first_name"]}} {{ y["competitor_last_name"]}}, 
+                                    {% endif %}
+                                {% endfor %}
+                            {% elif x["competitor_id"] == each["player_2_id"] %}
+                                {% for y in players %}
+                                    {% if y["competitor_id"] == each["player_1_id"] %}
+                                        {{ y["competitor_first_name"]}} {{ y["competitor_last_name"]}}, 
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
 
 {% endblock %}
