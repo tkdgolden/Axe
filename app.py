@@ -74,6 +74,89 @@ def login_required(f):
         return (f(*args, **kwargs))
     return check_login
 
+def select_season_tournament():
+    """ database call for all seasons and tournaments """
+
+    cur.execute("""SELECT * FROM seasons""")
+    rows = cur.fetchall()
+    cur.execute("""SELECT * FROM tournaments""")
+    cols = cur.fetchall()
+    return rows, cols
+
+def inactive_season_tournament():
+    """ from all seasons and tournaments, returns only the ones that are no longer active """
+    rows, cols = select_season_tournament()
+    today = date.today()
+
+    seasonarchive = []
+    for each in rows:
+        enddate = each["startdate"] + datetime.timedelta(days=70)
+        if (enddate < today):
+            seasonarchive.append(each)
+
+    tournamentarchive = []
+    for each in cols:
+        enddate = each["tournament_date"]  + datetime.timedelta(days=1)
+        if (enddate < today):
+            tournamentarchive.append(each)
+
+    return seasonarchive, tournamentarchive
+
+def active_season_tournament():
+    """ from all seasons and tournaments, returns only the ones that are active """
+    rows, cols = select_season_tournament()
+    seasonarchive, tournamentarchive = inactive_season_tournament()
+
+    for each in seasonarchive:
+        rows.remove(each)
+    for each in tournamentarchive:
+        cols.remove(each)
+    
+    return rows, cols
+
+def verify_judge_account(user_name, judge_pw):
+    """ verify judge username and password from database info """
+
+    # check for blank fields
+    if not user_name or not judge_pw:
+        return errorpage(message="Please enter a username and password.", sendto="login")
+    
+    # pull judge accounts from database
+    cur.execute("""SELECT * FROM judges WHERE judge_name = %(user_name)s""", {'user_name': user_name})
+    rows = cur.fetchall()
+    # check if the judge doesnt exist, or the given password doesnt hash
+    if (len(rows) != 1) or not check_password_hash(rows[0]["pass_hash"], judge_pw):
+        return errorpage(message="The username or password was not found.", sendto="login")
+    
+    return rows[0]['judge_id'], rows[0]["judge_name"]
+
+def no_duplicate_judge(name):
+    """ check database for a judge of the same name """
+
+    cur.execute("""SELECT * FROM judges WHERE judge_name = %(name)s""", {'name': name})
+    rows = cur.fetchall()
+    if len(rows) > 0:
+        return errorpage(sendto="newjudge", message="A judge account with this name already exists.")
+    
+def save_pw(pw):
+    """ create password hash and save it to the database """
+
+    pwhash = generate_password_hash(pw)
+    cur.execute("""INSERT INTO judges(judge_name, pass_hash) VALUES (%(name)s, %(pwhash)s)""", {'name': name, 'pwhash': pwhash})
+    conn.commit()
+
+def no_duplicate_competitor(fname, lname):
+    """ check database for a competitor of the same name """
+
+    cur.execute("""SELECT * FROM competitors WHERE competitor_first_name = %(fname)s AND competitor_last_name = %(lname)s""", {'fname': fname, 'lname': lname})
+    rows = cur.fetchall()
+    if len(rows) > 0:
+        return errorpage(sendto="newcompetitor", message="A competitor with this name already exists.")
+    
+def save_competitor(fname, lname):
+    """ save new competitor's first and last name to database """
+    cur.execute("""INSERT INTO competitors (competitor_first_name, competitor_last_name) VALUES (%(fname)s, %(lname)s)""", {'fname': fname, 'lname': lname})
+    conn.commit()
 
 # index page if not logged in, judgehome if they are
 @app.route("/")
@@ -86,36 +169,14 @@ def index():
     if session.get("user_id") is None:
         player_list = render_player_stats()
 
-        cur.execute("""SELECT * FROM seasons""")
-        rows = cur.fetchall()
-
-        cur.execute("""SELECT * FROM tournaments""")
-        cols = cur.fetchall()
+        rows, cols = select_season_tournament()
 
         return render_template("index.html", player_list=player_list, rows=rows, cols=cols)
 
     # logged in:
     # loads seasons and tournaments for dropdowns in judge home page
     # Filter out seasons and tournaments that are finished
-    cur.execute("""SELECT * FROM seasons""")
-    rows = cur.fetchall()
-    today = date.today()
-    seasonarchive = []
-    for each in rows:
-        enddate = each["startdate"] + datetime.timedelta(days=70)
-        if (enddate < today):
-            seasonarchive.append(each)
-    for each in seasonarchive:
-        rows.remove(each)
-    cur.execute("""SELECT * FROM tournaments""")
-    cols = cur.fetchall()
-    tournamentarchive = []
-    for each in cols:
-        enddate = each["tournament_date"]  + datetime.timedelta(days=1)
-        if (enddate < today):
-            tournamentarchive.append(each)
-    for each in tournamentarchive:
-        cols.remove(each)
+    rows, cols = inactive_season_tournament()
 
     # sends available season and tournament info to page to be displayed
     return render_template("judgehome.html", rows=rows, cols=cols)
@@ -129,22 +190,16 @@ def login():
     # after form submission
     if request.method == "POST":
         user_name = request.form.get("name")
+        judge_pw = request.form.get("password")
 
-        # check for blank fields
-        if not user_name or not request.form.get("password"):
-            return errorpage(message="Please enter a username and password.", sendto="login")
-        
-        # pull judge accounts from database
-        cur.execute("""SELECT * FROM judges WHERE judge_name = %(user_name)s""", {'user_name': user_name})
-        rows = cur.fetchall()
-
-        # check if the judge doesnt exist, or the given password doesnt hash
-        if (len(rows) != 1) or not check_password_hash(rows[0]["pass_hash"], request.form.get("password")):
+        try:
+            judge_id, judge_name = verify_judge_account(user_name, judge_pw)
+        except ValueError:
             return errorpage(message="The username or password was not found.", sendto="login")
 
         # save judge info in session
-        session["user_id"] = rows[0]['judge_id']
-        session["name"] = rows[0]["judge_name"]
+        session["user_id"] = judge_id
+        session["name"] = judge_name
         return redirect("/")
 
     # the form:
@@ -175,20 +230,18 @@ def newjudge():
         confirm = request.form.get("confirmation")
 
         # check for that judge already existing
-        cur.execute("""SELECT * FROM judges WHERE judge_name = %(name)s""", {'name': name})
-        rows = cur.fetchall()
-        if len(rows) > 0:
-            return errorpage(sendto="newjudge", message="A judge account with this name already exists.")
+        no_duplicate_judge(name)
 
         # check they entered the password twice the same
         if pw != confirm:
             return errorpage(sendto="newjudge", message="Passwords did not match.")
 
         # generate and store password hash
-        pwhash = generate_password_hash(pw)
-        cur.execute("""INSERT INTO judges(judge_name, pass_hash) VALUES (%(name)s, %(pwhash)s)""", {'name': name, 'pwhash': pwhash})
-        conn.commit()
-        return redirect("/")
+        try:
+            save_pw(pw)
+            return redirect("/")
+        except:
+            return errorpage(sendto="newjudge", message="Could not save password.")
 
     # the form:
     else:
@@ -210,15 +263,17 @@ def newcompetitor():
         lname = request.form.get("lastname")
 
         # check if that competitor already exists
-        cur.execute("""SELECT * FROM competitors WHERE competitor_first_name = %(fname)s AND competitor_last_name = %(lname)s""", {'fname': fname, 'lname': lname})
-        rows = cur.fetchall()
-        if len(rows) > 0:
+        try:
+            no_duplicate_competitor(fname, lname)
+        except:
             return errorpage(sendto="newcompetitor", message="A competitor with this name already exists.")
 
         # add competitor to database
-        cur.execute("""INSERT INTO competitors (competitor_first_name, competitor_last_name) VALUES (%(fname)s, %(lname)s)""", {'fname': fname, 'lname': lname})
-        conn.commit()
-        return redirect("/")
+        try:
+            save_competitor(fname, lname)
+            return redirect("/")
+        except:
+            return errorpage(sendto="newcompetitor", message="Could not save competitor.")
     
     # the form:
     else:
@@ -1117,21 +1172,7 @@ def archive():
     session["selected_tournament"] = None
 
     # loads archived seasons and tournaments
-    cur.execute("""SELECT * FROM seasons""")
-    rows = cur.fetchall()
-    today = date.today()
-    seasonarchive = []
-    for each in rows:
-        enddate = each["startdate"] + datetime.timedelta(days=70)
-        if (enddate < today):
-            seasonarchive.append(each)
-    cur.execute("""SELECT * FROM tournaments""")
-    cols = cur.fetchall()
-    tournamentarchive = []
-    for each in cols:
-        enddate = each["tournament_date"] + datetime.timedelta(days=1)
-        if (enddate < today):
-            tournamentarchive.append(each)
+    seasonarchive, tournamentarchive = inactive_season_tournament()
 
      # sends available season and tournament info to page to be displayed
     return render_template("archive.html", seasonarchive=seasonarchive, tournamentarchive=tournamentarchive)
