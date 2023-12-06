@@ -138,7 +138,7 @@ def no_duplicate_judge(name):
     if len(rows) > 0:
         return errorpage(sendto="newjudge", message="A judge account with this name already exists.")
     
-def save_pw(pw):
+def save_pw(name, pw):
     """ create password hash and save it to the database """
 
     pwhash = generate_password_hash(pw)
@@ -155,9 +155,123 @@ def no_duplicate_competitor(fname, lname):
     
 def save_competitor(fname, lname):
     """ save new competitor's first and last name to database """
+
     cur.execute("""INSERT INTO competitors (competitor_first_name, competitor_last_name) VALUES (%(fname)s, %(lname)s)""", {'fname': fname, 'lname': lname})
     conn.commit()
 
+def no_duplicate_season(season, yearof, discipline):
+    """ check database for a season of the same season, year, and discipline """
+
+    cur.execute("""SELECT season_id FROM seasons WHERE season = %(season)s AND yearof = %(yearof)s AND discipline = %(discipline)s""", {'season': season, 'yearof': yearof, 'discipline':discipline})
+    list = cur.fetchall()
+    if len(list) > 0:
+        return errorpage(sendto="newseason", message="A {season} {yearof} {discipline} season already exists.".format(season=season, yearof=yearof, discipline=discipline))
+    
+def save_season(season, yearof, discipline, startdate):
+    """ save new season info to database """
+
+    cur.execute("""INSERT INTO seasons (season, yearof, discipline, startdate) VALUES (%(season)s, %(yearof)s, %(discipline)s, %(startdate)s)""", {'season': season, 'yearof': yearof, 'discipline': discipline, 'startdate': startdate})
+    conn.commit()
+    
+def select_current_season(sess):
+    """ selects full db row for current season """
+
+    cur.execute("""SELECT * FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
+    rows = cur.fetchall()
+    if len(rows) != 1:
+        return errorpage(sendto="/", message="You must select a valid season.")
+    return rows
+    
+def select_season_competitors(sess):
+    """ selects all competitors enrolled in current season """
+
+    cur.execute("""SELECT * FROM competitors JOIN enrollment ON competitors.competitor_id = enrollment.competitor_id WHERE season_id = %(sess)s""", {'sess':sess})
+    players = cur.fetchall()
+    return players
+
+def select_completed_matches(sess):
+    """ selects matches from current season """
+
+    cur.execute("""SELECT * FROM matches WHERE season_id = %(sess)s""", {'sess':sess})
+    logged_matches = cur.fetchall()
+    return logged_matches
+
+def select_competitor(id):
+    """ selects row of competitor by id """
+
+    cur.execute("""SELECT * FROM competitors WHERE competitor_id = %(id)s""", {'id':id})
+    competitor = cur.fetchall()[0]
+    return competitor
+
+def insert_unscored_match(playerA, playerB, sess):
+    """ insert player ids and season into an otherwise empty new match, returns match_id """
+
+    cur.execute("""INSERT INTO matches (player_1_id, player_2_id, season_id) VALUES (%(playerA)s, %(playerB)s, %(sess)s) RETURNING match_id""", {'playerA': playerA, 'playerB': playerB, 'sess': sess})
+    match = cur.fetchall()
+    conn.commit()
+    return match[0][0]
+
+def count_quickthrow_points(qs):
+    """ increment each players quickthrow score for each quickthrow score that went to them """
+
+    pAqt = 0;
+    pBqt = 0;
+    for each in qs:
+        if each == "p1":
+            pAqt += 1
+        elif each == "p2":
+            pBqt += 1
+    return pAqt, pBqt
+
+def verify_scores(all_scores):
+    """ verify the scores are in the possible scores array """
+
+    for each in all_scores:
+        if each not in possible_scores:
+            return errorpage(message="someone tried to hack your form.", sendto="seasonview")
+        
+def determine_discipline_season_or_tournament():
+    """ determine season or tournament, get discipline value from database """
+
+    if session["selected_season"]:
+        sess = session["selected_season"]
+        cur.execute("""SELECT discipline FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
+        cols = cur.fetchall()
+        view = 'season'
+    else:
+        sess = session["selected_tournament"]
+        cur.execute("""SELECT discipline FROM tournaments WHERE tournament_id = %(sess)s""", {'sess':sess})
+        cols = cur.fetchall()
+        view = 'tournament'
+    discipline = cols[0]
+    return view, discipline
+
+def insert_completed_match(winner, pAtotal, pBtotal, discipline, judge, ts, match_id):
+    """ insert completed match info to database """
+
+    cur.execute("""UPDATE matches SET winner_id = %(winner)s, player1total = %(pAtotal)s, player2total = %(pBtotal)s, discipline = %(discipline)s, judge_id = %(judge)s, dt = %(ts)s WHERE match_id = %(match_id)s""", {'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts, 'match_id': match_id})
+    conn.commit()
+
+def insert_player_scores(player, match_id, qt, sequence, tone, ttwo, tthree, tfour, tfive, tsix, tseven, teight, total, win):
+    """ insert player scores into database """
+
+    cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(player)s, %(match_id)s, %(qt)s, %(sequence)s, %(tone)s, %(ttwo)s, %(tthree)s, %(tfour)s, %(tfive)s, %(tsix)s, %(tseven)s, %(teight)s, %(total)s, %(win)s)""", {'player': player, 'match_id': match_id, 'qt': qt, 'sequence': sequence, 'tone': tone, 'ttwo': ttwo, 'tthree': tthree, 'tfour': tfour, 'tfive': tfive, 'tsix': tsix, 'tseven': tseven, 'teight': teight, 'total': total, 'win': win})
+    conn.commit()
+
+def no_duplicate_tournament(name, discipline, date):
+    """ check database for a tournament of the same name, discipline, and date """
+
+    cur.execute("""SELECT tournament_id FROM tournaments WHERE tournament_name = %(name)s AND discipline = %(discipline)s AND tournament_date = %(date)s""", {'name': name, 'discipline': discipline, 'date': date})
+    list = cur.fetchall()
+    if len(list) > 0:
+        return errorpage(sendto="newtournament", message="A {name} {discipline} tournament on {date} already exists.".format(name=name, discipline=discipline, date=date))
+    
+def save_tournament(name, discipline, date, double_elimination):
+    """ save tournament info to database """
+
+    cur.execute("""INSERT INTO tournaments (tournament_name, discipline, tournament_date, double_elimination) VALUES (%(name)s, %(discipline)s, %(date)s, %(double_elimination)s)""", {'name': name, 'discipline': discipline, 'date': date, 'double_elimination': double_elimination})
+    conn.commit()
+        
 # index page if not logged in, judgehome if they are
 @app.route("/")
 def index():
@@ -238,7 +352,7 @@ def newjudge():
 
         # generate and store password hash
         try:
-            save_pw(pw)
+            save_pw(name, pw)
             return redirect("/")
         except:
             return errorpage(sendto="newjudge", message="Could not save password.")
@@ -298,15 +412,17 @@ def newseason():
         startdate = request.form.get("startdate")
 
         # check that the season doesnt exist already
-        cur.execute("""SELECT season_id FROM seasons WHERE season = %(season)s AND yearof = %(yearof)s AND discipline = %(discipline)s""", {'season': season, 'yearof': yearof, 'discipline':discipline})
-        list = cur.fetchall()
-        if len(list) > 0:
+        try:
+            no_duplicate_season(season, yearof, discipline)
+        except:
             return errorpage(sendto="newseason", message="A {season} {yearof} {discipline} season already exists.".format(season=season, yearof=yearof, discipline=discipline))
         
         # put the season in the database
-        cur.execute("""INSERT INTO seasons (season, yearof, discipline, startdate) VALUES (%(season)s, %(yearof)s, %(discipline)s, %(startdate)s)""", {'season': season, 'yearof': yearof, 'discipline': discipline, 'startdate': startdate})
-        conn.commit()
-        return redirect("/")
+        try:
+            save_season(season, yearof, discipline, startdate)
+            return redirect("/")
+        except:
+            return errorpage(sendto="newseason", message="Could not save the season.")
 
     # the form:
     else:
@@ -333,18 +449,22 @@ def seasonview():
         return errorpage(sendto="/", message="You must select a season.")
 
     # get that season's info from database
-    cur.execute("""SELECT * FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
-    rows = cur.fetchall()
-    if len(rows) != 1:
+    try:
+        rows = select_current_season(sess)
+    except:
         return errorpage(sendto="/", message="You must select a valid season.")
 
     # get competitor info from database
-    cur.execute("""SELECT * FROM competitors JOIN enrollment ON competitors.competitor_id = enrollment.competitor_id WHERE season_id = %(sess)s""", {'sess':sess})
-    players = cur.fetchall()
+    try:
+        players = select_season_competitors(sess)
+    except:
+        return errorpage(sendto="/", message="Could not retrieve competitors.")
 
     # TODO display completed matches
-    cur.execute("""SELECT * FROM matches WHERE season_id = %(sess)s""", {'sess':sess})
-    logged_matches = cur.fetchall()
+    try:
+        logged_matches = select_completed_matches(sess)
+    except:
+        return errorpage(sendto="/", message="Could not retrieve season matches.")
 
     # send that info on to the page to be displayed
     return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches)
@@ -364,8 +484,8 @@ def creatematch():
     # make an array with those competitors and their information from competitor database table
     array_competitors = []
     for each in session["array_competitor_ids"]:
-        cur.execute("""SELECT * FROM competitors WHERE competitor_id = %(each)s""", {'each':each})
-        array_competitors.append(cur.fetchall()[0])
+        competitor = select_competitor(each)
+        array_competitors.append(competitor)
 
     # get player ids
     playerA = session["array_competitor_ids"][0]
@@ -375,10 +495,7 @@ def creatematch():
     sess = session["selected_season"]
 
     # insert into matches, returns primary key match id for use in scores inserts
-    cur.execute("""INSERT INTO matches (player_1_id, player_2_id, season_id) VALUES (%(playerA)s, %(playerB)s, %(sess)s) RETURNING match_id""", {'playerA': playerA, 'playerB': playerB, 'sess': sess})
-    match = cur.fetchall()
-    conn.commit()
-    session["match_id"] = match[0][0]
+    session["match_id"] = insert_unscored_match(playerA, playerB, sess)
 
     # send competitor info to scorematch form
     return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
@@ -484,19 +601,11 @@ def scorematch():
 
         # iterate through the quicktrow points to count the points per player
         qs = [q1, q2, q3, q4, q5, q6, q7, q8]
-        pAqt = 0;
-        pBqt = 0;
-        for each in qs:
-            if each == "p1":
-                pAqt += 1
-            elif each == "p2":
-                pBqt += 1
+        pAqt, pBqt = count_quickthrow_points(qs)
 
         # iterate through all the throw scores to make sure nobody hacked the html
-        allscores = [pAtone, pAttwo, pAtthree, pAtfour, pAtfive, pAtsix, pAtseven, pAteight, pBtone, pBttwo, pBtthree, pBtfour, pBtfive, pBtsix, pBtseven, pBteight]
-        for each in allscores:
-            if each not in possible_scores:
-                return errorpage(message="someone tried to hack your form.", sendto="seasonview")
+        all_scores = [pAtone, pAttwo, pAtthree, pAtfour, pAtfive, pAtsix, pAtseven, pAteight, pBtone, pBttwo, pBtthree, pBtfour, pBtfive, pBtsix, pBtseven, pBteight]
+        verify_scores(all_scores)
 
         # sum each players score
         pAtotal = pAtone + pAttwo + pAtthree + pAtfour + pAtfive + pAtsix + pAtseven + pAteight + pAqt
@@ -530,34 +639,18 @@ def scorematch():
             pAwin = False
 
         # determine season or tournament, get discipline values
-        if session["selected_season"]:
-            sess = session["selected_season"]
-            cur.execute("""SELECT discipline FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
-            cols = cur.fetchall()
-            view = 'season'
-        else:
-            sess = session["selected_tournament"]
-            cur.execute("""SELECT discipline FROM tournaments WHERE tournament_id = %(sess)s""", {'sess':sess})
-            cols = cur.fetchall()
-            view = 'tournament'
+        view, discipline = determine_discipline_season_or_tournament()
+
         judge = session["user_id"]
-        discipline = cols[0]
 
         # three database inserts: one to matches, and one for each player into scores
         try:
             # insert into matches, returns primary key match id for use in scores inserts
-            cur.execute("""UPDATE matches SET winner_id = %(winner)s, player1total = %(pAtotal)s, player2total = %(pBtotal)s, discipline = %(discipline)s, judge_id = %(judge)s, dt = %(ts)s WHERE match_id = %(match_id)s""", {'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts, 'match_id': match_id})
-            conn.commit()
-
+            insert_completed_match(winner, pAtotal, pBtotal, discipline, judge, ts, match_id)
 
             # inserts into scores for each player
-            cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerA)s, %(match_id)s, %(pAqt)s, %(sequence)s, %(pAtone)s, %(pAttwo)s, %(pAtthree)s, %(pAtfour)s, %(pAtfive)s, %(pAtsix)s, %(pAtseven)s, %(pAteight)s, %(pAtotal)s, %(pAwin)s)""", {'playerA': playerA, 'match_id': match_id, 'pAqt': pAqt, 'sequence': sequence, 'pAtone': pAtone, 'pAttwo': pAttwo, 'pAtthree': pAtthree, 'pAtfour': pAtfour, 'pAtfive': pAtfive, 'pAtsix': pAtsix, 'pAtseven': pAtseven, 'pAteight': pAteight, 'pAtotal': pAtotal, 'pAwin': pAwin})
-            conn.commit()
-
-
-            cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(playerB)s, %(match_id)s, %(pBqt)s, %(sequence)s, %(pBtone)s, %(pBttwo)s, %(pBtthree)s, %(pBtfour)s, %(pBtfive)s, %(pBtsix)s, %(pBtseven)s, %(pBteight)s, %(pBtotal)s, %(pBwin)s)""", {'playerB': playerB, 'match_id': match_id, 'pBqt': pBqt, 'sequence': sequence, 'pBtone': pBtone, 'pBttwo': pBttwo, 'pBtthree': pBtthree, 'pBtfour': pBtfour, 'pBtfive': pBtfive, 'pBtsix': pBtsix, 'pBtseven': pBtseven, 'pBteight': pBteight, 'pBtotal': pBtotal, 'pBwin': pBwin})
-            conn.commit()
-
+            insert_player_scores(playerA, match_id, pAqt, sequence, pAtone, pAttwo, pAtthree, pAtfour, pAtfive, pAtsix, pAtseven, pAteight, pAtotal, pAwin)
+            insert_player_scores(playerB, match_id, pBqt, sequence, pBtone, pBttwo, pBtthree, pBtfour, pBtfive, pBtsix, pBtseven, pBteight, pBtotal, pBwin)
         
         # error if the inserts fail
         except:
@@ -593,15 +686,17 @@ def newtournament():
         double_elimination = request.form.get("double_eliminaiton")
 
         # check that the tournament doesnt exist already
-        cur.execute("""SELECT tournament_id FROM tournaments WHERE tournament_name = %(name)s AND discipline = %(discipline)s AND tournament_date = %(date)s""", {'name': name, 'discipline': discipline, 'date': date})
-        list = cur.fetchall()
-        if len(list) > 0:
+        try:
+            no_duplicate_tournament(name, discipline, date)
+        except:
             return errorpage(sendto="newtournament", message="A {name} {discipline} tournament on {date} already exists.".format(name=name, discipline=discipline, date=date))
         
         # put the new tournament into the database
-        cur.execute("""INSERT INTO tournaments (tournament_name, discipline, tournament_date, double_elimination) VALUES (%(name)s, %(discipline)s, %(date)s, %(double_elimination)s)""", {'name': name, 'discipline': discipline, 'date': date, 'double_elimination': double_elimination})
-        conn.commit()
-        return redirect("/")
+        try:
+            save_tournament(name, discipline, date, double_elimination)
+            return redirect("/")
+        except:
+            return errorpage(sendto="newtournament", message="Could not save tournamtent info.")
 
     # the form:
     else:
