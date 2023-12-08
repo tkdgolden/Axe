@@ -6,7 +6,8 @@ import psycopg2.extras
 from datetime import date
 # to hash and unhash judge passwords
 from werkzeug.security import check_password_hash, generate_password_hash
-
+# for secret
+import os
 # to calculate date differences
 import datetime
 
@@ -15,7 +16,16 @@ import helpers
 conn = None
 CUR = None
 
-def db_connect(SECRET):
+def db_connect():
+
+    # find database credentials
+    try:
+        SECRET = os.environ["SECRET"]
+        print("Heroku db access")
+    except:
+        SECRET = os.environ["DATABASE_URL"]
+        print("local db access")
+
     conn = psycopg2.connect(SECRET)
     global CUR
     CUR = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)

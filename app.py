@@ -1,25 +1,17 @@
-# to keep database credentials secure
-from distutils.log import error
 import os
 
 # flask framework for lots of things that make apps easy
-from flask import Flask, render_template, request, session, redirect, jsonify
+from flask import Flask, render_template, request, session, redirect
 # to store session variables
 from flask_session import Session
-
-# to create my own login_required wrap function
-from functools import wraps
-
 
 import json
 
 from db import *
 from helpers import *
 
-
 #initiate app
 app = Flask(__name__)
-
 
 # app settings
 app.config["SESSION_PERMANENT"] = False
@@ -27,22 +19,11 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 Session(app)
 
-# find database credentials
-try:
-    SECRET = os.environ["SECRET"]
-    print("Heroku db access")
-except:
-    SECRET = os.environ["DATABASE_URL"]
-    print("local db access")
-
-
 # connect to database
 try:
-    db_connect(SECRET)
+    db_connect()
 except:
     print("Unable to connect to database")
-
-
 
 # when compared against a sorted list of players, it sets the matches so that players are seeded correctly
 bracket_A_seed_order = [0,1]
