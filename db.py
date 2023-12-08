@@ -40,16 +40,40 @@ def select_season_tournament():
 
     return rows, cols
 
+def select_judge(user_name):
+    """ return judge row from username """
+
+    # pull judge accounts from database
+    CUR.execute("""SELECT * FROM judges WHERE judge_name = %(user_name)s""", {'user_name': user_name})
+
+    return CUR.fetchall()
+
+def select_match_by_id(match_id):
+    """ return match by id """
+
+    CUR.execute(""" SELECT * FROM matches WHERE match_id = %(match_id)s """, {'match_id' : match_id})
+
+    return CUR.fetchall()[0]
+
+def select_matches_by_season(season_id):
+    """ selects matches from current season """
+
+    CUR.execute("""SELECT * FROM matches WHERE season_id = %(season_id)s""", {'season_id':season_id})
+
+    return CUR.fetchall()
+
+def select_matchups(season_id):
+    """ selects matchups from current season """
+
+    CUR.execute(""" SELECT * FROM matchups WHERE season_id = %(season_id)s """, {'season_id':season_id})
+
+    return CUR.fetchall()
+
 def verify_judge_account(user_name, judge_pw):
     """ verify judge username and password from database info """
 
-    # check for blank fields
-    if not user_name or not judge_pw:
-        return helpers.errorpage(message="Please enter a username and password.", send_to="login")
-    
-    # pull judge accounts from database
-    CUR.execute("""SELECT * FROM judges WHERE judge_name = %(user_name)s""", {'user_name': user_name})
-    rows = CUR.fetchall()
+    rows = select_judge(user_name)
+
     # check if the judge doesnt exist, or the given password doesnt hash
     if (len(rows) != 1) or not check_password_hash(rows[0]["pass_hash"], judge_pw):
         return helpers.errorpage(message="The username or password was not found.", send_to="login")
@@ -90,8 +114,7 @@ def active_season_tournament():
 def no_duplicate_judge(name):
     """ check database for a judge of the same name """
 
-    CUR.execute("""SELECT * FROM judges WHERE judge_name = %(name)s""", {'name': name})
-    rows = CUR.fetchall()
+    rows = select_judge(name)
     if len(rows) > 0:
         return helpers.errorpage(send_to="newjudge", message="A judge account with this name already exists.")
     
@@ -134,35 +157,22 @@ def select_current_season(sess):
     """ selects full db row for current season """
 
     CUR.execute("""SELECT * FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
-    rows = CUR.fetchall()
-    if len(rows) != 1:
-        return helpers.errorpage(send_to="/", message="You must select a valid season.")
     
-    return rows
+    return CUR.fetchall()
     
 def select_season_competitors(sess):
     """ selects all competitors enrolled in current season """
 
     CUR.execute("""SELECT * FROM competitors JOIN enrollment ON competitors.competitor_id = enrollment.competitor_id WHERE season_id = %(sess)s""", {'sess':sess})
-    players = CUR.fetchall()
 
-    return players
-
-def select_completed_matches(sess):
-    """ selects matches from current season """
-
-    CUR.execute("""SELECT * FROM matches WHERE season_id = %(sess)s""", {'sess':sess})
-    logged_matches = CUR.fetchall()
-
-    return logged_matches
+    return CUR.fetchall()
 
 def select_competitor_by_id(id):
     """ selects row of competitor by id """
 
     CUR.execute("""SELECT * FROM competitors WHERE competitor_id = %(id)s""", {'id':id})
-    competitor = CUR.fetchall()[0]
 
-    return competitor
+    return CUR.fetchall()[0]
 
 def insert_unscored_season_match(playerA, playerB, sess):
     """ insert player ids and season into an otherwise empty new match, returns match_id """
@@ -177,12 +187,14 @@ def select_season_discipline(sess):
     """ returns discipline from season id """
 
     CUR.execute("""SELECT discipline FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
+
     return CUR.fetchall()
 
 def select_tournament_discipline(sess):
     """ returns discipline from tournament id """
 
     CUR.execute("""SELECT discipline FROM tournaments WHERE tournament_id = %(sess)s""", {'sess':sess})
+
     return CUR.fetchall()
 
 def insert_completed_match(winner, pAtotal, pBtotal, discipline, judge, ts, match_id):
@@ -201,9 +213,8 @@ def no_duplicate_tournament(name, discipline, date):
     """ check database for a tournament of the same name, discipline, and date """
 
     CUR.execute("""SELECT tournament_id FROM tournaments WHERE tournament_name = %(name)s AND discipline = %(discipline)s AND tournament_date = %(date)s""", {'name': name, 'discipline': discipline, 'date': date})
-    list = CUR.fetchall()
-    if len(list) > 0:
-        return helpers.errorpage(send_to="newtournament", message="A {name} {discipline} tournament on {date} already exists.".format(name=name, discipline=discipline, date=date))
+
+    return CUR.fetchall()
     
 def save_tournament(name, discipline, date, double_elimination):
     """ save tournament info to database """
@@ -214,9 +225,10 @@ def save_tournament(name, discipline, date, double_elimination):
 def select_tournament_match(match_id):
     """ select player & winner info from database with match_id """
 
-    CUR.execute("""SELECT player_1_id, player_2_id, winner_id FROM matches WHERE match_id = %(match_id)s""", {'match_id': match_id})
+    match = select_match_by_id(match_id)
+    relevant = [match['player_1_id'], match['player_2_id'], match['winner_id']]
 
-    return CUR.fetchall()[0]
+    return relevant
 
 def select_current_tournament(tournament_id):
     """ select row from tournaments from tournament_id """
@@ -300,16 +312,10 @@ def get_round_info(round_id):
 def select_winner(match_id):
     """ returns winner id from match id """
 
-    CUR.execute("""SELECT winner_id FROM matches WHERE match_id = %(match_id)s""", {'match_id': match_id})
+    match = select_match_by_id(match_id)
+    relevant = filter(lambda x: x in ['winner_id'], match)
 
-    return CUR.fetchall()[0][0]
-
-def select_match(match_id):
-    """ returns row for match by match_id """
-
-    CUR.execute("""SELECT * FROM matches WHERE match_id = %(match_id)s""", {'match_id': match_id})
-
-    return CUR.fetchall()[0]
+    return relevant
 
 def select_season(season_id):
     """ returns season row by season id """

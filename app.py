@@ -65,6 +65,10 @@ def login():
         user_name = request.form.get("name")
         judge_pw = request.form.get("password")
 
+        # check for blank fields
+        if not user_name or not judge_pw:
+            return helpers.errorpage(message="Please enter a username and password.", send_to="login")
+
         try:
             judge_id, judge_name = verify_judge_account(user_name, judge_pw)
         except ValueError:
@@ -210,6 +214,8 @@ def seasonview():
     # get that season's info from database
     try:
         rows = select_current_season(sess)
+        if len(rows) != 1:
+            return helpers.errorpage(send_to="/", message="You must select a valid season.")
     except:
         return errorpage(send_to="/", message="You must select a valid season.")
 
@@ -221,12 +227,17 @@ def seasonview():
 
     # TODO display completed matches
     try:
-        logged_matches = select_completed_matches(sess)
+        logged_matches = select_matches_by_season(sess)
     except:
         return errorpage(send_to="/", message="Could not retrieve season matches.")
+    
+    try:
+        matchups = select_matchups(sess)
+    except:
+        return errorpage(send_to="/", message="Could not retrieve season matchups.")
 
     # send that info on to the page to be displayed
-    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches)
+    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, matchups=matchups)
 
 
 # create match used only from seasons, in tournaments matches are created when the round is created
@@ -445,10 +456,9 @@ def newtournament():
         double_elimination = request.form.get("double_eliminaiton")
 
         # check that the tournament doesnt exist already
-        try:
-            no_duplicate_tournament(name, discipline, date)
-        except:
-            return errorpage(send_to="newtournament", message="A {name} {discipline} tournament on {date} already exists.".format(name=name, discipline=discipline, date=date))
+        list = no_duplicate_tournament(name, discipline, date)
+        if len(list) > 0:
+            return helpers.errorpage(send_to="newtournament", message="A {name} {discipline} tournament on {date} already exists.".format(name=name, discipline=discipline, date=date))
         
         # put the new tournament into the database
         try:
@@ -521,7 +531,7 @@ def tournamentview():
                 two_competitors = select_tournament_match(match)
                 
                 # if the round has no winner
-                if two_competitors[2] == None:
+                if two_competitors['winner_id'] == None:
 
                     # add the word match to be read by the javascript
                     match_count = ["match", match]
@@ -911,29 +921,29 @@ def editmatch():
 
     # get match info
     try:
-        match_info = select_match(match_id)
+        match_info = select_match_by_id(match_id)
     except:
         return errorpage(send_to="tournamentview", message="Could not load match.")
 
-    player_one_info = [match_info[1]]
-    player_two_info = [match_info[2]]
+    player_1 = match_info['player_1_id']
+    player_2 = match_info['player_2_id']
 
-    session["array_competitor_ids"] = [player_one_info, player_two_info]
+    session["array_competitor_ids"] = [player_1, player_2]
 
     # get player info
-    p1info = select_competitor_by_id(player_one_info)
-    player_one_info.append(p1info["competitor_first_name"])
-    player_one_info.append(p1info["competitor_last_name"])
-    p2info = select_competitor_by_id(player_two_info)
-    player_two_info.append(p2info["competitor_first_name"])
-    player_two_info.append(p2info["competitor_last_name"])
+    player_1_info = select_competitor_by_id(player_1)
+    player_1.append(player_1_info["competitor_first_name"])
+    player_1.append(player_1_info["competitor_last_name"])
+    player_2_info = select_competitor_by_id(player_2)
+    player_2.append(player_2_info["competitor_first_name"])
+    player_2.append(player_2_info["competitor_last_name"])
 
 
     # store match id in session
     session["match_id"] = match_id
 
     # store players in array
-    array_competitors = [player_one_info, player_two_info]
+    array_competitors = [player_1, player_2]
 
     # send competitor info to scorematch form
     return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
