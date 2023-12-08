@@ -1,5 +1,3 @@
-import os
-
 # flask framework for lots of things that make apps easy
 from flask import Flask, render_template, request, session, redirect
 # to store session variables
