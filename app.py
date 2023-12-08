@@ -91,7 +91,7 @@ def inactive_season_tournament():
 
     seasonarchive = []
     for each in rows:
-        enddate = each["startdate"] + datetime.timedelta(days=70)
+        enddate = each["start_date"] + datetime.timedelta(days=70)
         if (enddate < today):
             seasonarchive.append(each)
 
@@ -160,18 +160,18 @@ def save_competitor(fname, lname):
     cur.execute("""INSERT INTO competitors (competitor_first_name, competitor_last_name) VALUES (%(fname)s, %(lname)s)""", {'fname': fname, 'lname': lname})
     conn.commit()
 
-def no_duplicate_season(season, yearof, discipline):
+def no_duplicate_season(season, year_of, discipline):
     """ check database for a season of the same season, year, and discipline """
 
-    cur.execute("""SELECT season_id FROM seasons WHERE season = %(season)s AND yearof = %(yearof)s AND discipline = %(discipline)s""", {'season': season, 'yearof': yearof, 'discipline':discipline})
+    cur.execute("""SELECT season_id FROM seasons WHERE season = %(season)s AND year_of = %(year_of)s AND discipline = %(discipline)s""", {'season': season, 'year_of': year_of, 'discipline':discipline})
     list = cur.fetchall()
     if len(list) > 0:
-        return errorpage(send_to="newseason", message="A {season} {yearof} {discipline} season already exists.".format(season=season, yearof=yearof, discipline=discipline))
+        return errorpage(send_to="newseason", message="A {season} {year_of} {discipline} season already exists.".format(season=season, year_of=year_of, discipline=discipline))
     
-def save_season(season, yearof, discipline, startdate):
+def save_season(season, year_of, discipline, start_date):
     """ save new season info to database """
 
-    cur.execute("""INSERT INTO seasons (season, yearof, discipline, startdate) VALUES (%(season)s, %(yearof)s, %(discipline)s, %(startdate)s)""", {'season': season, 'yearof': yearof, 'discipline': discipline, 'startdate': startdate})
+    cur.execute("""INSERT INTO seasons (season, year_of, discipline, start_date) VALUES (%(season)s, %(year_of)s, %(discipline)s, %(start_date)s)""", {'season': season, 'year_of': year_of, 'discipline': discipline, 'start_date': start_date})
     conn.commit()
     
 def select_current_season(sess):
@@ -257,13 +257,13 @@ def determine_discipline_season_or_tournament():
 def insert_completed_match(winner, pAtotal, pBtotal, discipline, judge, ts, match_id):
     """ insert completed match info to database """
 
-    cur.execute("""UPDATE matches SET winner_id = %(winner)s, player1total = %(pAtotal)s, player2total = %(pBtotal)s, discipline = %(discipline)s, judge_id = %(judge)s, dt = %(ts)s WHERE match_id = %(match_id)s""", {'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts, 'match_id': match_id})
+    cur.execute("""UPDATE matches SET winner_id = %(winner)s, player_1_total = %(pAtotal)s, player_2_total = %(pBtotal)s, discipline = %(discipline)s, judge_id = %(judge)s, date_time = %(ts)s WHERE match_id = %(match_id)s""", {'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts, 'match_id': match_id})
     conn.commit()
 
 def insert_player_scores(player, match_id, qt, sequence, tone, ttwo, tthree, tfour, tfive, tsix, tseven, teight, total, win):
     """ insert player scores into database """
 
-    cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(player)s, %(match_id)s, %(qt)s, %(sequence)s, %(tone)s, %(ttwo)s, %(tthree)s, %(tfour)s, %(tfive)s, %(tsix)s, %(tseven)s, %(teight)s, %(total)s, %(win)s)""", {'player': player, 'match_id': match_id, 'qt': qt, 'sequence': sequence, 'tone': tone, 'ttwo': ttwo, 'tthree': tthree, 'tfour': tfour, 'tfive': tfive, 'tsix': tsix, 'tseven': tseven, 'teight': teight, 'total': total, 'win': win})
+    cur.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, sequence, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(player)s, %(match_id)s, %(qt)s, %(sequence)s, %(tone)s, %(ttwo)s, %(tthree)s, %(tfour)s, %(tfive)s, %(tsix)s, %(tseven)s, %(teight)s, %(total)s, %(win)s)""", {'player': player, 'match_id': match_id, 'qt': qt, 'sequence': sequence, 'tone': tone, 'ttwo': ttwo, 'tthree': tthree, 'tfour': tfour, 'tfive': tfive, 'tsix': tsix, 'tseven': tseven, 'teight': teight, 'total': total, 'win': win})
     conn.commit()
 
 def no_duplicate_tournament(name, discipline, date):
@@ -422,9 +422,9 @@ def select_season_matchups(season_id):
     return cur.fetchall()
 
 def insert_season_matchups(season_id, throwers, array):
-    """ inserts into matchups by season id, throwers and todo array """
+    """ inserts into matchups by season id, throwers and to do array """
 
-    cur.execute("""INSERT INTO matchups (season_id, throwers, todo) VALUES (%(season_id)s, %(throwers)s, %(array)s) ON CONFLICT (season_id) DO UPDATE SET (throwers, todo) = (excluded.throwers, excluded.todo)""", {'season_id':season_id, 'throwers':throwers, 'array':array})
+    cur.execute("""INSERT INTO matchups (season_id, throwers, to_do) VALUES (%(season_id)s, %(throwers)s, %(array)s) ON CONFLICT (season_id) DO UPDATE SET (throwers, to_do) = (excluded.throwers, excluded.to_do)""", {'season_id':season_id, 'throwers':throwers, 'array':array})
     conn.commit()
 
 def select_competitor_tournaments(competitor_id):
@@ -464,14 +464,14 @@ def select_competitor_wins(player_id):
 def select_competitor_matches(player_id):
     """ returns match info (players, winner, scores) for each match the player has been in by player id """
 
-    cur.execute("""SELECT player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE (player_1_id = %(player_id)s OR player_2_id = %(player_id)s) AND winner_id IS NOT NULL""", {'player_id': player_id})
+    cur.execute("""SELECT player_1_id, player_2_id, winner_id, player_1_total, player_2_total FROM matches WHERE (player_1_id = %(player_id)s OR player_2_id = %(player_id)s) AND winner_id IS NOT NULL""", {'player_id': player_id})
 
     return cur.fetchall()
 
 def select_tournament_matches(tournament_id):
     """ returns match info (match id, players, winner, scores) for each match in the tournament by tournament id """
 
-    cur.execute("""SELECT match_id, player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE tournament_id = %(tournament_id)s""", {'tournament_id':tournament_id})
+    cur.execute("""SELECT match_id, player_1_id, player_2_id, winner_id, player_1_total, player_2_total FROM matches WHERE tournament_id = %(tournament_id)s""", {'tournament_id':tournament_id})
 
     return cur.fetchall()
 
@@ -485,7 +485,7 @@ def select_tournament_rounds(tournament_id):
 def select_season_matches(season_id):
     """ returns match info (players, winner, scores) from all matches in season by season id """
 
-    cur.execute("""SELECT player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE season_id = %(season_id)s AND winner_id IS NOT NULL""", {'season_id':season_id})
+    cur.execute("""SELECT player_1_id, player_2_id, winner_id, player_1_total, player_2_total FROM matches WHERE season_id = %(season_id)s AND winner_id IS NOT NULL""", {'season_id':season_id})
 
     return cur.fetchall()
         
@@ -621,22 +621,22 @@ def newseason():
     if request.method == "POST":
 
         # check for empty fields
-        if not request.form.get("season") or not request.form.get("year") or not request.form.get("discipline") or not request.form.get("startdate"):
+        if not request.form.get("season") or not request.form.get("year") or not request.form.get("discipline") or not request.form.get("start_date"):
             return errorpage(send_to="newseason", message="Please fill out all fields.")
         season = request.form.get("season")
-        yearof = request.form.get("year")
+        year_of = request.form.get("year")
         discipline = request.form.get("discipline")
-        startdate = request.form.get("startdate")
+        start_date = request.form.get("start_date")
 
         # check that the season doesnt exist already
         try:
-            no_duplicate_season(season, yearof, discipline)
+            no_duplicate_season(season, year_of, discipline)
         except:
-            return errorpage(send_to="newseason", message="A {season} {yearof} {discipline} season already exists.".format(season=season, yearof=yearof, discipline=discipline))
+            return errorpage(send_to="newseason", message="A {season} {year_of} {discipline} season already exists.".format(season=season, year_of=year_of, discipline=discipline))
         
         # put the season in the database
         try:
-            save_season(season, yearof, discipline, startdate)
+            save_season(season, year_of, discipline, start_date)
             return redirect("/")
         except:
             return errorpage(send_to="newseason", message="Could not save the season.")
@@ -1451,7 +1451,7 @@ def enrollcompetitor():
                     throwers = [compid]
                     array = []
                 case _:
-                    array = exists[0]["todo"]
+                    array = exists[0]["to_do"]
                     throwers = exists[0]["throwers"]
                     for each in throwers:
                         array.append([each, compid])
@@ -1470,7 +1470,7 @@ def enrollcompetitor():
 
     # sending data to the form page
     if isseason:
-        result = "{} {} {} season".format(rows[0]['season'], rows[0]['yearof'], rows[0]['discipline'])
+        result = "{} {} {} season".format(rows[0]['season'], rows[0]['year_of'], rows[0]['discipline'])
     else:
         result = "{} {} tournament on {}".format(cols[0]['tournament_name'], cols[0]['discipline'], cols[0]['tournament_date'])
 
@@ -1577,8 +1577,8 @@ def tournament_stats_view():
                 else:
                     for y in match_list:
                         if y["match_id"] == each["matches"][matches_count]:
-                            p1total = y["player1total"]
-                            p2total = y["player2total"]
+                            p1total = y["player_1_total"]
+                            p2total = y["player_2_total"]
                             if (p1total == None or p2total == None):
                                 round_f_results[results_count] = []
                             else:
@@ -1601,8 +1601,8 @@ def tournament_stats_view():
                 else:
                     for y in match_list:
                         if y["match_id"] == each["matches"][matches_count]:
-                            p1total = y["player1total"]
-                            p2total = y["player2total"]
+                            p1total = y["player_1_total"]
+                            p2total = y["player_2_total"]
                             if (p1total == None or p2total == None):
                                 round_e_results[results_count] = []
                             else:
@@ -1625,8 +1625,8 @@ def tournament_stats_view():
                 else:
                     for y in match_list:
                         if y["match_id"] == each["matches"][matches_count]:
-                            p1total = y["player1total"]
-                            p2total = y["player2total"]
+                            p1total = y["player_1_total"]
+                            p2total = y["player_2_total"]
                             if (p1total == None or p2total == None):
                                 round_d_results[results_count] = []
                             else:
@@ -1649,8 +1649,8 @@ def tournament_stats_view():
                 else:
                     for y in match_list:
                         if y["match_id"] == each["matches"][matches_count]:
-                            p1total = y["player1total"]
-                            p2total = y["player2total"]
+                            p1total = y["player_1_total"]
+                            p2total = y["player_2_total"]
                             if (p1total == None or p2total == None):
                                 round_c_results[results_count] = []
                             else:
@@ -1673,8 +1673,8 @@ def tournament_stats_view():
                 else:
                     for y in match_list:
                         if y["match_id"] == each["matches"][matches_count]:
-                            p1total = y["player1total"]
-                            p2total = y["player2total"]
+                            p1total = y["player_1_total"]
+                            p2total = y["player_2_total"]
                             if (p1total == None or p2total == None):
                                 round_b_results[results_count] = []
                             else:
@@ -1697,8 +1697,8 @@ def tournament_stats_view():
                 else:
                     for y in match_list:
                         if y["match_id"] == each["matches"][matches_count]:
-                            p1total = y["player1total"]
-                            p2total = y["player2total"]
+                            p1total = y["player_1_total"]
+                            p2total = y["player_2_total"]
                             if (p1total == None or p2total == None):
                                 round_a_results[results_count] = []
                             else:
