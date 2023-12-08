@@ -6,11 +6,12 @@ possible_scores = [0,1,2,3,4,6,12]
 
 # function to output error message and send the user back to what they were attempting so they can try again
 def errorpage(message, send_to):
+    """ returns errorpage displaying message and "back to" button with custom route """
     return render_template("errorpage.html", message=message, sendto=send_to)
 
 
-# check that user is logged in
 def login_required(f):
+    """ checks that a user is logged in """
     @wraps(f)
     def check_login(*args, **kwargs):
         if session.get("user_id") is None:

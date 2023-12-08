@@ -164,10 +164,14 @@ def insert_unscored_season_match(playerA, playerB, sess):
     return match[0][0]
 
 def select_season_discipline(sess):
+    """ returns discipline from season id """
+
     CUR.execute("""SELECT discipline FROM seasons WHERE season_id = %(sess)s""", {'sess':sess})
     return CUR.fetchall()
 
 def select_tournament_discipline(sess):
+    """ returns discipline from tournament id """
+
     CUR.execute("""SELECT discipline FROM tournaments WHERE tournament_id = %(sess)s""", {'sess':sess})
     return CUR.fetchall()
 
