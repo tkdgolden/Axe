@@ -1075,24 +1075,6 @@ def player_view():
     player_stats.append(games_played)
 
     match_list = select_competitor_matches(player_id)
-    player_list = select_all_competitors()
-
-    for each in match_list:
-        player1_id = each[0]
-        player2_id = each[1]
-        winner_id = each[2]
-        for x in player_list:
-            if x[0] == player1_id:
-                each.append(x[1])
-                each.append(x[2])
-        for x in player_list:
-            if x[0] == player2_id:
-                each.append(x[1])
-                each.append(x[2])
-        for x in player_list:
-            if x[0] == winner_id:
-                each.append(x[1])
-                each.append(x[2])
 
     return render_template("player_view.html", player_stats=player_stats, match_list=match_list)
 

@@ -18,15 +18,19 @@ CUR = None
 
 def db_connect():
 
-    # find database credentials
-    try:
-        SECRET = os.environ["SECRET"]
-        print("Heroku db access")
-    except:
-        SECRET = os.environ["DATABASE_URL"]
-        print("local db access")
+    # development
+    # SECRET = os.environ["DATABASE_URL"]
+    # print("Heroku db access")
 
-    conn = psycopg2.connect(SECRET)
+    # test
+    # SECRET = os.environ["DATABASE_PATH"]
+    # print(SECRET)
+    # print("local db access")
+
+    try:
+        conn = psycopg2.connect('postgres://postgres:go205956@localhost/axe-scoring')
+    except:
+        print("ERROR")
     global CUR
     CUR = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -401,9 +405,22 @@ def select_competitor_wins(player_id):
 def select_competitor_matches(player_id):
     """ returns match info (players, winner, scores) for each match the player has been in by player id """
 
-    CUR.execute("""SELECT player_1_id, player_2_id, winner_id, player_1_total, player_2_total FROM matches WHERE (player_1_id = %(player_id)s OR player_2_id = %(player_id)s) AND winner_id IS NOT NULL""", {'player_id': player_id})
+    CUR.execute("""SELECT * FROM matches WHERE (player_1_id = %(player_id)s OR player_2_id = %(player_id)s) AND winner_id IS NOT NULL""", {'player_id': player_id})
+    matches = CUR.fetchall()
+    list_matches = []
+    for each in matches:
+        each_dict = dict(each)
+        p1 = each['player_1_id']
+        CUR.execute(""" SELECT * FROM competitors WHERE (competitor_id = %(p1)s ) """, {'p1': p1})
+        p1_name = CUR.fetchone()
+        each_dict['player_1_name'] = f"{p1_name['competitor_first_name']} {p1_name['competitor_last_name']}"
+        p2 = each['player_2_id']
+        CUR.execute(""" SELECT * FROM competitors WHERE (competitor_id = %(p2)s ) """, {'p2': p2})
+        p2_name = CUR.fetchone()
+        each_dict['player_2_name'] = f"{p2_name['competitor_first_name']} {p2_name['competitor_last_name']}"
+        list_matches.append(each_dict)
 
-    return CUR.fetchall()
+    return list_matches
 
 def select_tournament_matches(tournament_id):
     """ returns match info (match id, players, winner, scores) for each match in the tournament by tournament id """

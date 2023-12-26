@@ -2,53 +2,34 @@
 
 {% block body %}
 
-    <table id="playerstats" class="display" style="width:95%">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Average Score</th>
-                <th>Win Ratio</th>
-                <th>Games Played</th>
-            </tr>
-        </thead>
-        <tbody>
-                <tr>
-                    <td>{{ player_stats[0] }}</td>
-                    <td>{{ player_stats[1] }}</td>
-                    <td>{{ player_stats[2] }}</td>
-                    <td>{{ player_stats[3] }}</td>
-                    <td>{{ player_stats[4] }}</td>
-                    <td>{{ player_stats[5] }}</td>
-                </tr>
-        </tbody>
-    </table>
+    <h1>{{ player_stats[1] }} {{ player_stats[2] }}</h1>
+    <h3>Average Score: </h3><p>{{ player_stats[3] }}</p>
+    <h3>Win Ratio: </h3><p>{{ player_stats[4] }}</p>
+    <h3>Games Played: </h3><p>{{ player_stats[5] }}</p>
 
     <table id="player_matches" class="display" style="width:95%">
         <thead>
             <tr>
-                <th>Winner First Name</th>
-                <th>Winner Last Name</th>
-                <th>Player 1 First Name</th>
-                <th>Player 1 Last Name</th>
-                <th>Player 1 Score</th>
-                <th>Player 2 First Name</th>
-                <th>Player 2 Last Name</th>
-                <th>Player 2 Score</th>
+                <th>Hatchet Matches: </th>
             </tr>
         </thead>
         <tbody>
             {% for each in match_list %}
-                <tr>
-                    <td>{{ each[9] }}</td>
-                    <td>{{ each[10] }}</td>
-                    <td>{{ each[5] }}</td>
-                    <td>{{ each[6] }}</td>
-                    <td>{{ each[3] }}</td>
-                    <td>{{ each[7] }}</td>
-                    <td>{{ each[8] }}</td>
-                    <td>{{ each[4] }}</td>
+                <tr role="button" data-href="match_view?match_id={{ each['match_id'] }}">
+                    <td>
+                        {% if each['winner_id'] == player_stats['competitor_id'] %}
+                            WIN
+                        {% else %}
+                            LOSS
+                        {% endif %} 
+                        {{ each['player1total'] }} to {{ each['player2total'] }} against 
+                        {% if each['player_1_id'] == player_stats[0] %} 
+                            {{ each['player_2_name'] }}
+                        {% else %} 
+                            {{ each['player_1_name'] }}
+                        {% endif %}
+                        on {{ each['dt'] }}
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

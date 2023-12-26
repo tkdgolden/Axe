@@ -9,6 +9,12 @@ $(document).ready( function () {
         });
    });
 
+   $(function(){
+    $("#player_matches").on("click", "tr[role=\"button\"]", function () {
+         window.location = $(this).data("href");
+    });
+});
+
    $('.display').DataTable();
 } );
 
