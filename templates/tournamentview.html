@@ -2,7 +2,7 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
+
     <p>You are judging the {{ tournament_info["tournament_name"] }} {{ tournament_info["discipline"] }} tournament on {{ tournament_info["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
             
     {% if tournament_info["current_round"] %}

@@ -3,7 +3,7 @@
 
 {% block body %}
 
-    <a href="/login">Judge Log In</a>
+
 
     <table id="playerstats" class="display" style="width:95%">
         <thead>
@@ -36,22 +36,22 @@
         <!--Drop down menu of available seasons-->
         <li>Season
             <form action="/season_stats_view" method="get">
-                <select name="season" id="season">
+                <select name="season" id="season" class="form-select-sm">
                     {% for x in rows %}
                         <option value="{{ x['season_id'] }}">{{ x["season"] }} {{ x["yearof"] }} {{ x["discipline"] }}</option>
                     {% endfor %}
                 </select>
-                <input type="submit" value="View Stats">
+                <input class="btn btn-sm btn-outline-primary" type="submit" value="View Stats">
             </form>
         </li>
         <li>Tournament
             <form action="/tournament_stats_view" method="get">
-                <select name="tournament" id="tournament">
+                <select name="tournament" id="tournament" class="form-select-sm">
                     {% for x in cols %}
                         <option value="{{ x['tournament_id'] }}">{{ x["tournament_name"] }} {{ x["discipline"] }} tournament on {{ x["tournament_date"] }}</option>
                     {% endfor %}
                 </select>
-                <input type="submit" value="View Stats">
+                <button class="btn btn-sm btn-outline-primary" type="submit">View Stats</button>
             </form>
         </li>
     </ul>

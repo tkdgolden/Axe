@@ -22,7 +22,15 @@
         <script type="text/javascript" src="static\js\jquery.bracket.min.js"></script>
     </head>
     <body>
-        <h1>Tap That Axe</h1>
+        <div class="navbar">
+            <h1>Tap That Axe</h1>
+            {% if not session['user_id'] %}
+                <a href="/login" class="btn btn-outline-success">Judge Log In</a>
+            {% else %}
+                <p>You are logged in as {{ session.name }}.</p>
+                <a href="/logout">Log Out</a>
+            {% endif %}
+        </div>
         {% block body %}{% endblock %}
     </body>
 </html>
