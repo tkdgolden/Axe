@@ -57,7 +57,7 @@ def select_match_by_id(match_id):
 
     CUR.execute(""" SELECT * FROM matches WHERE match_id = %(match_id)s """, {'match_id' : match_id})
 
-    return CUR.fetchall()[0]
+    return CUR.fetchall()
 
 def select_matches_by_season(season_id):
     """ selects matches from current season """
@@ -439,7 +439,7 @@ def select_tournament_rounds(tournament_id):
 def select_season_matches(season_id):
     """ returns match info (players, winner, scores) from all matches in season by season id """
 
-    CUR.execute("""SELECT player_1_id, player_2_id, winner_id, player_1_total, player_2_total FROM matches WHERE season_id = %(season_id)s AND winner_id IS NOT NULL""", {'season_id':season_id})
+    CUR.execute("""SELECT * FROM matches WHERE season_id = %(season_id)s AND winner_id IS NOT NULL""", {'season_id':season_id})
 
     return CUR.fetchall()
 

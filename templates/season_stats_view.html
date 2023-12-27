@@ -27,31 +27,24 @@
             {% endfor %}
         </tbody>
     </table>
-    <h2>Most Recent Matches</h2>
-    <table id="season_matches" class="display" style="width:95%">
+    <table id="matches" class="display" style="width:95%">
         <thead>
             <tr>
-                <th>Winner First Name</th>
-                <th>Winner Last Name</th>
-                <th>Player 1 First Name</th>
-                <th>Player 1 Last Name</th>
-                <th>Player 1 Score</th>
-                <th>Player 2 First Name</th>
-                <th>Player 2 Last Name</th>
-                <th>Player 2 Score</th>
+                <th>Most Recent Matches</th>
             </tr>
         </thead>
         <tbody>
             {% for each in match_list %}
-                <tr>
-                    <td>{{ each[9] }}</td>
-                    <td>{{ each[10] }}</td>
-                    <td>{{ each[5] }}</td>
-                    <td>{{ each[6] }}</td>
-                    <td>{{ each[3] }}</td>
-                    <td>{{ each[7] }}</td>
-                    <td>{{ each[8] }}</td>
-                    <td>{{ each[4] }}</td>
+                <tr role="button" data-href="match_view?match_id={{ each[0] }}">
+                    <td>
+                        {{ each[12] }} WON 
+                        {% if each['winner_id'] == each[player_1_id] %} 
+                            {{ each['player1total'] }} to {{ each['player2total'] }} against {{ each[14] }}
+                        {% else %} 
+                            {{ each['player2total'] }} to {{ each['player1total'] }} against {{ each[13] }}
+                        {% endif %} 
+                        on {{ each['dt'] }}
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

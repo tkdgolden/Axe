@@ -7,7 +7,7 @@
     <h3>Win Ratio: </h3><p>{{ player_stats[4] }}</p>
     <h3>Games Played: </h3><p>{{ player_stats[5] }}</p>
 
-    <table id="player_matches" class="display" style="width:95%">
+    <table id="matches" class="display" style="width:95%">
         <thead>
             <tr>
                 <th>Hatchet Matches: </th>
@@ -22,11 +22,10 @@
                         {% else %}
                             LOSS
                         {% endif %} 
-                        {{ each['player1total'] }} to {{ each['player2total'] }} against 
                         {% if each['player_1_id'] == player_stats[0] %} 
-                            {{ each['player_2_name'] }}
+                            {{ each['player1total'] }} to {{ each['player2total'] }} against {{ each['player_2_name'] }}
                         {% else %} 
-                            {{ each['player_1_name'] }}
+                            {{ each['player2total'] }} to {{ each['player1total'] }} against {{ each['player_1_name'] }}
                         {% endif %}
                         on {{ each['dt'] }}
                     </td>

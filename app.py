@@ -1081,7 +1081,7 @@ def player_view():
 @app.route("/match_view")
 def match_view():
     match_id = request.args.get("match_id")
-    match_stats = select_match_by_id(match_id)
+    match_stats = select_match_by_id(match_id)[0]
     player_1_scores = select_scores_by_player_id_match_id(match_stats['player_1_id'], match_id)[0]
     player_2_scores = select_scores_by_player_id_match_id(match_stats['player_2_id'], match_id)[0]
     if (player_1_scores['seq'] == player_2_scores['seq']):
@@ -1145,20 +1145,11 @@ def season_stats_view():
         each.append(games_played)
 
     for each in match_list:
-        player1_id = each[0]
-        player2_id = each[1]
-        winner_id = each[2]
-        for x in player_list:
-            if x[0] == player1_id:
-                each.append(x[1])
-                each.append(x[2])
-        for x in player_list:
-            if x[0] == player2_id:
-                each.append(x[1])
-                each.append(x[2])
-        for x in player_list:
-            if x[0] == winner_id:
-                each.append(x[1])
-                each.append(x[2])
+        winner_name = player_name_from_id(each['winner_id'])
+        player_1_name = player_name_from_id(each['player_1_id'])
+        player_2_name = player_name_from_id(each["player_2_id"])
+        each.append(winner_name)
+        each.append(player_1_name)
+        each.append(player_2_name)
 
     return render_template("season_stats_view.html", player_list=player_list, match_list=match_list)
