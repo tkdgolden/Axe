@@ -1078,6 +1078,18 @@ def player_view():
 
     return render_template("player_view.html", player_stats=player_stats, match_list=match_list)
 
+@app.route("/match_view")
+def match_view():
+    match_id = request.args.get("match_id")
+    match_stats = select_match_by_id(match_id)
+    player_1_scores = select_scores_by_player_id_match_id(match_stats['player_1_id'], match_id)[0]
+    player_2_scores = select_scores_by_player_id_match_id(match_stats['player_2_id'], match_id)[0]
+    sequence = player_1_scores['seq'].split(',')
+    player_1_name = select_competitor_by_id(match_stats["player_1_id"])[1] + " " + select_competitor_by_id(match_stats["player_1_id"])[2]
+    player_2_name = select_competitor_by_id(match_stats["player_2_id"])[1] + " " + select_competitor_by_id(match_stats["player_2_id"])[2]
+
+    return render_template("match_view.html", match_stats=match_stats, player_1_scores=player_1_scores, player_2_scores=player_2_scores, player_1_name=player_1_name, player_2_name=player_2_name, sequence=sequence)
+
 
 @app.route("/tournament_stats_view")
 def tournament_stats_view():

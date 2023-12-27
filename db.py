@@ -442,3 +442,10 @@ def select_season_matches(season_id):
     CUR.execute("""SELECT player_1_id, player_2_id, winner_id, player_1_total, player_2_total FROM matches WHERE season_id = %(season_id)s AND winner_id IS NOT NULL""", {'season_id':season_id})
 
     return CUR.fetchall()
+
+def select_scores_by_player_id_match_id(player_id, match_id):
+    """ returns score info from scores by player and match ids """
+
+    CUR.execute(""" SELECT * FROM scores WHERE competitor_id = %(player_id)s AND match_id = %(match_id)s """, {'player_id': player_id, 'match_id': match_id})
+
+    return CUR.fetchall()
