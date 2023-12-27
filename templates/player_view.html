@@ -27,7 +27,7 @@
                         {% else %} 
                             {{ each['player2total'] }} to {{ each['player1total'] }} against {{ each['player_1_name'] }}
                         {% endif %}
-                        on {{ each['dt'] }}
+                        on {{ each['dt'].strftime('%m-%d-%Y') }}
                     </td>
                 </tr>
             {% endfor %}

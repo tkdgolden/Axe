@@ -2,16 +2,18 @@
 {% extends "layout.html" %}
 
 {% block body %}
-
+    <h1>
+        {{ season_info[1] }} {{ season_info[2] }} {{ season_info[3] }}
+    </h1>
     <table id="seasonstats" class="display" style="width:95%">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>First Name</th>
                 <th>Last Name</th>
-                <th>Average Score</th>
-                <th>Win Ratio</th>
-                <th>Games Played</th>
+                <th>Season Average</th>
+                <th>Season Win Ratio</th>
+                <th>Games Played this Season</th>
             </tr>
         </thead>
         <tbody>
@@ -20,9 +22,9 @@
                     <td>{{ each[0] }}</td>
                     <td>{{ each[1] }}</td>
                     <td>{{ each[2] }}</td>
-                    <td>{{ each[3] }}</td>
-                    <td>{{ each[4] }}</td>
-                    <td>{{ each[5] }}</td>
+                    <td>{{ each[6] }}</td>
+                    <td>{{ each[7] }}</td>
+                    <td>{{ each[8] }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -43,7 +45,7 @@
                         {% else %} 
                             {{ each['player2total'] }} to {{ each['player1total'] }} against {{ each[13] }}
                         {% endif %} 
-                        on {{ each['dt'] }}
+                        on {{ each['dt'].strftime('%m-%d-%Y') }}
                     </td>
                 </tr>
             {% endfor %}

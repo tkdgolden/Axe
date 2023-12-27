@@ -2,15 +2,8 @@
 import psycopg2
 # to be able to run sql code in the app
 import psycopg2.extras
-# to get today's date
-from datetime import date
 # to hash and unhash judge passwords
-from werkzeug.security import check_password_hash, generate_password_hash
-# for secret
-import os
-# to calculate date differences
-import datetime
-
+from werkzeug.security import generate_password_hash
 import helpers
 
 conn = None
@@ -73,55 +66,6 @@ def select_matchups(season_id):
 
     return CUR.fetchall()
 
-def verify_judge_account(user_name, judge_pw):
-    """ verify judge username and password from database info """
-
-    rows = select_judge(user_name)
-
-    # check if the judge doesnt exist, or the given password doesnt hash
-    if (len(rows) != 1) or not check_password_hash(rows[0]["pass_hash"], judge_pw):
-        return helpers.errorpage(message="The username or password was not found.", send_to="login")
-    
-    return rows[0]['judge_id'], rows[0]["judge_name"]
-
-def inactive_season_tournament():
-    """ from all seasons and tournaments, returns only the ones that are no longer active """
-    rows, cols = select_season_tournament()
-    today = date.today()
-
-    seasonarchive = []
-    for each in rows:
-        enddate = each["start_date"] + datetime.timedelta(days=70)
-        if (enddate < today):
-            seasonarchive.append(each)
-
-    tournamentarchive = []
-    for each in cols:
-        enddate = each["tournament_date"]  + datetime.timedelta(days=1)
-        if (enddate < today):
-            tournamentarchive.append(each)
-
-    return seasonarchive, tournamentarchive
-
-def active_season_tournament():
-    """ from all seasons and tournaments, returns only the ones that are active """
-    rows, cols = select_season_tournament()
-    seasonarchive, tournamentarchive = inactive_season_tournament()
-
-    for each in seasonarchive:
-        rows.remove(each)
-    for each in tournamentarchive:
-        cols.remove(each)
-    
-    return rows, cols
-
-def no_duplicate_judge(name):
-    """ check database for a judge of the same name """
-
-    rows = select_judge(name)
-    if len(rows) > 0:
-        return helpers.errorpage(send_to="newjudge", message="A judge account with this name already exists.")
-    
 def save_pw(name, pw):
     """ create password hash and save it to the database """
 
@@ -226,14 +170,6 @@ def save_tournament(name, discipline, date, double_elimination):
     CUR.execute("""INSERT INTO tournaments (tournament_name, discipline, tournament_date, double_elimination) VALUES (%(name)s, %(discipline)s, %(date)s, %(double_elimination)s)""", {'name': name, 'discipline': discipline, 'date': date, 'double_elimination': double_elimination})
     conn.commit()
 
-def select_tournament_match(match_id):
-    """ select player & winner info from database with match_id """
-
-    match = select_match_by_id(match_id)
-    relevant = [match['player_1_id'], match['player_2_id'], match['winner_id']]
-
-    return relevant
-
 def select_current_tournament(tournament_id):
     """ select row from tournaments from tournament_id """
 
@@ -313,14 +249,6 @@ def get_round_info(round_id):
 
     return CUR.fetchall()[0]
 
-def select_winner(match_id):
-    """ returns winner id from match id """
-
-    match = select_match_by_id(match_id)
-    relevant = filter(lambda x: x in ['winner_id'], match)
-
-    return relevant
-
 def select_season(season_id):
     """ returns season row by season id """
 
@@ -395,10 +323,24 @@ def select_competitor_average_games(player_id):
 
     return CUR.fetchall()
 
+def select_competitor_season_average(player_id, season_id):
+    """ returns player average score by player id """
+
+    CUR.execute("""SELECT ROUND(AVG(total), 2), COUNT(*) FROM scores JOIN matches ON scores.match_id = matches.match_id WHERE competitor_id = %(player_id)s AND season_id = %(season_id)s""", {'player_id': player_id, 'season_id': season_id})
+
+    return CUR.fetchall()
+
 def select_competitor_wins(player_id):
     """ returns number of games a player has won """
 
     CUR.execute("""SELECT COUNT(*) FROM scores WHERE competitor_id = %(player_id)s AND won = true""", {'player_id':player_id})
+
+    return CUR.fetchall()[0][0]
+
+def select_competitor_season_wins(player_id, season_id):
+    """ returns number of games a player has won """
+
+    CUR.execute("""SELECT COUNT(*) FROM matches WHERE winner_id = %(player_id)s AND season_id = %(season_id)s""", {'player_id': player_id, 'season_id': season_id})
 
     return CUR.fetchall()[0][0]
 

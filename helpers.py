@@ -1,9 +1,21 @@
+from datetime import date
+import datetime
 import json
-from flask import render_template, session
+from flask import render_template, request, session
 from functools import wraps
 import db
+# to hash and unhash judge passwords
+from werkzeug.security import check_password_hash
 
 possible_scores = [0,1,2,3,4,6,12]
+
+# when compared against a sorted list of players, it sets the matches so that players are seeded correctly
+bracket_A_seed_order = [0,1]
+bracket_B_seed_order = [0,3,1,2]
+bracket_C_seed_order = [0,7,3,4,2,5,1,6]
+bracket_D_seed_order = [0,15,7,8,3,12,4,11,1,14,6,9,2,13,5,10]
+bracket_E_seed_order = [0,31,15,16,8,23,7,24,3,28,12,19,11,20,4,27,1,30,14,17,9,22,6,25,2,29,13,18,10,21,5,26]
+bracket_F_seed_order = [0,63,31,32,16,47,15,48,8,55,23,40,24,39,7,56,3,60,28,35,19,44,12,51,11,52,20,43,27,36,4,59,1,62,30,33,17,46,14,49,9,54,22,41,25,38,6,57,2,61,29,34,18,45,13,50,10,53,21,42,26,37,5,58]
 
 # function to output error message and send the user back to what they were attempting so they can try again
 def errorpage(message, send_to):
@@ -240,3 +252,330 @@ def build_bracket(player_list, match_list, round_list, first_round_found, first_
     teams_array = json.dumps(teams_array)
 
     return teams_array, results
+
+# takes a list of sorted players and a tournament and places player into matches, gives them byes appropriately
+@login_required
+def createround(sorted_players, tournament_id):
+
+    # clears session info
+    session["selected_season"] = None
+
+    matches_array = []
+    bye_array = []
+    player_one = None
+    player_two = None
+    sorted_players = list(sorted_players)
+    player_count = len(sorted_players)
+    tournament_id = tournament_id
+
+    if player_count < 2:
+        return errorpage(send_to="tournamentview", message="Tournaments must include at least two players.")
+
+    # starts at round A
+    elif player_count == 2:
+        which_round = "A"
+
+        # create matches
+        for each in bracket_A_seed_order:
+            if player_one is None:
+                player_one = sorted_players[each]
+            else:
+                player_two = sorted_players[each]
+                try:
+                    match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
+                except:
+                    return errorpage(send_to="tournamentview", message="Could not create match.")
+                matches_array.append(match_id)
+
+        # there will be no byes by default for this smallest round
+        bye_array = [0]
+
+    # starts at round B
+    elif player_count < 5:
+        which_round = "B"
+
+        # handle not full seeding
+        if player_count < 4:
+            sorted_players.append(0)
+
+        # create matches
+        for each in bracket_B_seed_order:
+            match_id = None
+            if player_one is None:
+                player_one = sorted_players[each]
+            else:
+                if sorted_players[each]:
+                    player_two = sorted_players[each]
+                    try:
+                        match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
+                    except:
+                        return errorpage(send_to="tournamentview", message="Could not create match.")
+                    bye_array.append(0)
+                    matches_array.append(match_id)
+                else:
+                    bye_array.append(player_one)
+                player_one = None
+                player_two = None
+
+    # starts at round C
+    elif player_count < 9:
+        which_round = "C"
+
+        # handle not full seeding
+        bye_array = []
+        count = player_count
+        while count < 8:
+            sorted_players.append(0)
+            count += 1
+        
+        # create matches
+        for each in bracket_C_seed_order:
+            match_id = None
+            if player_one is None:
+                player_one = sorted_players[each]
+            else:
+                if sorted_players[each]:
+                    player_two = sorted_players[each]
+                    try:
+                        match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
+                    except:
+                        return errorpage(send_to="tournamentview", message="Could not create match.")
+                    bye_array.append(0)
+                    matches_array.append(match_id)
+                else:
+                    bye_array.append(player_one)
+                player_one = None
+                player_two = None
+
+    # starts at round D
+    elif player_count < 17:
+        which_round = "D"
+
+        # handle not full seeding
+        bye_array = []
+        count = player_count
+        while count < 16:
+            sorted_players.append(0)
+            count += 1
+        
+        # create matches
+        for each in bracket_D_seed_order:
+            match_id = None
+            if player_one is None:
+                player_one = sorted_players[each]
+            else:
+                if sorted_players[each]:
+                    player_two = sorted_players[each]
+                    try:
+                        match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
+                    except:
+                        return errorpage(send_to="tournamentview", message="Could not create match.")
+                    bye_array.append(0)
+                    matches_array.append(match_id)
+                else:
+                    bye_array.append(player_one)
+                player_one = None
+                player_two = None
+
+    # starts at round E
+    elif player_count <33:
+        which_round = "E"
+
+        # handle not full seeding
+        bye_array = []
+        count = player_count
+        while count < 32:
+            sorted_players.append(0)
+            count += 1
+        
+        # create matches
+        for each in bracket_E_seed_order:
+            match_id = None
+            if player_one is None:
+                player_one = sorted_players[each]
+            else:
+                if sorted_players[each]:
+                    player_two = sorted_players[each]
+                    try:
+                        match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
+                    except:
+                        return errorpage(send_to="tournamentview", message="Could not create match.")
+                    bye_array.append(0)
+                    matches_array.append(match_id)
+                else:
+                    bye_array.append(player_one)
+                player_one = None
+                player_two = None
+
+    # starts at round F
+    elif player_count <65:
+        which_round = "F"
+
+        # handle not full seeding
+        bye_array = []
+        count = player_count
+        while count < 32:
+            sorted_players.append(0)
+            count += 1
+        
+        # create matches
+        for each in bracket_F_seed_order:
+            match_id = None
+            if player_one is None:
+                player_one = sorted_players[each]
+            else:
+                if sorted_players[each]:
+                    player_two = sorted_players[each]
+                    try:
+                        match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
+                    except:
+                        return errorpage(send_to="tournamentview", message="Could not create match.")
+                    bye_array.append(0)
+                    matches_array.append(match_id)
+                else:
+                    bye_array.append(player_one)
+                player_one = None
+                player_two = None
+
+    # insert round entry to database
+    try:
+        round_id = db.insert_round(tournament_id, matches_array, bye_array, which_round)
+    except:
+        return errorpage(send_to="tournamentview", message="Could not create round.")
+
+    # set the current round in the tounament info and session
+    try:
+        db.set_current_round(round_id, tournament_id)
+    except:
+        return errorpage(send_to="tournamentview", message="Could not save current round.")
+    session["current_round"] = round_id
+
+    
+
+# updates tournament data for a variety of routes
+def refreshtournament():
+
+    # clear session info
+    session["selected_season"] = None
+    session["current_round"] = None
+
+    # find the selected tournament
+    if request.args.get("tournament"):
+        sess = request.args.get("tournament")
+        session["selected_tournament"] = sess
+    elif session["selected_tournament"]:
+        sess = session["selected_tournament"]
+    else:
+        return errorpage(send_to="/", message="You must select a tournament.")
+    
+    # get the tournament info from database
+    try:
+        tournament_info = db.select_current_tournament(sess)
+    except:
+        return errorpage(send_to="/", message="Could not load tournament.")
+    
+    # get competitor info from database
+    try:
+        players = db.select_tournament_competitors(sess)
+    except:
+        return errorpage(send_to="/", message="Could not load players.")
+
+    # get the current round id from the tournament info
+    round_id = tournament_info[0][5]
+
+    # get the round info
+    try:
+        round_info = db.select_round(round_id)
+    except:
+        return errorpage(send_to="/", message="Could not load round.")
+
+    # returns players and tournament info to the route that called refresh
+    return players, tournament_info, round_info
+
+
+def verify_judge_account(user_name, judge_pw):
+    """ verify judge username and password from database info """
+
+    rows = db.select_judge(user_name)
+
+    # check if the judge doesnt exist, or the given password doesnt hash
+    if (len(rows) != 1) or not check_password_hash(rows[0]["pass_hash"], judge_pw):
+        return errorpage(message="The username or password was not found.", send_to="login")
+    
+    return rows[0]['judge_id'], rows[0]["judge_name"]
+
+def inactive_season_tournament():
+    """ from all seasons and tournaments, returns only the ones that are no longer active """
+    rows, cols = db.select_season_tournament()
+    today = date.today()
+
+    seasonarchive = []
+    for each in rows:
+        print(each[4])
+        enddate = each[4] + datetime.timedelta(days=70)
+        if (enddate < today):
+            seasonarchive.append(each)
+
+    tournamentarchive = []
+    for each in cols:
+        enddate = each["tournament_date"]  + datetime.timedelta(days=1)
+        if (enddate < today):
+            tournamentarchive.append(each)
+
+    return seasonarchive, tournamentarchive
+
+def active_season_tournament():
+    """ from all seasons and tournaments, returns only the ones that are active """
+    rows, cols = db.select_season_tournament()
+    seasonarchive, tournamentarchive = inactive_season_tournament()
+
+    for each in seasonarchive:
+        rows.remove(each)
+    for each in tournamentarchive:
+        cols.remove(each)
+    
+    return rows, cols
+
+def no_duplicate_judge(name):
+    """ check database for a judge of the same name """
+
+    rows = db.select_judge(name)
+    if len(rows) > 0:
+        return errorpage(send_to="newjudge", message="A judge account with this name already exists.")
+    
+    
+def select_winner(match_id):
+    """ returns winner id from match id """
+
+    match = db.select_match_by_id(match_id)
+    relevant = filter(lambda x: x in ['winner_id'], match)
+
+    return relevant
+
+
+def select_tournament_match(match_id):
+    """ select player & winner info from database with match_id """
+
+    match = db.select_match_by_id(match_id)[0]
+    relevant = [match['player_1_id'], match['player_2_id'], match['winner_id']]
+
+    return relevant
+
+
+def render_player_stats():
+    player_list = db.select_all_competitors()
+    for each in player_list:
+        player_id = each[0]
+        output = db.select_competitor_average_games(player_id)
+        average = output[0][0]
+        games_played = output[0][1]
+        games_won = db.select_competitor_wins(player_id)
+        if (games_played == 0):
+            win_rate = 0
+        else:
+            win_rate = round((games_won / games_played), 2)
+        each.append(average)
+        each.append(win_rate)
+        each.append(games_played)
+
+    return(player_list)

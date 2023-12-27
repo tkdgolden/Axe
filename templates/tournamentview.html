@@ -3,9 +3,9 @@
 
 {% block body %}
     <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
-    <p>You are judging the {{ cols["tournament_name"] }} {{ cols["discipline"] }} tournament on {{ cols["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
+    <p>You are judging the {{ tournament_info["tournament_name"] }} {{ tournament_info["discipline"] }} tournament on {{ tournament_info["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
             
-    {% if cols["current_round"] %}
+    {% if tournament_info["current_round"] %}
         <h2>Upcoming Matches</h2>
             <p class="nextround">All matches for this round are complete.</p>
             <form action="/nextround" method="get" class="nextround">
@@ -63,7 +63,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if cols["enrollment_open"] == True %}
+    {% if tournament_info["enrollment_open"] == True %}
         <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
     {% endif %}
 

@@ -3,10 +3,10 @@ from flask import Flask, render_template, request, session, redirect
 # to store session variables
 from flask_session import Session
 
-import json
-
 from db import *
 from helpers import *
+
+
 
 #initiate app
 app = Flask(__name__)
@@ -23,13 +23,6 @@ try:
 except:
     print("Unable to connect to database")
 
-# when compared against a sorted list of players, it sets the matches so that players are seeded correctly
-bracket_A_seed_order = [0,1]
-bracket_B_seed_order = [0,3,1,2]
-bracket_C_seed_order = [0,7,3,4,2,5,1,6]
-bracket_D_seed_order = [0,15,7,8,3,12,4,11,1,14,6,9,2,13,5,10]
-bracket_E_seed_order = [0,31,15,16,8,23,7,24,3,28,12,19,11,20,4,27,1,30,14,17,9,22,6,25,2,29,13,18,10,21,5,26]
-bracket_F_seed_order = [0,63,31,32,16,47,15,48,8,55,23,40,24,39,7,56,3,60,28,35,19,44,12,51,11,52,20,43,27,36,4,59,1,62,30,33,17,46,14,49,9,54,22,41,25,38,6,57,2,61,29,34,18,45,13,50,10,53,21,42,26,37,5,58]
         
 # index page if not logged in, judgehome if they are
 @app.route("/")
@@ -489,36 +482,35 @@ def tournamentview():
         return errorpage(send_to="/", message="You must select a tournament.")
 
     # calls refreshtournament function
-    results = refreshtournament()
-    players = results[0]
+    players, tournament, round = refreshtournament()
 
     # cols is tournament info
-    cols = results[1][0]
+    tournament_info = tournament[0]
     match_info = []
     player_info = []
 
     # if there is a round started
-    if (results[2]):
-        round_info = results[2][0]
+    if (round):
+        round_info = round[0]
 
         # counting the number of matches
         count = 0
 
         # for each competitor in the bye competitors list
-        for each in round_info[1]:
+        for round in round_info[1]:
 
             # if it is a real competitor and not a placeholder for a bye
-            if each != 0:
+            if round != 0:
 
                 # add the word bye to be read by the javascript
                 match_info.append("bye")
 
                 # add the player info
-                for x in players:
-                    if x[0] == each:
-                        player_id = x[0]
-                        player_first_name = x[1]
-                        player_last_name = x[2]
+                for player in players:
+                    if player[0] == round:
+                        player_id = player[0]
+                        player_first_name = player[1]
+                        player_last_name = player[2]
                         player_info = [player_id, player_first_name, player_last_name]
                 match_info.append(player_info)
             
@@ -531,7 +523,7 @@ def tournamentview():
                 two_competitors = select_tournament_match(match)
                 
                 # if the round has no winner
-                if two_competitors['winner_id'] == None:
+                if two_competitors[2] == None:
 
                     # add the word match to be read by the javascript
                     match_count = ["match", match]
@@ -541,11 +533,11 @@ def tournamentview():
                     iteration = 0
                     while iteration < 2:
                         competitor = two_competitors[iteration]
-                        for x in players:
-                            if x[0] == competitor:
-                                player_id = x[0]
-                                player_first_name = x[1]
-                                player_last_name = x[2]
+                        for player in players:
+                            if player[0] == competitor:
+                                player_id = player[0]
+                                player_first_name = player[1]
+                                player_last_name = player[2]
                                 player_info = [player_id, player_first_name, player_last_name]
                         match_info.append(player_info)
                         iteration += 1
@@ -561,59 +553,19 @@ def tournamentview():
                     iteration = 0
                     while iteration < 2:
                         competitor = two_competitors[iteration]
-                        for x in players:
-                            if x[0] == competitor:
-                                player_id = x[0]
-                                player_first_name = x[1]
-                                player_last_name = x[2]
+                        for player in players:
+                            if player[0] == competitor:
+                                player_id = player[0]
+                                player_first_name = player[1]
+                                player_last_name = player[2]
                                 player_info = [player_id, player_first_name, player_last_name]
                         match_info.append(player_info)
                         iteration += 1
                 count += 1
 
     # send info to page to be displayed
-    return render_template("tournamentview.html", cols=cols, players=players, match_info=match_info)
+    return render_template("tournamentview.html", tournament_info=tournament_info, players=players, match_info=match_info)
 
-
-# updates tournament data for a variety of routes
-def refreshtournament():
-
-    # clear session info
-    session["selected_season"] = None
-    session["current_round"] = None
-
-    # find the selected tournament
-    if request.args.get("tournament"):
-        sess = request.args.get("tournament")
-        session["selected_tournament"] = sess
-    elif session["selected_tournament"]:
-        sess = session["selected_tournament"]
-    else:
-        return errorpage(send_to="/", message="You must select a tournament.")
-    
-    # get the tournament info from database
-    try:
-        cols = select_current_tournament(sess)
-    except:
-        return errorpage(send_to="/", message="Could not load tournament.")
-    
-    # get competitor info from database
-    try:
-        players = select_tournament_competitors(sess)
-    except:
-        return errorpage(send_to="/", message="Could not load players.")
-
-    # get the current round id from the tournament info
-    round_id = cols[0][5]
-
-    # get the round info
-    try:
-        round_info = select_round(round_id)
-    except:
-        return errorpage(send_to="/", message="Could not load round.")
-
-    # returns players and cols (tournament info) to the route that called refresh
-    return players, cols, round_info
 
 
 # will seed players in first round, change tournament status to started
@@ -634,13 +586,9 @@ def begintournament():
         return errorpage(send_to="/", message="You must select a tournament.")
 
     # calls refreshtournament function
-    results = refreshtournament()
+    players, tournament_info,  = refreshtournament()
 
-    players = results[0]
-
-    # tournament info
-    cols = results[1]
-    tournament_id = cols[0]["tournament_id"]
+    tournament_id = tournament_info["tournament_id"]
 
     # put just the player ids into a list
     player_ids = []
@@ -670,206 +618,6 @@ def begintournament():
 
     # create the first round
     createround(sorted_players, tournament_id)
-
-    return tournamentview()
-
-
-# takes a list of sorted players and a tournament and places player into matches, gives them byes appropriately
-@login_required
-def createround(sorted_players, tournament_id):
-
-    # clears session info
-    session["selected_season"] = None
-
-    matches_array = []
-    bye_array = []
-    player_one = None
-    player_two = None
-    sorted_players = list(sorted_players)
-    player_count = len(sorted_players)
-    tournament_id = tournament_id
-
-    if player_count < 2:
-        return errorpage(send_to="tournamentview", message="Tournaments must include at least two players.")
-
-    # starts at round A
-    elif player_count == 2:
-        which_round = "A"
-
-        # create matches
-        for each in bracket_A_seed_order:
-            if player_one is None:
-                player_one = sorted_players[each]
-            else:
-                player_two = sorted_players[each]
-                try:
-                    match_id = insert_unscored_tournament_match(player_one, player_two, tournament_id)
-                except:
-                    return errorpage(send_to="tournamentview", message="Could not create match.")
-                matches_array.append(match_id)
-
-        # there will be no byes by default for this smallest round
-        bye_array = [0]
-
-    # starts at round B
-    elif player_count < 5:
-        which_round = "B"
-
-        # handle not full seeding
-        if player_count < 4:
-            sorted_players.append(0)
-
-        # create matches
-        for each in bracket_B_seed_order:
-            match_id = None
-            if player_one is None:
-                player_one = sorted_players[each]
-            else:
-                if sorted_players[each]:
-                    player_two = sorted_players[each]
-                    try:
-                        match_id = insert_unscored_tournament_match(player_one, player_two, tournament_id)
-                    except:
-                        return errorpage(send_to="tournamentview", message="Could not create match.")
-                    bye_array.append(0)
-                    matches_array.append(match_id)
-                else:
-                    bye_array.append(player_one)
-                player_one = None
-                player_two = None
-
-    # starts at round C
-    elif player_count < 9:
-        which_round = "C"
-
-        # handle not full seeding
-        bye_array = []
-        count = player_count
-        while count < 8:
-            sorted_players.append(0)
-            count += 1
-        
-        # create matches
-        for each in bracket_C_seed_order:
-            match_id = None
-            if player_one is None:
-                player_one = sorted_players[each]
-            else:
-                if sorted_players[each]:
-                    player_two = sorted_players[each]
-                    try:
-                        match_id = insert_unscored_tournament_match(player_one, player_two, tournament_id)
-                    except:
-                        return errorpage(send_to="tournamentview", message="Could not create match.")
-                    bye_array.append(0)
-                    matches_array.append(match_id)
-                else:
-                    bye_array.append(player_one)
-                player_one = None
-                player_two = None
-
-    # starts at round D
-    elif player_count < 17:
-        which_round = "D"
-
-        # handle not full seeding
-        bye_array = []
-        count = player_count
-        while count < 16:
-            sorted_players.append(0)
-            count += 1
-        
-        # create matches
-        for each in bracket_D_seed_order:
-            match_id = None
-            if player_one is None:
-                player_one = sorted_players[each]
-            else:
-                if sorted_players[each]:
-                    player_two = sorted_players[each]
-                    try:
-                        match_id = insert_unscored_tournament_match(player_one, player_two, tournament_id)
-                    except:
-                        return errorpage(send_to="tournamentview", message="Could not create match.")
-                    bye_array.append(0)
-                    matches_array.append(match_id)
-                else:
-                    bye_array.append(player_one)
-                player_one = None
-                player_two = None
-
-    # starts at round E
-    elif player_count <33:
-        which_round = "E"
-
-        # handle not full seeding
-        bye_array = []
-        count = player_count
-        while count < 32:
-            sorted_players.append(0)
-            count += 1
-        
-        # create matches
-        for each in bracket_E_seed_order:
-            match_id = None
-            if player_one is None:
-                player_one = sorted_players[each]
-            else:
-                if sorted_players[each]:
-                    player_two = sorted_players[each]
-                    try:
-                        match_id = insert_unscored_tournament_match(player_one, player_two, tournament_id)
-                    except:
-                        return errorpage(send_to="tournamentview", message="Could not create match.")
-                    bye_array.append(0)
-                    matches_array.append(match_id)
-                else:
-                    bye_array.append(player_one)
-                player_one = None
-                player_two = None
-
-    # starts at round F
-    elif player_count <65:
-        which_round = "F"
-
-        # handle not full seeding
-        bye_array = []
-        count = player_count
-        while count < 32:
-            sorted_players.append(0)
-            count += 1
-        
-        # create matches
-        for each in bracket_F_seed_order:
-            match_id = None
-            if player_one is None:
-                player_one = sorted_players[each]
-            else:
-                if sorted_players[each]:
-                    player_two = sorted_players[each]
-                    try:
-                        match_id = insert_unscored_tournament_match(player_one, player_two, tournament_id)
-                    except:
-                        return errorpage(send_to="tournamentview", message="Could not create match.")
-                    bye_array.append(0)
-                    matches_array.append(match_id)
-                else:
-                    bye_array.append(player_one)
-                player_one = None
-                player_two = None
-
-    # insert round entry to database
-    try:
-        round_id = insert_round(tournament_id, matches_array, bye_array, which_round)
-    except:
-        return errorpage(send_to="tournamentview", message="Could not create round.")
-
-    # set the current round in the tounament info and session
-    try:
-        set_current_round(round_id, tournament_id)
-    except:
-        return errorpage(send_to="tournamentview", message="Could not save current round.")
-    session["current_round"] = round_id
 
     return tournamentview()
 
@@ -1043,24 +791,6 @@ def archive():
      # sends available season and tournament info to page to be displayed
     return render_template("archive.html", seasonarchive=seasonarchive, tournamentarchive=tournamentarchive)
 
-def render_player_stats():
-    player_list = select_all_competitors()
-    for each in player_list:
-        player_id = each[0]
-        output = select_competitor_average_games(player_id)
-        average = output[0][0]
-        games_played = output[0][1]
-        games_won = select_competitor_wins(player_id)
-        if (games_played == 0):
-            win_rate = 0
-        else:
-            win_rate = round((games_won / games_played), 2)
-        each.append(average)
-        each.append(win_rate)
-        each.append(games_played)
-    return(player_list)
-
-
 @app.route("/player_view")
 def player_view():
     player_id = request.args.get("player_id")
@@ -1127,16 +857,17 @@ def season_stats_view():
     else:
         return errorpage(send_to="/", message="You must select a season.")
 
+    season_info = select_season(season_id)[0]
     player_list = select_season_competitors(season_id)
 
     match_list = select_season_matches(season_id)
 
     for each in player_list:
         player_id = each[0]
-        output = select_competitor_average_games(player_id)
+        output = select_competitor_season_average(player_id, season_id)
         average = output[0][0]
         games_played = output[0][1]
-        games_won = select_competitor_wins(player_id)
+        games_won = select_competitor_season_wins(player_id, season_id)
         win_rate = 0
         if (games_played > 0):
             win_rate = round((games_won / games_played), 2)
@@ -1152,4 +883,4 @@ def season_stats_view():
         each.append(player_1_name)
         each.append(player_2_name)
 
-    return render_template("season_stats_view.html", player_list=player_list, match_list=match_list)
+    return render_template("season_stats_view.html", player_list=player_list, match_list=match_list, season_info=season_info)
