@@ -425,7 +425,7 @@ def select_competitor_matches(player_id):
 def select_tournament_matches(tournament_id):
     """ returns match info (match id, players, winner, scores) for each match in the tournament by tournament id """
 
-    CUR.execute("""SELECT match_id, player_1_id, player_2_id, winner_id, player_1_total, player_2_total FROM matches WHERE tournament_id = %(tournament_id)s""", {'tournament_id':tournament_id})
+    CUR.execute("""SELECT match_id, player_1_id, player_2_id, winner_id, player1total, player2total FROM matches WHERE tournament_id = %(tournament_id)s""", {'tournament_id':tournament_id})
 
     return CUR.fetchall()
 
