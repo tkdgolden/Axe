@@ -1,80 +1,84 @@
 {% extends "layout.html" %}
-
+{% block title %}Match Details{% endblock %}
 {% block body %}
-    <h1>Match Details</h1>
-    <h3>Discipline: </h3><p>{{ match_stats['discipline'] }}</p>
-    <h3>Date: </h3><p>{{ match_stats['dt'] }}</p>
-        <table>
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>{% if match_stats[winner_id] == match_stats[player_1_id] %}<b>{{ player_1_name }}</b>{% else %}player_1_name{% endif %}</th>
-                    <th>{% if match_stats[winner_id] == match_stats[player_2_id] %}<b>{{ player_2_name }}</b>{% else %}player_2_name{% endif %}</th>
-                    <th>Active Target:</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th>Throw 1:</th>
-                    <td>{{ player_1_scores['throw1'] }}</td>
-                    <td>{{ player_2_scores['throw1'] }}</td>
-                    <td>{{ sequence[0] }}</td>
-                </tr>
-                <tr>
-                    <th>Throw 2:</th>
-                    <td>{{ player_1_scores['throw2'] }}</td>
-                    <td>{{ player_2_scores['throw2'] }}</td>
-                    <td>{{ sequence[1] }}</td>
-                </tr>
-                <tr>
-                    <th>Throw 3:</th>
-                    <td>{{ player_1_scores['throw3'] }}</td>
-                    <td>{{ player_2_scores['throw3'] }}</td>
-                    <td>{{ sequence[2] }}</td>
-                </tr>
-                <tr>
-                    <th>Throw 4:</th>
-                    <td>{{ player_1_scores['throw4'] }}</td>
-                    <td>{{ player_2_scores['throw4'] }}</td>
-                    <td>{{ sequence[3] }}</td>
-                </tr>
-                <tr>
-                    <th>Throw 5:</th>
-                    <td>{{ player_1_scores['throw5'] }}</td>
-                    <td>{{ player_2_scores['throw5'] }}</td>
-                    <td>{{ sequence[4] }}</td>
-                </tr>
-                <tr>
-                    <th>Throw 6:</th>
-                    <td>{{ player_1_scores['throw6'] }}</td>
-                    <td>{{ player_2_scores['throw6'] }}</td>
-                    <td>{{ sequence[5] }}</td>
-                </tr>
-                <tr>
-                    <th>Throw 7:</th>
-                    <td>{{ player_1_scores['throw7'] }}</td>
-                    <td>{{ player_2_scores['throw7'] }}</td>
-                    <td>{{ sequence[6] }}</td>
-                </tr>
-                <tr>
-                    <th>Throw 8:</th>
-                    <td>{{ player_1_scores['throw8'] }}</td>
-                    <td>{{ player_2_scores['throw8'] }}</td>
-                    <td>{{ sequence[7] }}</td>
-                </tr>
-                <tr>
-                    <th>Quick Points:</th>
-                    <td>{{ player_1_scores['quick_points'] }}</td>
-                    <td>{{ player_2_scores['quick_points'] }}</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th>Final Score:</th>
-                    <td>{{ match_stats['player1total'] }}</td>
-                    <td>{{ match_stats['player2total'] }}</td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+<h3>Discipline: </h3>
+<p>{{ match_stats['discipline'] }}</p>
+<h3>Date: </h3>
+<p>{{ match_stats['dt'] }}</p>
+<hr>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>{% if match_stats[winner_id] == match_stats[player_1_id] %}<b>{{ player_1_name }}</b>{% else
+                %}player_1_name{% endif %}</th>
+            <th>{% if match_stats[winner_id] == match_stats[player_2_id] %}<b>{{ player_2_name }}</b>{% else
+                %}player_2_name{% endif %}</th>
+            <th>Active Target:</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>Throw 1:</th>
+            <td>{{ player_1_scores['throw1'] }}</td>
+            <td>{{ player_2_scores['throw1'] }}</td>
+            <td>{{ sequence[0] }}</td>
+        </tr>
+        <tr>
+            <th>Throw 2:</th>
+            <td>{{ player_1_scores['throw2'] }}</td>
+            <td>{{ player_2_scores['throw2'] }}</td>
+            <td>{{ sequence[1] }}</td>
+        </tr>
+        <tr>
+            <th>Throw 3:</th>
+            <td>{{ player_1_scores['throw3'] }}</td>
+            <td>{{ player_2_scores['throw3'] }}</td>
+            <td>{{ sequence[2] }}</td>
+        </tr>
+        <tr>
+            <th>Throw 4:</th>
+            <td>{{ player_1_scores['throw4'] }}</td>
+            <td>{{ player_2_scores['throw4'] }}</td>
+            <td>{{ sequence[3] }}</td>
+        </tr>
+        <tr>
+            <th>Throw 5:</th>
+            <td>{{ player_1_scores['throw5'] }}</td>
+            <td>{{ player_2_scores['throw5'] }}</td>
+            <td>{{ sequence[4] }}</td>
+        </tr>
+        <tr>
+            <th>Throw 6:</th>
+            <td>{{ player_1_scores['throw6'] }}</td>
+            <td>{{ player_2_scores['throw6'] }}</td>
+            <td>{{ sequence[5] }}</td>
+        </tr>
+        <tr>
+            <th>Throw 7:</th>
+            <td>{{ player_1_scores['throw7'] }}</td>
+            <td>{{ player_2_scores['throw7'] }}</td>
+            <td>{{ sequence[6] }}</td>
+        </tr>
+        <tr>
+            <th>Throw 8:</th>
+            <td>{{ player_1_scores['throw8'] }}</td>
+            <td>{{ player_2_scores['throw8'] }}</td>
+            <td>{{ sequence[7] }}</td>
+        </tr>
+        <tr>
+            <th>Quick Points:</th>
+            <td>{{ player_1_scores['quick_points'] }}</td>
+            <td>{{ player_2_scores['quick_points'] }}</td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>Final Score:</th>
+            <td>{{ match_stats['player1total'] }}</td>
+            <td>{{ match_stats['player2total'] }}</td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
 
 {% endblock %}

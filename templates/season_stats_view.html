@@ -1,10 +1,7 @@
 <!--Index page when NOT LOGGED IN for purposes of COMPETITOR viewing of results not judges-->
 {% extends "layout.html" %}
-
+{% block title %}{{ season_info[1] }} {{ season_info[2] }} {{ season_info[3] }} Season{% endblock %}
 {% block body %}
-    <h1>
-        {{ season_info[1] }} {{ season_info[2] }} {{ season_info[3] }}
-    </h1>
     <table id="seasonstats" class="display" style="width:95%">
         <thead>
             <tr>
@@ -29,6 +26,7 @@
             {% endfor %}
         </tbody>
     </table>
+    <hr>
     <table id="matches" class="display" style="width:95%">
         <thead>
             <tr>

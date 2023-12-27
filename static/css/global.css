@@ -7,6 +7,6 @@
     float:right;
 }
 
-select{
-    color:aqua;
+.table-row:hover {
+    background-color: aqua;
 }

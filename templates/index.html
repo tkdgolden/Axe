@@ -2,9 +2,6 @@
 {% extends "layout.html" %}
 
 {% block body %}
-
-
-
     <table id="playerstats" class="display" style="width:95%">
         <thead>
             <tr>
@@ -18,7 +15,7 @@
         </thead>
         <tbody>
             {% for each in player_list %}
-                <tr role="button" data-href="player_view?player_id={{ each[0] }}">
+                <tr role="button" data-href="player_view?player_id={{ each[0] }}" class="table-row">
                     <td>{{ each[0] }}</td>
                     <td>{{ each[1] }}</td>
                     <td>{{ each[2] }}</td>
@@ -29,7 +26,7 @@
             {% endfor %}
         </tbody>
     </table>
-
+    <hr>
     <p>You can view player stats by:</p>
 
     <ul>

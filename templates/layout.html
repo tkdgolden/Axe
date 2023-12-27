@@ -24,6 +24,9 @@
     <body>
         <div class="navbar">
             <h1>Tap That Axe</h1>
+            <h2>
+                {% block title %}{% endblock %}
+            </h2>
             {% if not session['user_id'] %}
                 <a href="/login" class="btn btn-outline-success">Judge Log In</a>
             {% else %}
@@ -31,6 +34,7 @@
                 <a href="/logout">Log Out</a>
             {% endif %}
         </div>
+        <hr>
         {% block body %}{% endblock %}
     </body>
 </html>

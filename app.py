@@ -831,7 +831,7 @@ def tournament_stats_view():
         tournament_id = request.args.get("tournament")
     else:
         return errorpage(send_to="/", message="You must select a tournament.")
-
+    tournament_info = select_tournament(tournament_id)[0]
     player_list = select_tournament_competitors(tournament_id)
 
     match_list = select_tournament_matches(tournament_id)
@@ -846,7 +846,7 @@ def tournament_stats_view():
 
 
 
-    return render_template("tournament_stats_view.html", teams_array=teams_array, results=results)
+    return render_template("tournament_stats_view.html", teams_array=teams_array, results=results, tournament_info=tournament_info)
 
 
 @app.route("/season_stats_view")

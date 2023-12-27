@@ -1,12 +1,11 @@
 {% extends "layout.html" %}
-
+{% block title %}{{ player_stats[1] }} {{ player_stats[2] }}{% endblock %}
 {% block body %}
 
-    <h1>{{ player_stats[1] }} {{ player_stats[2] }}</h1>
     <h3>Average Score: </h3><p>{{ player_stats[3] }}</p>
     <h3>Win Ratio: </h3><p>{{ player_stats[4] }}</p>
     <h3>Games Played: </h3><p>{{ player_stats[5] }}</p>
-
+    <hr>
     <table id="matches" class="display" style="width:95%">
         <thead>
             <tr>
