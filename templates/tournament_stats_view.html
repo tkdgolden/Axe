@@ -5,11 +5,12 @@
 
 {% block title %}{{ tournament_info['tournament_name'] }} - {{ tournament_info['discipline'] }} on {{ tournament_info['tournament_date'].strftime('%m-%d-%Y') }} {% if tournament_info['current_round'] == 'F' %}{% endif%}{% endblock %}
 {% block body %}
-    <div class="tourney" style="width:95%" data-teams-array="{{ teams_array }}" data-results="{{ results }}"></div>
-    <div>
+<div id="box">
+    <div class="tourney" data-teams-array="{{ teams_array }}" data-results="{{ results }}"></div>
+    <div id="sliders">
         <label class="rangePicker">
             Name Width
-            <input data-propName='teamWidth' oninput="resize(this, 'teamWidth')" type="range" min="30" max="200" step="1" value="60">
+            <input data-propName='teamWidth' type="range" min="30" max="200" step="1" value="60">
         </label>
         <label>
             Bracket Width
@@ -20,7 +21,7 @@
             <input data-propName='matchMargin' type="range" min="3" max="100" step="1" value="20">
         </label>
     </div>
-
+</div>
     <script type="text/javascript" src="{{ url_for('static', filename='js/tournamentStatView.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/statview.js') }}"></script>
 

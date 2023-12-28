@@ -7,6 +7,12 @@
     float:right;
 }
 
-.table-row:hover {
-    background-color: aqua;
+#box {
+    height: 100vh;
+    width: 95%;
+}
+
+#sliders {
+    position: fixed;
+    bottom: 0;
 }
