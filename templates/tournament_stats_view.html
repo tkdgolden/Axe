@@ -1,9 +1,8 @@
 <!--Index page when NOT LOGGED IN for purposes of COMPETITOR viewing of results not judges-->
 
-<!-- NEEDS 6 PROBLEMS! DONT TRY TO FIX THEM! -->
 {% extends "layout.html" %}
 
-{% block title %}{{ tournament_info['tournament_name'] }} - {{ tournament_info['discipline'] }} on {{ tournament_info['tournament_date'].strftime('%m-%d-%Y') }} {% if tournament_info['current_round'] == 'F' %}{% endif%}{% endblock %}
+{% block title %}{{ tournament_info['tournament_name'] }} - {{ tournament_info['discipline'].capitalize() }} on {{ tournament_info['tournament_date'].strftime('%m-%d-%Y') }} {% if tournament_info['current_round'] == 'F' %}{% endif%}{% endblock %}
 {% block body %}
 <div id="box">
     <div class="tourney" data-teams-array="{{ teams_array }}" data-results="{{ results }}"></div>

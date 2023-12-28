@@ -1,6 +1,6 @@
 <!--Index page when NOT LOGGED IN for purposes of COMPETITOR viewing of results not judges-->
 {% extends "layout.html" %}
-{% block title %}{{ season_info[1] }} {{ season_info[2] }} {{ season_info[3] }} Season{% endblock %}
+{% block title %}{{ season_info[1].capitalize() }} {{ season_info[2] }} {{ season_info[3].capitalize() }} Season{% endblock %}
 {% block body %}
     <table id="seasonstats" class="table table-dark display table-hover" style="width:95%">
         <thead>

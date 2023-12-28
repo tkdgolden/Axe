@@ -1,10 +1,16 @@
 {% extends "layout.html" %}
 {% block title %}Match Details{% endblock %}
 {% block body %}
-<h3>Discipline: </h3>
-<p>{{ match_stats['discipline'] }}</p>
-<h3>Date: </h3>
-<p>{{ match_stats['dt'] }}</p>
+<div class="container">
+    <div class="item">
+        <h3>Discipline: </h3>
+        <p>{{ match_stats['discipline'].strip("{}").capitalize() }}</p>
+    </div>
+    <div class="item">
+        <h3>Date: </h3>
+        <p>{{ match_stats['dt'].strftime('%m-%d-%Y') }}</p>
+    </div>
+</div>
 <hr>
 <table class="table table-dark display">
     <thead>
