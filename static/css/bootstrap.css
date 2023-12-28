@@ -1874,7 +1874,7 @@ progress {
   --bs-table-active-color: #fff;
   --bs-table-active-bg: rgba(0, 0, 0, 0.1);
   --bs-table-hover-color: #fff;
-  --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+  --bs-table-hover-bg: rgba(0, 0, 0, 0.175);
   width: 100%;
   margin-bottom: 1rem;
   vertical-align: top;
@@ -1892,6 +1892,7 @@ progress {
 }
 .table > thead {
   vertical-align: bottom;
+  --bs-table-color-state: var(--bs-secondary);
 }
 
 .table-group-divider {
@@ -2039,15 +2040,15 @@ progress {
 }
 
 .table-dark {
-  --bs-table-color: #fff;
-  --bs-table-bg: #170229;
-  --bs-table-border-color: #2e1b3e;
+  --bs-table-color: #8c226e;
+  /* --bs-table-bg: #170229; */
+  --bs-table-border-color: #5e174a;
   --bs-table-striped-bg: #230f34;
-  --bs-table-striped-color: #fff;
+  --bs-table-striped-color: #8c226e;
   --bs-table-active-bg: #2e1b3e;
   --bs-table-active-color: #fff;
-  --bs-table-hover-bg: #281539;
-  --bs-table-hover-color: #fff;
+  --bs-table-hover-bg: #32fbe37e;
+  --bs-table-hover-color: #ea39b8;
   color: var(--bs-table-color);
   border-color: var(--bs-table-border-color);
 }
@@ -12155,7 +12156,7 @@ hr {
 
 table,
 .table {
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.3), 0 0 2px rgba(255, 255, 255, 0.3), 0 0 5px rgba(255, 255, 255, 0.2);
+  text-shadow: 0 0 1px rgba(234, 57, 184, 0.3), 0 0 2px rgba(234, 57, 184, 0.3), 0 0 5px rgba(234, 57, 184, 0.2);
 }
 
 .btn-primary, .btn-outline-primary {
