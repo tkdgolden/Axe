@@ -1,12 +1,19 @@
 {% extends "layout.html" %}
 {% block title %}{{ player_stats[1] }} {{ player_stats[2] }} Player Stats{% endblock %}
 {% block body %}
-
-    <h3>Average Score: </h3><p>{{ player_stats[3] }}</p>
-    <h3>Win Ratio: </h3><p>{{ player_stats[4] }}</p>
-    <h3>Games Played: </h3><p>{{ player_stats[5] }}</p>
+    <div class="container">
+        <div class="item">
+            <h3>Average Score: </h3><p>{{ player_stats[3] }}</p>
+        </div>
+        <div class="item">
+            <h3>Win Ratio: </h3><p>{{ player_stats[4] }}</p>
+        </div>
+        <div class="item">
+            <h3>Games Played: </h3><p>{{ player_stats[5] }}</p>
+        </div>
+    </div>
     <hr>
-    <table id="matches" class="display" style="width:95%">
+    <table id="matches" class="table table-striped table-dark display table-hover" style="width:95%">
         <thead>
             <tr>
                 <th>Hatchet Matches: </th>

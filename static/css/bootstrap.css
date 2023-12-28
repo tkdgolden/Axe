@@ -431,6 +431,7 @@ caption {
 th {
   text-align: inherit;
   text-align: -webkit-match-parent;
+  --bs-table-color-state: var(--bs-secondary);
 }
 
 thead,

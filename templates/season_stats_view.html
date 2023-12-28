@@ -2,7 +2,7 @@
 {% extends "layout.html" %}
 {% block title %}{{ season_info[1] }} {{ season_info[2] }} {{ season_info[3] }} Season{% endblock %}
 {% block body %}
-    <table id="seasonstats" class="display" style="width:95%">
+    <table id="seasonstats" class="table table-dark display table-hover" style="width:95%">
         <thead>
             <tr>
                 <th>ID</th>
@@ -17,8 +17,8 @@
             {% for each in player_list %}
                 <tr role="button" data-href="player_view?player_id={{ each[0] }}">
                     <td>{{ each[0] }}</td>
-                    <td>{{ each[1] }}</td>
-                    <td>{{ each[2] }}</td>
+                    <th>{{ each[1] }}</th>
+                    <th>{{ each[2] }}</th>
                     <td>{{ each[6] }}</td>
                     <td>{{ each[7] }}</td>
                     <td>{{ each[8] }}</td>
@@ -27,7 +27,7 @@
         </tbody>
     </table>
     <hr>
-    <table id="matches" class="display" style="width:95%">
+    <table id="matches" class="table table-dark display table-hover" style="width:95%">
         <thead>
             <tr>
                 <th>Most Recent Matches</th>
