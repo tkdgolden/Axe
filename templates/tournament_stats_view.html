@@ -5,50 +5,23 @@
 
 {% block title %}{{ tournament_info['tournament_name'] }} - {{ tournament_info['discipline'] }} on {{ tournament_info['tournament_date'].strftime('%m-%d-%Y') }} {% if tournament_info['current_round'] == 'F' %}{% endif%}{% endblock %}
 {% block body %}
-    <div class="tourney" style="width:95%"></div>
+    <div class="tourney" style="width:95%" data-teams-array="{{ teams_array }}" data-results="{{ results }}"></div>
     <div>
         <label class="rangePicker">
             Name Width
-            <input oninput="resize(this, 'teamWidth')" type="range" min="30" max="200" step="1" value="60">
+            <input data-propName='teamWidth' oninput="resize(this, 'teamWidth')" type="range" min="30" max="200" step="1" value="60">
         </label>
         <label>
             Bracket Width
-            <input  oninput="resize(this, 'roundMargin')" type="range" min="3" max="100" step="1" value="20">
+            <input  data-propName='roundMargin' type="range" min="3" max="100" step="1" value="20">
         </label>
         <label>
             Bracket Height
-            <input  oninput="resize(this, 'matchMargin')" type="range" min="3" max="100" step="1" value="20">
+            <input data-propName='matchMargin' type="range" min="3" max="100" step="1" value="20">
         </label>
     </div>
 
-    <script type="text/javascript">
-        var teamsArray = {{ teams_array|safe }};
-        var resultsArray ={{results}};
-
-        console.log(resultsArray);
-        var bigData = {
-            teams : teamsArray,
-            results : resultsArray,
-        };
-        
-        $(function() {
-            $('.tourney').bracket({skipConsolationRound: true, init: bigData})
-        })
-
-        var resizeParameters = {
-            skipConsolationRound: true, 
-            scoreWidth: 20,
-            init: bigData
-        };
-
-        function resize(target, propName) {
-            resizeParameters[propName] = parseInt(target.value);
-            $('.tourney').bracket(resizeParameters);        
-        }
-
-
-
-    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/tournamentStatView.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/statview.js') }}"></script>
 
 {% endblock %}
