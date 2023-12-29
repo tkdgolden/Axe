@@ -33,6 +33,7 @@
             {% if not session['user_id'] %}
                 <a href="/login" class="btn btn-outline-success">Judge Log In</a>
             {% else %}
+                {% block judgepage %}{% endblock %}
                 <p>You are logged in as {{ session.name }}.</p>
                 <a href="/logout">Log Out</a>
             {% endif %}

@@ -1,9 +1,14 @@
 <!--Page displaying a judge's options within a tournament (enroll competitor, start match, view players, recent matches)-->
 {% extends "layout.html" %}
 
+{% block judgepage %}
+    <p>You are judging the {{ tournament_info["tournament_name"] }} {{ tournament_info["discipline"].capitalize() }} Tournament on {{ tournament_info["tournament_date"] }}.</p>
+    <a href="/">Leave Tournament/ Back to Judge Homepage</a>
+{% endblock %}
+
 {% block body %}
 
-    <p>You are judging the {{ tournament_info["tournament_name"] }} {{ tournament_info["discipline"] }} tournament on {{ tournament_info["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
+
             
     {% if tournament_info["current_round"] %}
         <h2>Upcoming Matches</h2>

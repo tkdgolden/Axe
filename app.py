@@ -770,7 +770,7 @@ def enrollcompetitor():
 
     # sending data to the form page
     if isseason:
-        result = "{} {} {} season".format(rows[0]['season'], rows[0]['year_of'], rows[0]['discipline'])
+        result = "{} {} {} season".format(rows[0]['season'], rows[0]['yearof'], rows[0]['discipline'])
     else:
         result = "{} {} tournament on {}".format(cols[0]['tournament_name'], cols[0]['discipline'], cols[0]['tournament_date'])
 

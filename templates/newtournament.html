@@ -1,9 +1,13 @@
 <!--Form to create a new tournament-->
 {% extends "layout.html" %}
 
-{% block body %}
+{% block judgepage %}
+    <h3>Create a new Tournament</h3>
 
-    <h1>Create a new Tournament:</h1>
+    <p><a href="/">Back to Judge Home</a></p>
+{% endblock %}
+
+{% block body %}
 
     <form action="/newtournament" method="post">
         <input autocomplete="off" autofocus name="name" placeholder="Name" type="text">
@@ -22,7 +26,5 @@
         <label for="single">Single Elimination</label>
         <input type="submit" value="Create">
     </form>
-
-    <p><a href="/">Back to Judge Home</a></p>
 
 {% endblock %}

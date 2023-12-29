@@ -8,9 +8,12 @@
 
 {% extends "layout.html" %}
 
-{% block body %}
+{% block judgepage %}
+    <p>You are judging the {{ rows[0]["season"] }} {{ rows[0]["yearof"] }} {{ rows[0]["discipline"] }} season.</p>
+    <a href="/">Leave Season/ Back to Judge Homepage</a>
+{% endblock %}
 
-    <p>You are judging the {{ rows[0]["season"] }} {{ rows[0]["yearof"] }} {{ rows[0]["discipline"] }} season.     <a href="/">Leave Season/ Back to Judge Homepage</a></p>
+{% block body %}
     <h2>Suggested Matches</h2>
         <form method="get" action="/creatematch">
             {% for each in matchups[3] %}

@@ -1,9 +1,13 @@
 <!--Form to create a new season-->
 {% extends "layout.html" %}
 
-{% block body %}
+{% block judgepage %}
+    <h3>Create a new Season:</h3>
 
-    <h1>Create a new Season:</h1>
+    <p><a href="/">Back to Judge Home</a></p>
+{% endblock %}
+
+{% block body %}
 
     <form action="/newseason" method="post">
         <label for="season">Season:</label>
@@ -26,6 +30,6 @@
         <input type="submit" value="Create">
     </form>
 
-    <p><a href="/">Back to Judge Home</a></p>
+
 
 {% endblock %}
