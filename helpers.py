@@ -597,7 +597,7 @@ def render_player_stats():
         each.append(average)
         each.append(win_rate)
         each.append(games_played)
-        each.append("Cumulative")
+        each.append("cumulative")
     each_discipline_player_list.append(all_discipline_player_list)
 
     return(each_discipline_player_list)

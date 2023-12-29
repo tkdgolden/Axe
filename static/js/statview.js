@@ -23,11 +23,24 @@ $(document).ready(function () {
 
     $('.display').DataTable();
 
-    $('#playerstats_length').css("visibility", "hidden");
-    $('#playerstats_filter').css("visibility", "hidden");
-    $('#matches_length').css("visibility", "hidden");
-    $('#matches_filter').css("visibility", "hidden");
-    $('#seasonstats_length').css("visibility", "hidden");
-    $('#seasonstats_filter').css("visibility", "hidden");
+    $('.dataTables_length').css("display", "none");
+    $('.dataTables_filter').css("display", "none");
+
+    $('.tablinks').on("click", function(evt) {
+        discipline = evt.target.dataset.discipline;
+        viewTable(evt, discipline);
+    });
+
+    function viewTable(evt, discipline) {
+        console.log(discipline);
+        var tabcontent, tablinks;
+
+        tabcontent = $('.tabcontent').css("display", "none");
+        
+        tablinks = $('.tablinks').removeClass("active");
+
+        $(`#${discipline}`).css("display", "block");
+        evt.target.classList.add("active");
+    }
 });
 

@@ -2,57 +2,70 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    {% for discipline in each_discipline_player_list %}
-        <h3>{{ discipline[0][6].title() }}</h3>
-        <table id="playerstats" class="table table-striped table-dark display table-hover" style="width:95%">
-            <thead>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Average Score</th>
-                    <th>Win Ratio</th>
-                    <th>Games Played</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for player in discipline %}
-                    <tr role="button" data-href="player_view?player_id={{ player[0] }}" class="table-row">
-                        <th>{{ player[2] }}</th>
-                        <th>{{ player[1] }}</th>
-                        <td>{{ player[3] }}</td>
-                        <td>{{ player[4] }}</td>
-                        <td>{{ player[5] }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endfor %}
-    <hr>
-    <p>You can view player stats by:</p>
-
-    <ul>
-        <!--Drop down menu of available seasons-->
-        <li>Season
-            <form action="/season_stats_view" method="get">
-                <select name="season" id="season" class="form-select-sm">
-                    {% for x in rows %}
-                        <option value="{{ x['season_id'] }}">{{ x["season"] }} {{ x["yearof"] }} {{ x["discipline"] }}</option>
-                    {% endfor %}
-                </select>
-                <input class="btn btn-sm btn-outline-primary" type="submit" value="View Stats">
-            </form>
-        </li>
-        <li>Tournament
-            <form action="/tournament_stats_view" method="get">
-                <select name="tournament" id="tournament" class="form-select-sm">
-                    {% for x in cols %}
-                        <option value="{{ x['tournament_id'] }}">{{ x["tournament_name"] }} {{ x["discipline"] }} tournament on {{ x["tournament_date"] }}</option>
-                    {% endfor %}
-                </select>
-                <button class="btn btn-sm btn-outline-primary" type="submit">View Stats</button>
-            </form>
-        </li>
-    </ul>
+    <div class="container">
+        <div class="item">
+            <p>You can view player stats by:</p>
+            <ul>
+                <!--Drop down menu of available seasons-->
+                <li>Season
+                    <form action="/season_stats_view" method="get">
+                        <select name="season" id="season" class="form-select-sm">
+                            {% for x in rows %}
+                                <option value="{{ x['season_id'] }}">{{ x["season"] }} {{ x["yearof"] }} {{ x["discipline"] }}</option>
+                            {% endfor %}
+                        </select>
+                        <input class="btn btn-sm btn-outline-primary" type="submit" value="View Stats">
+                    </form>
+                </li>
+                <li>Tournament
+                    <form action="/tournament_stats_view" method="get">
+                        <select name="tournament" id="tournament" class="form-select-sm">
+                            {% for x in cols %}
+                                <option value="{{ x['tournament_id'] }}">{{ x["tournament_name"] }} {{ x["discipline"] }} tournament on {{ x["tournament_date"] }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-sm btn-outline-primary" type="submit">View Stats</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+        <div class="item" id="tables">
+            <div class="tab">
+                <button data-discipline="hatchet" id="hatchet_tab" class="tablinks btn btn-outline-primary">Hatchet</button>
+                <button data-discipline="knives" id="knives_tab" class="tablinks btn btn-outline-primary">Knives</button>
+                <button data-discipline="bigaxe" id="bigaxe_tab" class="tablinks btn btn-outline-primary">Big Axe</button>
+                <button data-discipline="duals" id="duals_tab" class="tablinks btn btn-outline-primary">Duals</button>
+                <button data-discipline="cumulative" id="cumulative_tab" class="tablinks btn btn-outline-primary">Cumulative</button>
+            </div>
+            {% for discipline in each_discipline_player_list %}
+                <div class="tabcontent" id="{{ discipline[0][6] }}">
+                    <h3>{{ discipline[0][6].title() }}</h3>
+                    <table id="playerstats" class="table table-striped table-dark display table-hover" style="width:95%">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Average Score</th>
+                                <th>Win Ratio</th>
+                                <th>Games Played</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in discipline %}
+                                <tr role="button" data-href="player_view?player_id={{ player[0] }}" class="table-row">
+                                    <th>{{ player[2] }}</th>
+                                    <th>{{ player[1] }}</th>
+                                    <td>{{ player[3] }}</td>
+                                    <td>{{ player[4] }}</td>
+                                    <td>{{ player[5] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/statview.js') }}"></script>
 
