@@ -17,6 +17,8 @@ bracket_D_seed_order = [0,15,7,8,3,12,4,11,1,14,6,9,2,13,5,10]
 bracket_E_seed_order = [0,31,15,16,8,23,7,24,3,28,12,19,11,20,4,27,1,30,14,17,9,22,6,25,2,29,13,18,10,21,5,26]
 bracket_F_seed_order = [0,63,31,32,16,47,15,48,8,55,23,40,24,39,7,56,3,60,28,35,19,44,12,51,11,52,20,43,27,36,4,59,1,62,30,33,17,46,14,49,9,54,22,41,25,38,6,57,2,61,29,34,18,45,13,50,10,53,21,42,26,37,5,58]
 
+disciplines = ['hatchet', 'knives', 'bigaxe', 'duals']
+
 # function to output error message and send the user back to what they were attempting so they can try again
 def errorpage(message, send_to):
     """ returns errorpage displaying message and "back to" button with custom route """
@@ -563,8 +565,26 @@ def select_tournament_match(match_id):
 
 
 def render_player_stats():
-    player_list = db.select_all_competitors()
-    for each in player_list:
+    each_discipline_player_list = []
+    for discipline in disciplines:
+        player_list = db.select_all_competitors()
+        for each in player_list:
+            player_id = each[0]
+            output = db.select_competitor_average_games_by_discipline(player_id, discipline)
+            average = output[0][0]
+            games_played = output[0][1]
+            games_won = db.select_competitor_wins_by_discipline(player_id, discipline)
+            if (games_played == 0):
+                win_rate = 0
+            else:
+                win_rate = round((games_won / games_played), 2)
+            each.append(average)
+            each.append(win_rate)
+            each.append(games_played)
+            each.append(discipline)
+        each_discipline_player_list.append(player_list)
+    all_discipline_player_list = db.select_all_competitors()
+    for each in all_discipline_player_list:
         player_id = each[0]
         output = db.select_competitor_average_games(player_id)
         average = output[0][0]
@@ -577,5 +597,7 @@ def render_player_stats():
         each.append(average)
         each.append(win_rate)
         each.append(games_played)
+        each.append("Cumulative")
+    each_discipline_player_list.append(all_discipline_player_list)
 
-    return(player_list)
+    return(each_discipline_player_list)

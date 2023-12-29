@@ -33,11 +33,11 @@ def index():
 
     # not logged in:
     if session.get("user_id") is None:
-        player_list = render_player_stats()
+        each_discipline_player_list = render_player_stats()
 
         rows, cols = select_season_tournament()
 
-        return render_template("index.html", player_list=player_list, rows=rows, cols=cols)
+        return render_template("index.html", each_discipline_player_list=each_discipline_player_list, rows=rows, cols=cols)
 
     # logged in:
     # loads seasons and tournaments for dropdowns in judge home page
@@ -403,7 +403,7 @@ def scorematch():
 
         # determine season or tournament, get discipline values
         view, discipline = determine_discipline_season_or_tournament()
-
+        discipline = discipline.strip("{}")
         judge = session["user_id"]
 
         # three database inserts: one to matches, and one for each player into scores

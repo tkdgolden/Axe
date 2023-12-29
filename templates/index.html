@@ -2,30 +2,31 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <table id="playerstats" class="table table-striped table-dark display table-hover" style="width:95%">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Average Score</th>
-                <th>Win Ratio</th>
-                <th>Games Played</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for each in player_list %}
-                <tr role="button" data-href="player_view?player_id={{ each[0] }}" class="table-row">
-                    <td>{{ each[0] }}</td>
-                    <th>{{ each[2] }}</th>
-                    <th>{{ each[1] }}</th>
-                    <td>{{ each[3] }}</td>
-                    <td>{{ each[4] }}</td>
-                    <td>{{ each[5] }}</td>
+    {% for discipline in each_discipline_player_list %}
+        <h3>{{ discipline[0][6].title() }}</h3>
+        <table id="playerstats" class="table table-striped table-dark display table-hover" style="width:95%">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Average Score</th>
+                    <th>Win Ratio</th>
+                    <th>Games Played</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for player in discipline %}
+                    <tr role="button" data-href="player_view?player_id={{ player[0] }}" class="table-row">
+                        <th>{{ player[2] }}</th>
+                        <th>{{ player[1] }}</th>
+                        <td>{{ player[3] }}</td>
+                        <td>{{ player[4] }}</td>
+                        <td>{{ player[5] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
     <hr>
     <p>You can view player stats by:</p>
 
