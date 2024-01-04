@@ -23,21 +23,21 @@ $(document).ready(function () {
 
     $('.display').DataTable();
 
+    // Hide a search bar at the top of the table I don't like.
     $('.dataTables_length').css("display", "none");
     $('.dataTables_filter').css("display", "none");
 
+    $('#hatchet').css("display", "block");
+
     $('.tablinks').on("click", function(evt) {
-        discipline = evt.target.dataset.discipline;
+        var discipline = evt.target.dataset.discipline;
         viewTable(evt, discipline);
     });
 
     function viewTable(evt, discipline) {
-        console.log(discipline);
-        var tabcontent, tablinks;
-
-        tabcontent = $('.tabcontent').css("display", "none");
+        $('.tabcontent').css("display", "none");
         
-        tablinks = $('.tablinks').removeClass("active");
+        $('.tablinks').removeClass("active");
 
         $(`#${discipline}`).css("display", "block");
         evt.target.classList.add("active");

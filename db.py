@@ -6,8 +6,6 @@ import psycopg2.extras
 from werkzeug.security import generate_password_hash
 import helpers
 
-conn = None
-CUR = None
 
 def db_connect():
 
@@ -21,6 +19,7 @@ def db_connect():
     # print("local db access")
 
     try:
+        global conn
         conn = psycopg2.connect('postgres://postgres:go205956@localhost/axe-scoring')
     except:
         print("ERROR")
@@ -90,7 +89,7 @@ def save_competitor(fname, lname):
 def no_duplicate_season(season, year_of, discipline):
     """ check database for a season of the same season, year, and discipline """
 
-    CUR.execute("""SELECT season_id FROM seasons WHERE season = %(season)s AND year_of = %(year_of)s AND discipline = %(discipline)s""", {'season': season, 'year_of': year_of, 'discipline':discipline})
+    CUR.execute("""SELECT season_id FROM seasons WHERE season = %(season)s AND yearof = %(year_of)s AND discipline = %(discipline)s""", {'season': season, 'year_of': year_of, 'discipline':discipline})
     list = CUR.fetchall()
     if len(list) > 0:
         return helpers.errorpage(send_to="newseason", message="A {season} {year_of} {discipline} season already exists.".format(season=season, year_of=year_of, discipline=discipline))
@@ -98,7 +97,7 @@ def no_duplicate_season(season, year_of, discipline):
 def save_season(season, year_of, discipline, start_date):
     """ save new season info to database """
 
-    CUR.execute("""INSERT INTO seasons (season, year_of, discipline, start_date) VALUES (%(season)s, %(year_of)s, %(discipline)s, %(start_date)s)""", {'season': season, 'year_of': year_of, 'discipline': discipline, 'start_date': start_date})
+    CUR.execute("""INSERT INTO seasons (season, yearof, discipline, startdate) VALUES (%(season)s, %(year_of)s, %(discipline)s, %(start_date)s)""", {'season': season, 'year_of': year_of, 'discipline': discipline, 'start_date': start_date})
     conn.commit()
     
 def select_current_season(sess):

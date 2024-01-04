@@ -160,25 +160,22 @@ def newseason():
     if request.method == "POST":
 
         # check for empty fields
-        if not request.form.get("season") or not request.form.get("year") or not request.form.get("discipline") or not request.form.get("start_date"):
+        if not request.form.get("season") or not request.form.get("year") or not request.form.get("discipline") or not request.form.get("startdate"):
             return errorpage(send_to="newseason", message="Please fill out all fields.")
         season = request.form.get("season")
         year_of = request.form.get("year")
         discipline = request.form.get("discipline")
-        start_date = request.form.get("start_date")
+        start_date = request.form.get("startdate")
 
         # check that the season doesnt exist already
-        try:
-            no_duplicate_season(season, year_of, discipline)
-        except:
-            return errorpage(send_to="newseason", message="A {season} {year_of} {discipline} season already exists.".format(season=season, year_of=year_of, discipline=discipline))
+        no_duplicate_season(season, year_of, discipline)
         
         # put the season in the database
-        try:
-            save_season(season, year_of, discipline, start_date)
-            return redirect("/")
-        except:
-            return errorpage(send_to="newseason", message="Could not save the season.")
+        # try:
+        save_season(season, year_of, discipline, start_date)
+        return redirect("/")
+        # except:
+        #     return errorpage(send_to="newseason", message="Could not save the season.")
 
     # the form:
     else:
