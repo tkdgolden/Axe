@@ -237,10 +237,9 @@ def creatematch():
 
     # make sure there is a valid season selected
     if session["selected_season"]:
-        session["array_competitor_ids"] = request.args.getlist("competitor_selection")
+        session["array_competitor_ids"] = request.args.getlist("competitor_selection")[0].strip("[]").split(",")
     else:
         return errorpage(send_to="/", message="Create match is only for seasons.")
-        
     # make an array with those competitors and their information from competitor database table
     array_competitors = []
     for each in session["array_competitor_ids"]:
@@ -400,7 +399,8 @@ def scorematch():
 
         # determine season or tournament, get discipline values
         view, discipline = determine_discipline_season_or_tournament()
-        discipline = discipline.strip("{}")
+        discipline = discipline[0]
+        print(discipline)
         judge = session["user_id"]
 
         # three database inserts: one to matches, and one for each player into scores
@@ -660,16 +660,11 @@ def editmatch():
     
     match_id = request.args.get("match")
 
-    # make sure there is a valid tournament selected
-    if not session["selected_tournament"]:
-        return errorpage(send_to="/", message="Create match is only for seasons.")
-
     # get match info
     try:
-        match_info = select_match_by_id(match_id)
+        match_info = select_match_by_id(match_id)[0]
     except:
         return errorpage(send_to="tournamentview", message="Could not load match.")
-
     player_1 = match_info['player_1_id']
     player_2 = match_info['player_2_id']
 
@@ -677,18 +672,18 @@ def editmatch():
 
     # get player info
     player_1_info = select_competitor_by_id(player_1)
-    player_1.append(player_1_info["competitor_first_name"])
-    player_1.append(player_1_info["competitor_last_name"])
+    player_1_first = (player_1_info["competitor_first_name"])
+    player_1_last = (player_1_info["competitor_last_name"])
     player_2_info = select_competitor_by_id(player_2)
-    player_2.append(player_2_info["competitor_first_name"])
-    player_2.append(player_2_info["competitor_last_name"])
+    player_2_first = (player_2_info["competitor_first_name"])
+    player_2_last = (player_2_info["competitor_last_name"])
 
 
     # store match id in session
     session["match_id"] = match_id
 
     # store players in array
-    array_competitors = [player_1, player_2]
+    array_competitors = [player_1, player_1_first, player_1_last, player_2, player_2_first, player_2_last]
 
     # send competitor info to scorematch form
     return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
@@ -741,19 +736,19 @@ def enrollcompetitor():
                     return errorpage(send_to="enrollcompetitor", message="That competitor is already enrolled in this season.")
             insert_enrollment_season(compid, sid)
 
-            # retrieve this seasons matchup data, add new thrower and matchups to it, put it back in database
-            exists = select_season_matchups(sid)
-            match len(exists):
-                case 0:
-                    throwers = [compid]
-                    array = []
-                case _:
-                    array = exists[0]["to_do"]
-                    throwers = exists[0]["throwers"]
-                    for each in throwers:
-                        array.append([each, compid])
-                    throwers.append(compid)
-            insert_season_matchups(sid, throwers, array)
+            # # retrieve this seasons matchup data, add new thrower and matchups to it, put it back in database
+            # exists = select_season_matchups(sid)
+            # match len(exists):
+            #     case 0:
+            #         throwers = [compid]
+            #         array = []
+            #     case _:
+            #         array = exists[0]["todo"]
+            #         throwers = exists[0]["throwers"]
+            #         for each in throwers:
+            #             array.append([each, compid])
+            #         throwers.append(compid)
+            # insert_season_matchups(sid, throwers, array)
 
             return redirect("/seasonview")
         else:

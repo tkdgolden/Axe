@@ -1933,7 +1933,7 @@ progress {
 }
 
 .table-active {
-  --bs-table-color-state: var(--bs-table-active-color);
+  color: transparent;
   --bs-table-bg-state: var(--bs-table-active-bg);
 }
 
@@ -1988,9 +1988,9 @@ progress {
   --bs-table-color: #fff;
   --bs-table-bg: #1ba2f6;
   --bs-table-border-color: #32abf7;
-  --bs-table-striped-bg: #26a7f6;
+  --bs-table-striped-bg: #007fce;
   --bs-table-striped-color: #fff;
-  --bs-table-active-bg: #32abf7;
+  --bs-table-active-bg: #1a0933;
   --bs-table-active-color: #fff;
   --bs-table-hover-bg: #2ca9f7;
   --bs-table-hover-color: #fff;

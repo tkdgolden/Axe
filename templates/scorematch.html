@@ -2,9 +2,8 @@
 {% extends "layout.html" %}
 
 {% block body %}
-
     <h2>Score a Match</h2>
-        <h3>{{ array_competitors[0][1] }} {{ array_competitors[0][2] }} Versus {{ array_competitors[1][1] }} {{ array_competitors[1][2] }}</h3>
+        <h3>{{ array_competitors[1] }} {{ array_competitors[2] }} Versus {{ array_competitors[4] }} {{ array_competitors[5] }}</h3>
     <p><a href="/seasonview">Return to Season View</a></p>
     <form action="/scorematch" method="POST" onsubmit="CheckTie()">
         <input type="hidden" id="sequence" name="sequence">
@@ -14,15 +13,15 @@
                 <col span="3" style="background-color: beige">
                 <col span="1" style="background-color: blue">
             </colgroup>
-            <head>
+            <thead>
                 <th>
-                    {{ array_competitors[0][1] }} {{ array_competitors[0][2] }}
+                    {{ array_competitors[1] }} {{ array_competitors[2] }}
                 </th>
                 <th id="p1score">0</th><th></th><th id="p2score">0</th>
                 <th>
-                    {{ array_competitors[1][1] }} {{ array_competitors[1][2] }}
+                    {{ array_competitors[4] }} {{ array_competitors[5] }}
                 </th>
-            </head>
+            </thead>
             <tbody>
                 <tr>
                     <td>

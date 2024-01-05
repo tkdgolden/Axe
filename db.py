@@ -51,6 +51,13 @@ def select_match_by_id(match_id):
 
     return CUR.fetchall()
 
+def select_matches_by_season_and_week(season_id, week=1):
+    """ selects matches from current season """
+
+    CUR.execute("""SELECT * FROM matches WHERE season_id = %(season_id)s AND week = %(week)s""", {'season_id':season_id, 'week':week})
+
+    return CUR.fetchall()
+
 def select_matches_by_season(season_id):
     """ selects matches from current season """
 
@@ -292,7 +299,7 @@ def select_season_matchups(season_id):
 def insert_season_matchups(season_id, throwers, array):
     """ inserts into matchups by season id, throwers and to do array """
 
-    CUR.execute("""INSERT INTO matchups (season_id, throwers, to_do) VALUES (%(season_id)s, %(throwers)s, %(array)s) ON CONFLICT (season_id) DO UPDATE SET (throwers, to_do) = (excluded.throwers, excluded.to_do)""", {'season_id':season_id, 'throwers':throwers, 'array':array})
+    CUR.execute("""INSERT INTO matchups (season_id, throwers, todo) VALUES (%(season_id)s, %(throwers)s, %(array)s) ON CONFLICT (season_id) DO UPDATE SET (throwers, todo) = (excluded.throwers, excluded.todo)""", {'season_id':season_id, 'throwers':throwers, 'array':array})
     conn.commit()
 
 def select_competitor_tournaments(competitor_id):

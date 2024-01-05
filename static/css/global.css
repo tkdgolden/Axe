@@ -107,3 +107,15 @@ li {
 #tables {
     flex-grow: 2;
 }
+
+#weeklymatchups th {
+    background-color: #007fce;
+}
+
+.complete {
+    background-color: #3cf281 !important;
+}
+
+.begun {    
+    background-color: #ffc107 !important;
+}

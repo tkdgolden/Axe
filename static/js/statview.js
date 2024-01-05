@@ -3,22 +3,17 @@ $(document).ready(function () {
         order: [[3, 'desc']]
     });
 
-    $(function () {
-        $("#playerstats").on("click", "tr[role=\"button\"]", function () {
-            window.location = $(this).data("href");
-        });
+    $("#playerstats").on("click", "tr[role=\"button\"]", function () {
+        window.location = $(this).data("href");
     });
 
-    $(function () {
-        $("#seasonstats").on("click", "tr[role=\"button\"]", function () {
-            window.location = $(this).data("href");
-        });
+    $("#seasonstats").on("click", "tr[role=\"button\"]", function () {
+        window.location = $(this).data("href");
     });
 
-    $(function () {
-        $("#matches").on("click", "tr[role=\"button\"]", function () {
-            window.location = $(this).data("href");
-        });
+
+    $("#matches").on("click", "tr[role=\"button\"]", function () {
+        window.location = $(this).data("href");
     });
 
     $('.display').DataTable();

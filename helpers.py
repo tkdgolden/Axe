@@ -67,7 +67,6 @@ def determine_discipline_season_or_tournament():
         cols = db.select_tournament_discipline(sess)
         view = 'tournament'
     discipline = cols[0]
-
     return view, discipline
 
 def player_name_from_id(player_id):
