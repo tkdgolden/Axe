@@ -192,7 +192,7 @@ def seasonview():
     session["array_competitor_ids"] = None
     session["selected_tournament"] = None
     
-    # get the selected season to be displayed
+    # get the selected week to be displayed
     if request.args.get("week"):
         week = request.args.get("week")
     else:
@@ -211,7 +211,7 @@ def seasonview():
     # get that season's info from database
     try:
         rows = select_current_season(sess)
-        if len(rows) != 1:
+        if not rows:
             return helpers.errorpage(send_to="/", message="You must select a valid season.")
     except:
         return errorpage(send_to="/", message="You must select a valid season.")
@@ -225,6 +225,7 @@ def seasonview():
     # TODO display completed matches
     try:
         logged_matches = select_matches_by_season_and_week(sess, week)
+        print(logged_matches)
     except:
         return errorpage(send_to="/", message="Could not retrieve season matches.")
 
@@ -257,9 +258,10 @@ def creatematch():
 
     # get session values to be stored
     sess = session["selected_season"]
+    week = session["week"]
 
     # insert into matches, returns primary key match id for use in scores inserts
-    session["match_id"] = insert_unscored_season_match(playerA, playerB, sess)
+    session["match_id"] = insert_unscored_season_match(playerA, playerB, sess, week)
 
     # send competitor info to scorematch form
     return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
@@ -666,7 +668,7 @@ def editmatch():
 
     # get match info
     try:
-        match_info = select_match_by_id(match_id)[0]
+        match_info = select_match_by_id(match_id)
     except:
         return errorpage(send_to="tournamentview", message="Could not load match.")
     player_1 = match_info['player_1_id']

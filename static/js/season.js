@@ -13,6 +13,7 @@ $(document).ready(function () {
             absentPlayers.push(playerId);
         }
         $('.squares').removeClass("table-active");
+        $('.toprow').removeClass("table-active");
         absentPlayers.forEach(function(pID) {
             $(`.${pID}`).addClass("table-active");
         });
@@ -46,18 +47,15 @@ $(document).ready(function () {
     var begun = $(".squares").filter(function() {
         return $(this).children().data("match");
     });
-
     begun.addClass("begun");
-    begun.text("begun");
+    begun.on("click", function() {
+        const mId = $(this).children().data("match");
+        window.location = `editmatch?match=${mId}`;
+    });
 
     $(".squares").each(function() {
-        if ($(this).hasClass("begun") === true) {
-            var mId = $(this).children("p").data("match");
-            $(this).on("click", function() {
-                window.location = `editmatch?match=${mId}`;
-            });
-        }
-        else if ($(this).hasClass("complete") === false) {
+
+        if (($(this).hasClass("complete") === false) && ($(this).hasClass("begun") === false)) {
             var p1 = $(this).data("p1");
             var p2 = $(this).data("p2");
             $(this).on("click", function() {
@@ -73,4 +71,30 @@ $(document).ready(function () {
         window.location = `seasonview?season=${season}&week=${week}`;
     });
 
+    $(".grid").each(function() {
+        const classes = $(this).attr("class").split(/\s+/);
+        const playerIdClasses = classes.filter(function(eachClass) {
+            if (parseInt(eachClass)) {
+                return parseInt(eachClass);
+            }
+        });
+        $(this).on("mouseenter",
+            function() {
+                playerIdClasses.forEach(function(eachId) {
+                    const id = parseInt(eachId);
+                    const withId = $(`.${id}`);
+                    const showing = withId.filter(function() {
+                        if ($(this).hasClass("table-active") === false) {
+                            return this;
+                        }
+                    });
+                    console.log(showing);
+                    showing.addClass("hover");
+                });
+            }
+        );
+        $(this).on("mouseout", function() {
+            $("*").removeClass("hover");
+        })
+    });
 });

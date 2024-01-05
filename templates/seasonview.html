@@ -24,14 +24,14 @@
             <tr>
                 <th class="table-active"></th>
                 {% for player in players %}
-                    <th class="{{ player['competitor_id']  }} toprow" data-player="{{ player['competitor_id'] }}">{{ player["competitor_first_name"] }} {{ player["competitor_last_name"] }}</th>
+                    <th class="grid {{ player['competitor_id']  }} toprow" data-player="{{ player['competitor_id'] }}">{{ player["competitor_first_name"] }} {{ player["competitor_last_name"] }}</th>
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
             {% for player in players|reverse %}
                 <tr>
-                    <th>{{ player["competitor_first_name"] }} {{ player["competitor_last_name"] }}</t>
+                    <th class="grid toprow {{ player['competitor_id'] }}" data-player="{{ player['competitor_id'] }}">{{ player["competitor_first_name"] }} {{ player["competitor_last_name"] }}</t>
                     {% for opponent in players %}
                         {% if player == opponent %}
                             <td class="table-active"></td>

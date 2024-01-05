@@ -51,7 +51,7 @@ def select_match_by_id(match_id):
 
     CUR.execute(""" SELECT * FROM matches WHERE match_id = %(match_id)s """, {'match_id' : match_id})
 
-    return CUR.fetchall()
+    return CUR.fetchone()
 
 def select_matches_by_season_and_week(season_id, week=1):
     """ selects matches from current season """
@@ -122,10 +122,10 @@ def select_competitor_by_id(id):
 
     return CUR.fetchall()[0]
 
-def insert_unscored_season_match(playerA, playerB, sess):
+def insert_unscored_season_match(playerA, playerB, sess, week):
     """ insert player ids and season into an otherwise empty new match, returns match_id """
 
-    CUR.execute("""INSERT INTO matches (player_1_id, player_2_id, season_id) VALUES (%(playerA)s, %(playerB)s, %(sess)s) RETURNING match_id""", {'playerA': playerA, 'playerB': playerB, 'sess': sess})
+    CUR.execute("""INSERT INTO matches (player_1_id, player_2_id, season_id, week) VALUES (%(playerA)s, %(playerB)s, %(sess)s, %(week)s) RETURNING match_id""", {'playerA': playerA, 'playerB': playerB, 'sess': sess, 'week': week})
     match = CUR.fetchall()
     conn.commit()
 
