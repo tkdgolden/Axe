@@ -225,7 +225,6 @@ def seasonview():
     # TODO display completed matches
     try:
         logged_matches = select_matches_by_season_and_week(sess, week)
-        print(logged_matches)
     except:
         return errorpage(send_to="/", message="Could not retrieve season matches.")
 
@@ -444,12 +443,14 @@ def newtournament():
     if request.method == "POST":
 
         # check for empty fields
-        if not request.form.get("name") or not request.form.get("discipline") or not request.form.get("date") or not request.form.get("double_elimination"):
+        if not request.form.get("name") or not request.form.get("discipline") or not request.form.get("date"):
             return errorpage(send_to="newtournament", message="Please fill in all fields.")
         name = request.form.get("name")
         discipline = request.form.get("discipline")
         date = request.form.get("date")
         double_elimination = request.form.get("double_eliminaiton")
+        if double_elimination == None:
+            double_elimination = False
 
         # check that the tournament doesnt exist already
         list = no_duplicate_tournament(name, discipline, date)
@@ -458,10 +459,11 @@ def newtournament():
         
         # put the new tournament into the database
         try:
+            print(name, discipline, date, double_elimination)
             save_tournament(name, discipline, date, double_elimination)
             return redirect("/")
         except:
-            return errorpage(send_to="newtournament", message="Could not save tournamtent info.")
+            return errorpage(send_to="newtournament", message="Could not save tournament info.")
 
     # the form:
     else:

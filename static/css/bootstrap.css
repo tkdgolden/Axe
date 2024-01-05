@@ -1937,9 +1937,14 @@ progress {
   --bs-table-bg-state: var(--bs-table-active-bg);
 }
 
-.table-hover > tbody > tr:hover > * {
+td.hover:not(.table-active, .complete, .begun), .table-hover tr:hover > :not(th, .table-active, .complete, .begun) {
   --bs-table-color-state: var(--bs-table-hover-color);
   --bs-table-bg-state: var(--bs-table-hover-bg);
+}
+
+th.hover, .table-hover > tbody > tr:hover > th {
+  --bs-table-color-state: var(--bs-table-hover-color);
+  --bs-table-bg-state: #5e174a;
 }
 
 .table-primary {
@@ -1992,7 +1997,7 @@ progress {
   --bs-table-striped-color: #fff;
   --bs-table-active-bg: #1a0933;
   --bs-table-active-color: #fff;
-  --bs-table-hover-bg: #2ca9f7;
+  --bs-table-hover-bg: #ea39b8;
   --bs-table-hover-color: #fff;
   color: var(--bs-table-color);
   border-color: var(--bs-table-border-color);

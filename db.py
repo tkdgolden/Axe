@@ -164,10 +164,10 @@ def no_duplicate_tournament(name, discipline, date):
 
     return CUR.fetchall()
     
-def save_tournament(name, discipline, date, double_elimination):
+def save_tournament(name, discipline, date, double_elimination=False):
     """ save tournament info to database """
 
-    CUR.execute("""INSERT INTO tournaments (tournament_name, discipline, tournament_date, double_elimination) VALUES (%(name)s, %(discipline)s, %(date)s, %(double_elimination)s)""", {'name': name, 'discipline': discipline, 'date': date, 'double_elimination': double_elimination})
+    CUR.execute("""INSERT INTO tournaments(tournament_name, discipline, tournament_date, double_elimination) VALUES(%(name)s, %(discipline)s, %(date)s, %(double_elimination)s)""", {'name': name, 'discipline': discipline, 'date': date, 'double_elimination': double_elimination})
     conn.commit()
 
 def select_current_tournament(tournament_id):

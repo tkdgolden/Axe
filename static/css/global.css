@@ -128,11 +128,11 @@ li {
     font-size:x-large;
 }
 
-table :not(.hover, .table-active) {
+/* .squares:not(.hover, .table-active) {
     border-radius: 10px;
 }
 
 .hover {
     border-radius: 20px;
     border: 2px solid #ea39b8;
-}
+} */

@@ -556,7 +556,7 @@ def select_winner(match_id):
 def select_tournament_match(match_id):
     """ select player & winner info from database with match_id """
 
-    match = db.select_match_by_id(match_id)[0]
+    match = db.select_match_by_id(match_id)
     relevant = [match['player_1_id'], match['player_2_id'], match['winner_id']]
 
     return relevant

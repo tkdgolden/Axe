@@ -9,7 +9,7 @@
 {% extends "layout.html" %}
 
 {% block judgepage %}
-    <p>You are judging the {{ rows[0]["season"] }} {{ rows[0]["yearof"] }} {{ rows[0]["discipline"] }} season.</p>
+    <p>You are judging the {{ rows[0]["year_of"] }} {{ rows[0]["season"] }} {{ rows[0]["yearof"] }} {{ rows[0]["discipline"] }} season.</p>
     <a href="/">Leave Season/ Back to Judge Homepage</a>
 {% endblock %}
 
@@ -19,7 +19,7 @@
         <label for="week">Week:</label>
         <input type="number" min="1" max="8" step="1" value="{{ session['week'] }}" name="week" id="week"/>
     </form>
-    <table id="weeklymatchups" class="table table-info display" style="width:95%">
+    <table id="weeklymatchups" class="table table-hover table-info display" style="width:95%">
         <thead>
             <tr>
                 <th class="table-active"></th>
@@ -31,7 +31,7 @@
         <tbody>
             {% for player in players|reverse %}
                 <tr>
-                    <th class="grid toprow {{ player['competitor_id'] }}" data-player="{{ player['competitor_id'] }}">{{ player["competitor_first_name"] }} {{ player["competitor_last_name"] }}</t>
+                    <th class="grid toprow {{ player['competitor_id'] }}" data-player="{{ player['competitor_id'] }}">{{ player["competitor_first_name"] }} {{ player["competitor_last_name"] }}</th>
                     {% for opponent in players %}
                         {% if player == opponent %}
                             <td class="table-active"></td>
