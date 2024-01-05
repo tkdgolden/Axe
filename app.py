@@ -191,6 +191,13 @@ def seasonview():
     # clear session values
     session["array_competitor_ids"] = None
     session["selected_tournament"] = None
+    
+    # get the selected season to be displayed
+    if request.args.get("week"):
+        week = request.args.get("week")
+    else:
+        week = 1
+    session["week"] = week
 
     # get the selected season to be displayed
     if request.args.get("season"):
@@ -217,17 +224,12 @@ def seasonview():
 
     # TODO display completed matches
     try:
-        logged_matches = select_matches_by_season(sess)
+        logged_matches = select_matches_by_season_and_week(sess, week)
     except:
         return errorpage(send_to="/", message="Could not retrieve season matches.")
-    
-    try:
-        matchups = select_matchups(sess)
-    except:
-        return errorpage(send_to="/", message="Could not retrieve season matchups.")
 
     # send that info on to the page to be displayed
-    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, matchups=matchups)
+    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches)
 
 
 # create match used only from seasons, in tournaments matches are created when the round is created
@@ -244,7 +246,10 @@ def creatematch():
     array_competitors = []
     for each in session["array_competitor_ids"]:
         competitor = select_competitor_by_id(each)
-        array_competitors.append(competitor)
+        array_competitors.append(competitor["competitor_id"])
+        array_competitors.append(competitor["competitor_first_name"])
+        array_competitors.append(competitor["competitor_last_name"])
+
 
     # get player ids
     playerA = session["array_competitor_ids"][0]
@@ -400,7 +405,6 @@ def scorematch():
         # determine season or tournament, get discipline values
         view, discipline = determine_discipline_season_or_tournament()
         discipline = discipline[0]
-        print(discipline)
         judge = session["user_id"]
 
         # three database inserts: one to matches, and one for each player into scores
@@ -700,8 +704,8 @@ def enrollcompetitor():
     # determine if a season or tournament is selected
     if session["selected_season"]:
         season = session["selected_season"]
-        rows = select_season(season)
-        if len(rows) == 1:
+        season_info = select_season(season)
+        if season_info:
             isseason = True
             returnlink = "seasonview"
     elif session["selected_tournament"]:
@@ -729,26 +733,12 @@ def enrollcompetitor():
         # check if the competitor is already enrolled in the selected season or tournament
         compid = comp[0][0]
         if isseason:
-            sid = rows[0]["season_id"]
+            sid = season_info["season_id"]
             check = select_competitor_seasons(compid)
             for each in check:
                 if sid == each[0]:
                     return errorpage(send_to="enrollcompetitor", message="That competitor is already enrolled in this season.")
             insert_enrollment_season(compid, sid)
-
-            # # retrieve this seasons matchup data, add new thrower and matchups to it, put it back in database
-            # exists = select_season_matchups(sid)
-            # match len(exists):
-            #     case 0:
-            #         throwers = [compid]
-            #         array = []
-            #     case _:
-            #         array = exists[0]["todo"]
-            #         throwers = exists[0]["throwers"]
-            #         for each in throwers:
-            #             array.append([each, compid])
-            #         throwers.append(compid)
-            # insert_season_matchups(sid, throwers, array)
 
             return redirect("/seasonview")
         else:
@@ -762,7 +752,7 @@ def enrollcompetitor():
 
     # sending data to the form page
     if isseason:
-        result = "{} {} {} season".format(rows[0]['season'], rows[0]['yearof'], rows[0]['discipline'])
+        result = "{} {} {} season".format(season_info['season'], season_info['yearof'], season_info['discipline'])
     else:
         result = "{} {} tournament on {}".format(cols[0]['tournament_name'], cols[0]['discipline'], cols[0]['tournament_date'])
 
@@ -849,7 +839,7 @@ def season_stats_view():
     else:
         return errorpage(send_to="/", message="You must select a season.")
 
-    season_info = select_season(season_id)[0]
+    season_info = select_season(season_id)
     player_list = select_season_competitors(season_id)
 
     match_list = select_season_matches(season_id)

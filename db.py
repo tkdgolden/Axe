@@ -1,4 +1,5 @@
 # to connect to postgresql
+import os
 import psycopg2
 # to be able to run sql code in the app
 import psycopg2.extras
@@ -9,20 +10,21 @@ import helpers
 
 def db_connect():
 
-    # development
-    # SECRET = os.environ["DATABASE_URL"]
-    # print("Heroku db access")
+    which_db = "heroku"
 
-    # test
-    # SECRET = os.environ["DATABASE_PATH"]
-    # print(SECRET)
-    # print("local db access")
+    if which_db == "local":
+        SECRET = os.environ["DATABASE_PATH"]
+        print("local db access")
+    elif which_db == "heroku":
+        SECRET = os.environ["DATABASE_URL"]
+        print("Heroku db access")
+
 
     try:
         global conn
-        conn = psycopg2.connect('postgres://postgres:go205956@localhost/axe-scoring')
+        conn = psycopg2.connect(SECRET)
     except:
-        print("ERROR")
+        print("ERROR connecting to db")
     global CUR
     CUR = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -53,7 +55,6 @@ def select_match_by_id(match_id):
 
 def select_matches_by_season_and_week(season_id, week=1):
     """ selects matches from current season """
-
     CUR.execute("""SELECT * FROM matches WHERE season_id = %(season_id)s AND week = %(week)s""", {'season_id':season_id, 'week':week})
 
     return CUR.fetchall()
@@ -62,13 +63,6 @@ def select_matches_by_season(season_id):
     """ selects matches from current season """
 
     CUR.execute("""SELECT * FROM matches WHERE season_id = %(season_id)s""", {'season_id':season_id})
-
-    return CUR.fetchall()
-
-def select_matchups(season_id):
-    """ selects matchups from current season """
-
-    CUR.execute(""" SELECT * FROM matchups WHERE season_id = %(season_id)s """, {'season_id':season_id})
 
     return CUR.fetchall()
 
@@ -246,21 +240,21 @@ def get_previous_round(tournament_id):
 
     CUR.execute("""SELECT current_round FROM tournaments WHERE tournament_id = %(tournament_id)s""", {'tournament_id': tournament_id})
 
-    return CUR.fetchall()[0][0]
+    return CUR.fetchone()[0]
 
 def get_round_info(round_id):
     """ returns row for round by round id """
 
     CUR.execute("""SELECT * FROM rounds WHERE round_id = %(round_id)s""", {'round_id': round_id})
 
-    return CUR.fetchall()[0]
+    return CUR.fetchone()
 
 def select_season(season_id):
     """ returns season row by season id """
 
     CUR.execute("""SELECT * FROM seasons WHERE season_id = %(season_id)s""", {'season_id':season_id})
 
-    return CUR.fetchall()
+    return CUR.fetchone()
 
 def select_tournament(tournament_id):
     """ returns tournament row by tournament id """
@@ -287,19 +281,6 @@ def insert_enrollment_season(competitor_id, season_id):
     """ enrolls a competitor in a season by competitor id and season id """
 
     CUR.execute("""INSERT INTO enrollment (competitor_id, season_id) VALUES (%(competitor_id)s, %(season_id)s)""", {'competitor_id':competitor_id, 'season_id':season_id})
-    conn.commit()
-
-def select_season_matchups(season_id):
-    """ returns matchups row by season id """
-
-    CUR.execute("""SELECT * FROM matchups WHERE season_id = %(season_id)s""", {'season_id':season_id})
-
-    return CUR.fetchall()
-
-def insert_season_matchups(season_id, throwers, array):
-    """ inserts into matchups by season id, throwers and to do array """
-
-    CUR.execute("""INSERT INTO matchups (season_id, throwers, todo) VALUES (%(season_id)s, %(throwers)s, %(array)s) ON CONFLICT (season_id) DO UPDATE SET (throwers, todo) = (excluded.throwers, excluded.todo)""", {'season_id':season_id, 'throwers':throwers, 'array':array})
     conn.commit()
 
 def select_competitor_tournaments(competitor_id):

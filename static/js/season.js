@@ -38,14 +38,14 @@ $(document).ready(function () {
 
     var complete = $(".squares").filter(function() {
         return $(this).text().includes("complete");
-    })
+    });
 
     complete.addClass("complete");
     complete.text("complete");
 
     var begun = $(".squares").filter(function() {
         return $(this).children().data("match");
-    })
+    });
 
     begun.addClass("begun");
     begun.text("begun");
@@ -63,7 +63,14 @@ $(document).ready(function () {
             $(this).on("click", function() {
                 window.location = `creatematch?competitor_selection=[${p1},${p2}]`;
             });
-        };
-    })
+        }
+    });
+
+    $("form").change(function() {
+        const week = $(this).children("input").val();
+        sessionStorage.setItem("week", week);
+        const season = new URLSearchParams(window.location.search).get('season');
+        window.location = `seasonview?season=${season}&week=${week}`;
+    });
 
 });

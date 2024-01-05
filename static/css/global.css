@@ -119,3 +119,11 @@ li {
 .begun {    
     background-color: #ffc107 !important;
 }
+
+.pname {
+    color:#170229;
+}
+
+.head {
+    font-size:x-large;
+}

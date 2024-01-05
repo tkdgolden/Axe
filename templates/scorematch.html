@@ -1,24 +1,28 @@
 
 {% extends "layout.html" %}
 
-{% block body %}
+{% block judgepage %}
     <h2>Score a Match</h2>
-        <h3>{{ array_competitors[1] }} {{ array_competitors[2] }} Versus {{ array_competitors[4] }} {{ array_competitors[5] }}</h3>
-    <p><a href="/seasonview">Return to Season View</a></p>
+    <h3>{{ array_competitors[1] }} {{ array_competitors[2] }} Versus {{ array_competitors[4] }} {{ array_competitors[5] }}</h3>
+    <a href="/seasonview">Return to Season View</a>
+{% endblock %}
+
+{% block body %}
+
     <form action="/scorematch" method="POST" onsubmit="CheckTie()">
         <input type="hidden" id="sequence" name="sequence">
         <table>
             <colgroup>
-                <col span="1" style="background-color: red">
-                <col span="3" style="background-color: beige">
-                <col span="1" style="background-color: blue">
+                <col span="1" style="background-color: #ffc107">
+                <col span="3" style="background-color: #432874">
+                <col span="1" style="background-color: #ea39b8">
             </colgroup>
-            <thead>
-                <th>
+            <thead class="head">
+                <th class="pname">
                     {{ array_competitors[1] }} {{ array_competitors[2] }}
                 </th>
                 <th id="p1score">0</th><th></th><th id="p2score">0</th>
-                <th>
+                <th class="pname">
                     {{ array_competitors[4] }} {{ array_competitors[5] }}
                 </th>
             </thead>
@@ -38,11 +42,11 @@
                         Throw 1:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t1')">Begin</button>
+                        <button type="button" class="btn btn-outline-light" onclick="return ShowRound('t1')">Begin</button>
                         <p id="t1" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q1" class="1q" value="p1" style="accent-color:red" disabled>
+                        <input type="radio" name="q1" class="1q" value="p1" style="accent-color:red;" disabled>
                         <input type="radio" name="q1" value="" style="accent-color:black">
                         <input type="radio" name="q1" class="2q" value="p2" style="accent-color:blue" disabled>
                     </td>
@@ -72,7 +76,7 @@
                         Throw 2:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t2')">Begin</button>
+                        <button type="button" class="btn btn-outline-light" onclick="return ShowRound('t2')">Begin</button>
                         <p id="t2" style="display:none"></p>
                     </td>
                     <td>
@@ -106,7 +110,7 @@
                         Throw 3:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t3')">Begin</button>
+                        <button type="button" class="btn btn-outline-light" onclick="return ShowRound('t3')">Begin</button>
                         <p id="t3" style="display:none"></p>
                     </td>
                     <td>
@@ -140,7 +144,7 @@
                         Throw 4:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t4')">Begin</button>
+                        <button type="button" class="btn btn-outline-light" onclick="return ShowRound('t4')">Begin</button>
                         <p id="t4" style="display:none"></p>
                     </td>
                     <td>
@@ -174,7 +178,7 @@
                         Throw 5:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t5')">Begin</button>
+                        <button type="button" class="btn btn-outline-light" onclick="return ShowRound('t5')">Begin</button>
                         <p id="t5" style="display:none"></p>
                     </td>
                     <td>
@@ -208,7 +212,7 @@
                         Throw 6:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t6')">Begin</button>
+                        <button type="button" class="btn btn-outline-light" onclick="return ShowRound('t6')">Begin</button>
                         <p id="t6" style="display:none"></p>
                     </td>
                     <td>
@@ -242,7 +246,7 @@
                         Throw 7:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t7')">Begin</button>
+                        <button type="button" class="btn btn-outline-light" onclick="return ShowRound('t7')">Begin</button>
                         <p id="t7" style="display:none"></p>
                     </td>
                     <td>
@@ -276,7 +280,7 @@
                         Throw 8:
                     </td>
                     <td>
-                        <button type="button" onclick="return ShowRound('t8')">Begin</button>
+                        <button type="button" class="btn btn-outline-light" onclick="return ShowRound('t8')">Begin</button>
                         <p id="t8" style="display:none"></p>
                     </td>
                     <td>
