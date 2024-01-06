@@ -797,7 +797,7 @@ def player_view():
 @app.route("/match_view")
 def match_view():
     match_id = request.args.get("match_id")
-    match_stats = select_match_by_id(match_id)[0]
+    match_stats = select_match_by_id(match_id)
     player_1_scores = select_scores_by_player_id_match_id(match_stats['player_1_id'], match_id)[0]
     player_2_scores = select_scores_by_player_id_match_id(match_stats['player_2_id'], match_id)[0]
     if (player_1_scores['seq'] == player_2_scores['seq']):
@@ -844,6 +844,8 @@ def season_stats_view():
         return errorpage(send_to="/", message="You must select a season.")
 
     season_info = select_season(season_id)
+    quarters_info = select_season_quarters(season_id)
+    laps_info = select_season_laps(season_id)
     player_list = select_season_competitors(season_id)
 
     match_list = select_season_matches(season_id)
@@ -869,4 +871,4 @@ def season_stats_view():
         each.append(player_1_name)
         each.append(player_2_name)
 
-    return render_template("season_stats_view.html", player_list=player_list, match_list=match_list, season_info=season_info)
+    return render_template("season_stats_view.html", player_list=player_list, match_list=match_list, season_info=season_info, quarters_info=quarters_info, laps_info=laps_info)
