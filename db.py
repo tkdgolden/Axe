@@ -313,7 +313,7 @@ def select_competitor_average_games(player_id):
 def select_competitor_average_games_by_discipline(player_id, discipline):
     """ returns player average score for a given discipline by player id """
 
-    CUR.execute("""SELECT ROUND(AVG(total), 2), COUNT(*) FROM scores JOIN matches ON scores.match_id = matches.match_id WHERE competitor_id = %(player_id)s AND discipline = %(discipline)s""", {'player_id':player_id, 'discipline':discipline})
+    CUR.execute("""SELECT ROUND(AVG(scores.total), 2), COUNT(*) FROM scores JOIN matches ON scores.match_id = matches.match_id WHERE scores.competitor_id = %(player_id)s AND matches.discipline = %(discipline)s""", {'player_id':player_id, 'discipline':discipline})
 
     return CUR.fetchall()
 
@@ -334,7 +334,7 @@ def select_competitor_wins(player_id):
 def select_competitor_wins_by_discipline(player_id, discipline):
     """ returns number of games a player has won within a given discipline """
 
-    CUR.execute("""SELECT COUNT(*) FROM scores JOIN matches ON scores.match_id = matches.match_id WHERE competitor_id = %(player_id)s AND won = true AND discipline = %(discipline)s""", {'player_id':player_id, 'discipline':discipline})
+    CUR.execute("""SELECT COUNT(*) FROM scores JOIN matches ON scores.match_id = matches.match_id WHERE competitor_id = %(player_id)s AND scores.won = true AND matches.discipline = %(discipline)s""", {'player_id':player_id, 'discipline':discipline})
 
     return CUR.fetchall()[0][0]
 
