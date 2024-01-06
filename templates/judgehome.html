@@ -11,7 +11,7 @@
             <form action="/seasonview" method="get">
                 <select name="season" class="form-select-sm" id="season">
                     {% for x in rows %}
-                        <option value="{{ x['season_id'] }}">{{ x["season"].capitalize() }} {{ x["yearof"] }} {{ x["discipline"].capitalize() }}</option>
+                        <option value="{{ x['season_id'] }}">{{ x["season"].capitalize() }} {{ x["yearof"] }}</option>
                     {% endfor %}
                 </select>
                 <button class="btn btn-sm btn-outline-primary" type="submit">Begin</button>

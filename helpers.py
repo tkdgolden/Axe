@@ -512,7 +512,7 @@ def inactive_season_tournament():
 
     seasonarchive = []
     for each in rows:
-        enddate = each[4] + datetime.timedelta(days=70)
+        enddate = each[3] + datetime.timedelta(days=70)
         if (enddate < today):
             seasonarchive.append(each)
 
@@ -569,7 +569,6 @@ def render_player_stats():
         for each in player_list:
             player_id = each[0]
             output = db.select_competitor_average_games_by_discipline(player_id, discipline)
-            print(player_id, discipline, output)
             average = output[0][0]
             games_played = output[0][1]
             games_won = db.select_competitor_wins_by_discipline(player_id, discipline)

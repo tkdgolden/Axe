@@ -459,7 +459,6 @@ def newtournament():
         
         # put the new tournament into the database
         try:
-            print(name, discipline, date, double_elimination)
             save_tournament(name, discipline, date, double_elimination)
             return redirect("/")
         except:
