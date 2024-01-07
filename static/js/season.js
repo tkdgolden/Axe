@@ -64,7 +64,7 @@ $(document).ready(function () {
         }
     });
 
-    $("input").change(function() {
+    $(".view").change(function() {
         const quarter = $("#quarter").val();
         sessionStorage.setItem("season_quarter", quarter);
         var lap = $("#lap").val();

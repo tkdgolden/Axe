@@ -55,18 +55,18 @@ def verify_scores(all_scores):
             return errorpage(message="someone tried to hack your form.", send_to="seasonview")
         
 
-def determine_discipline_season_or_tournament():
+def determine_discipline_season_or_tournament(match_id):
     """ determine season or tournament, get discipline value from database """
 
     if session["selected_season"]:
         sess = session["selected_season"]
-        cols = db.select_season_discipline(sess)
+        discipline = db.select_match_discipline(int(match_id))[0]
         view = 'season'
     else:
         sess = session["selected_tournament"]
         cols = db.select_tournament_discipline(sess)
         view = 'tournament'
-    discipline = cols[0]
+        discipline = cols[0][0]
     return view, discipline
 
 def player_name_from_id(player_id):
