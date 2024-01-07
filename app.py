@@ -208,19 +208,21 @@ def seasonview():
     # get the selected quarter to be displayed
     if request.args.get("quarter"):
         quarter_month = request.args.get("quarter")
-    try:
-        quarter_month = session["selected_quarter"]
-    except KeyError:
-        quarter_month = 1
+    else:
+        try:
+            quarter_month = session["selected_quarter"]
+        except KeyError:
+            quarter_month = 1
     session["selected_quarter"] = quarter_month
 
     # get the selected lap to be displayed
     if request.args.get("lap"):
         lap_count = request.args.get("lap")
-    try:
-        lap_count = session["selected_lap"]
-    except KeyError:
-        lap_count = 1
+    else:
+        try:
+            lap_count = session["selected_lap"]
+        except KeyError:
+            lap_count = 1
     session["selected_lap"] = lap_count
 
     # get that season's info from database
