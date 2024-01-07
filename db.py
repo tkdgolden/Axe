@@ -53,24 +53,33 @@ def select_match_by_id(match_id):
 
     return CUR.fetchone()
 
-def select_matches_by_season_and_week(season_id, week=1):
-    """ selects matches from current season """
-    CUR.execute("""SELECT * FROM matches WHERE season_id = %(season_id)s AND week = %(week)s""", {'season_id':season_id, 'week':week})
-
-    return CUR.fetchall()
-
 def select_matches_by_season(season_id):
     """ selects matches from current season """
 
-    CUR.execute("""SELECT * FROM matches WHERE season_id = %(season_id)s""", {'season_id':season_id})
+    CUR.execute("""SELECT * FROM matches JOIN laps ON laps.lap_id = matches.lap_id JOIN quarters ON quarters.quarter_id = laps.quarter_id JOIN seasons ON seasons.season_id = quarters.season_id WHERE seasons.season_id = %(season_id)s""", {'season_id':season_id})
 
     return CUR.fetchall()
+
+def select_matches_by_lap_quarter_season(lap_count, quarter_month, season_id):
+    """ selects matches info from current lap, need quarter and season id to get lap """
+
+    CUR.execute(""" SELECT * FROM matches WHERE lap_id = (SELECT lap_id FROM laps WHERE counter = %(lap_count)s AND quarter_id = (SELECT quarter_id FROM quarters WHERE season_id = %(season_id)s AND month = %(quarter_month)s)) """, {'lap_count': lap_count, 'season_id': season_id, 'quarter_month': quarter_month})
+
+    return CUR.fetchall()
+
+def select_lap_id_by_lap_quarter_season(lap_count, quarter_month, season_id):
+    """ selects lap id from current lap, need quarter and season id """
+
+    CUR.execute("""SELECT lap_id FROM laps WHERE counter = %(lap_count)s AND quarter_id = (SELECT quarter_id FROM quarters WHERE season_id = %(season_id)s AND month = %(quarter_month)s) """, {'lap_count': lap_count, 'season_id': season_id, 'quarter_month': quarter_month})
+
+    return CUR.fetchone()
 
 def save_pw(name, pw):
     """ create password hash and save it to the database """
 
     pwhash = generate_password_hash(pw)
     CUR.execute("""INSERT INTO judges(judge_name, pass_hash) VALUES (%(name)s, %(pwhash)s)""", {'name': name, 'pwhash': pwhash})
+
     conn.commit()
 
 def no_duplicate_competitor(fname, lname):
@@ -87,18 +96,18 @@ def save_competitor(fname, lname):
     CUR.execute("""INSERT INTO competitors (competitor_first_name, competitor_last_name) VALUES (%(fname)s, %(lname)s)""", {'fname': fname, 'lname': lname})
     conn.commit()
 
-def no_duplicate_season(season, year_of, discipline):
-    """ check database for a season of the same season, year, and discipline """
+def no_duplicate_season(season, year_of):
+    """ check database for a season of the same season and year"""
 
-    CUR.execute("""SELECT season_id FROM seasons WHERE season = %(season)s AND yearof = %(year_of)s AND discipline = %(discipline)s""", {'season': season, 'year_of': year_of, 'discipline':discipline})
+    CUR.execute("""SELECT season_id FROM seasons WHERE season = %(season)s AND yearof = %(year_of)s""", {'season': season, 'year_of': year_of})
     list = CUR.fetchall()
     if len(list) > 0:
-        return helpers.errorpage(send_to="newseason", message="A {season} {year_of} {discipline} season already exists.".format(season=season, year_of=year_of, discipline=discipline))
+        return helpers.errorpage(send_to="newseason", message="A {season} {year_of} season already exists.".format(season=season, year_of=year_of))
     
-def save_season(season, year_of, discipline, start_date):
+def save_season(season, year_of, start_date):
     """ save new season info to database """
 
-    CUR.execute("""INSERT INTO seasons (season, yearof, discipline, startdate) VALUES (%(season)s, %(year_of)s, %(discipline)s, %(start_date)s)""", {'season': season, 'year_of': year_of, 'discipline': discipline, 'start_date': start_date})
+    CUR.execute("""INSERT INTO seasons (season, yearof, startdate) VALUES (%(season)s, %(year_of)s, %(start_date)s)""", {'season': season, 'year_of': year_of, 'start_date': start_date})
     conn.commit()
     
 def select_current_season(sess):
@@ -122,10 +131,10 @@ def select_competitor_by_id(id):
 
     return CUR.fetchall()[0]
 
-def insert_unscored_season_match(playerA, playerB, sess, week):
+def insert_unscored_season_match(playerA, playerB, lap_id):
     """ insert player ids and season into an otherwise empty new match, returns match_id """
 
-    CUR.execute("""INSERT INTO matches (player_1_id, player_2_id, season_id, week) VALUES (%(playerA)s, %(playerB)s, %(sess)s, %(week)s) RETURNING match_id""", {'playerA': playerA, 'playerB': playerB, 'sess': sess, 'week': week})
+    CUR.execute("""INSERT INTO matches (player_1_id, player_2_id, lap_id) VALUES (%(playerA)s, %(playerB)s, %(lap_id)s) RETURNING match_id""", {'playerA': playerA, 'playerB': playerB, 'lap_id': lap_id})
     match = CUR.fetchall()
     conn.commit()
 

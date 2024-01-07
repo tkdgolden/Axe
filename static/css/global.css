@@ -110,6 +110,7 @@ li {
 
 #weeklymatchups th {
     background-color: #007fce;
+    color:#5e174a;
 }
 
 .complete {
@@ -127,12 +128,3 @@ li {
 .head {
     font-size:x-large;
 }
-
-/* .squares:not(.hover, .table-active) {
-    border-radius: 10px;
-}
-
-.hover {
-    border-radius: 20px;
-    border: 2px solid #ea39b8;
-} */

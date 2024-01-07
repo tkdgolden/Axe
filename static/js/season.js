@@ -64,12 +64,20 @@ $(document).ready(function () {
         }
     });
 
-    $("form").change(function() {
-        const week = $(this).children("input").val();
-        sessionStorage.setItem("week", week);
+    $("input").change(function() {
+        const quarter = $("#quarter").val();
+        sessionStorage.setItem("season_quarter", quarter);
+        var lap = $("#lap").val();
+        if ($(this).attr("id") === 'quarter') {
+            lap = 1;
+        }
+        sessionStorage.setItem("season_lap", lap);
         const season = new URLSearchParams(window.location.search).get('season');
-        window.location = `seasonview?season=${season}&week=${week}`;
+        window.location = `seasonview?season=${season}&quarter=${quarter}&lap=${lap}`;
     });
+
+    $("#quarter").val(sessionStorage.getItem("season_quarter"));
+    $("#lap").val(sessionStorage.getItem("season_lap"));
 
     $(".grid").each(function() {
         const classes = $(this).attr("class").split(/\s+/);
@@ -88,7 +96,6 @@ $(document).ready(function () {
                             return this;
                         }
                     });
-                    console.log(showing);
                     showing.addClass("hover");
                 });
             }

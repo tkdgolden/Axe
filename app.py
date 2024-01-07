@@ -35,17 +35,17 @@ def index():
     if session.get("user_id") is None:
         each_discipline_player_list = render_player_stats()
 
-        rows, cols = select_season_tournament()
+        seasons, tournaments = select_season_tournament()
 
-        return render_template("index.html", each_discipline_player_list=each_discipline_player_list, rows=rows, cols=cols)
+        return render_template("index.html", each_discipline_player_list=each_discipline_player_list, seasons=seasons, tournaments=tournaments)
 
     # logged in:
     # loads seasons and tournaments for dropdowns in judge home page
     # Filter out seasons and tournaments that are finished
-    rows, cols = inactive_season_tournament()
+    seasons, tournaments = active_season_tournament()
 
     # sends available season and tournament info to page to be displayed
-    return render_template("judgehome.html", rows=rows, cols=cols)
+    return render_template("judgehome.html", seasons=seasons, tournaments=tournaments)
 
 
 # a login form, validated, variables put in session and / reloaded
@@ -83,6 +83,11 @@ def logout():
     session.clear()
     return redirect("/")
 
+
+# displays info page
+@app.route("/rules")
+def rules():
+    return render_template("rules.html")
 
 # validates form to create a new judge
 @app.route("/newjudge", methods=["GET", "POST"])
@@ -160,19 +165,18 @@ def newseason():
     if request.method == "POST":
 
         # check for empty fields
-        if not request.form.get("season") or not request.form.get("year") or not request.form.get("discipline") or not request.form.get("startdate"):
+        if not request.form.get("season") or not request.form.get("year") or not request.form.get("startdate"):
             return errorpage(send_to="newseason", message="Please fill out all fields.")
         season = request.form.get("season")
         year_of = request.form.get("year")
-        discipline = request.form.get("discipline")
         start_date = request.form.get("startdate")
 
         # check that the season doesnt exist already
-        no_duplicate_season(season, year_of, discipline)
+        no_duplicate_season(season, year_of)
         
         # put the season in the database
         # try:
-        save_season(season, year_of, discipline, start_date)
+        save_season(season, year_of, start_date)
         return redirect("/")
         # except:
         #     return errorpage(send_to="newseason", message="Could not save the season.")
@@ -191,13 +195,6 @@ def seasonview():
     # clear session values
     session["array_competitor_ids"] = None
     session["selected_tournament"] = None
-    
-    # get the selected week to be displayed
-    if request.args.get("week"):
-        week = request.args.get("week")
-    else:
-        week = 1
-    session["week"] = week
 
     # get the selected season to be displayed
     if request.args.get("season"):
@@ -207,6 +204,20 @@ def seasonview():
         sess = session["selected_season"]
     else:
         return errorpage(send_to="/", message="You must select a season.")
+    
+    # get the selected quarter to be displayed
+    if request.args.get("quarter"):
+        quarter_month = request.args.get("quarter")
+    else:
+        quarter_month = 1
+    session["selected_quarter"] = quarter_month
+
+    # get the selected lap to be displayed
+    if request.args.get("lap"):
+        lap_count = request.args.get("lap")
+    else:
+        lap_count = 1
+    session["selected_lap"] = lap_count
 
     # get that season's info from database
     try:
@@ -222,12 +233,12 @@ def seasonview():
     except:
         return errorpage(send_to="/", message="Could not retrieve competitors.")
 
-    # TODO display completed matches
+    # display completed matches
     try:
-        logged_matches = select_matches_by_season_and_week(sess, week)
+        logged_matches = select_matches_by_lap_quarter_season(lap_count, quarter_month, sess)
     except:
         return errorpage(send_to="/", message="Could not retrieve season matches.")
-
+    print(logged_matches)
     # send that info on to the page to be displayed
     return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches)
 
@@ -257,10 +268,14 @@ def creatematch():
 
     # get session values to be stored
     sess = session["selected_season"]
-    week = session["week"]
+    quarter = session["selected_quarter"]
+    lap = session["selected_lap"]
+
+    # get lap_id
+    lap_id = select_lap_id_by_lap_quarter_season(lap, quarter, sess)[0]
 
     # insert into matches, returns primary key match id for use in scores inserts
-    session["match_id"] = insert_unscored_season_match(playerA, playerB, sess, week)
+    session["match_id"] = insert_unscored_season_match(playerA, playerB, lap_id)
 
     # send competitor info to scorematch form
     return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
@@ -487,9 +502,13 @@ def tournamentview():
 
     # calls refreshtournament function
     players, tournament, round = refreshtournament()
+    print(players)
+    print(tournament)
+    print(round)
+
 
     # cols is tournament info
-    tournament_info = tournament[0]
+    tournament_info = tournament
     match_info = []
     player_info = []
 
@@ -590,8 +609,7 @@ def begintournament():
         return errorpage(send_to="/", message="You must select a tournament.")
 
     # calls refreshtournament function
-    players, tournament_info,  = refreshtournament()
-
+    players, tournament_info, round_info = refreshtournament()
     tournament_id = tournament_info["tournament_id"]
 
     # put just the player ids into a list
@@ -755,7 +773,7 @@ def enrollcompetitor():
 
     # sending data to the form page
     if isseason:
-        result = "{} {} {} season".format(season_info['season'], season_info['yearof'], season_info['discipline'])
+        result = "{} {} season".format(season_info['season'], season_info['yearof'])
     else:
         result = "{} {} tournament on {}".format(cols[0]['tournament_name'], cols[0]['discipline'], cols[0]['tournament_date'])
 

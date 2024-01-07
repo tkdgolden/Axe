@@ -14,10 +14,11 @@
 {% endblock %}
 
 {% block body %}
-    
     <form>
-        <label for="week">Week:</label>
-        <input type="number" min="1" max="8" step="1" value="{{ session['week'] }}" name="week" id="week"/>
+        <label for="quarter">Quarter:</label>
+        <input type="number" min="1" class="form-select-sm" max="4" step="1" value="{{ session['selected_quarter'] }}" name="quarter" id="quarter"/>
+        <label for="lap">Series:</label>
+        <input type="number" min="1" class="form-select-sm" max="3" step="1" value="{{ session['selected_lap'] }}" name="lap" id="lap"/>
     </form>
     <table id="weeklymatchups" class="table table-hover table-info display" style="width:95%">
         <thead>

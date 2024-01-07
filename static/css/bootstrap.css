@@ -1893,7 +1893,7 @@ progress {
 }
 .table > thead {
   vertical-align: bottom;
-  --bs-table-color-state: var(--bs-secondary);
+  --bs-table-color-state: #1a0933;
 }
 
 .table-group-divider {
@@ -1990,7 +1990,7 @@ th.hover, .table-hover > tbody > tr:hover > th {
 }
 
 .table-info {
-  --bs-table-color: #fff;
+  --bs-table-color: #1a0933;
   --bs-table-bg: #1ba2f6;
   --bs-table-border-color: #32abf7;
   --bs-table-striped-bg: #007fce;
@@ -1999,7 +1999,7 @@ th.hover, .table-hover > tbody > tr:hover > th {
   --bs-table-active-color: #fff;
   --bs-table-hover-bg: #ea39b8;
   --bs-table-hover-color: #fff;
-  color: var(--bs-table-color);
+  color: #1a0933;
   border-color: var(--bs-table-border-color);
 }
 

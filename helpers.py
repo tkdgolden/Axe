@@ -119,8 +119,8 @@ def build_bracket(player_list, match_list, round_list, first_round_found, first_
                 else:
                     for y in match_list:
                         if y["match_id"] == each["matches"][matches_count]:
-                            p1total = y["player_1_total"]
-                            p2total = y["player_2_total"]
+                            p1total = y["player1total"]
+                            p2total = y["player2total"]
                             if (p1total == None or p2total == None):
                                 round_e_results[results_count] = []
                             else:
@@ -143,8 +143,9 @@ def build_bracket(player_list, match_list, round_list, first_round_found, first_
                 else:
                     for y in match_list:
                         if y["match_id"] == each["matches"][matches_count]:
-                            p1total = y["player_1_total"]
-                            p2total = y["player_2_total"]
+                            print(y)
+                            p1total = y["player1total"]
+                            p2total = y["player2total"]
                             if (p1total == None or p2total == None):
                                 round_d_results[results_count] = []
                             else:
@@ -471,7 +472,7 @@ def refreshtournament():
     
     # get the tournament info from database
     try:
-        tournament_info = db.select_current_tournament(sess)
+        tournament_info = db.select_current_tournament(sess)[0]
     except:
         return errorpage(send_to="/", message="Could not load tournament.")
     
@@ -482,7 +483,7 @@ def refreshtournament():
         return errorpage(send_to="/", message="Could not load players.")
 
     # get the current round id from the tournament info
-    round_id = tournament_info[0][5]
+    round_id = tournament_info[5]
 
     # get the round info
     try:
@@ -533,7 +534,7 @@ def active_season_tournament():
         rows.remove(each)
     for each in tournamentarchive:
         cols.remove(each)
-    
+    print(rows, cols)
     return rows, cols
 
 def no_duplicate_judge(name):

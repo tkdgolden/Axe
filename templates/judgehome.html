@@ -10,7 +10,7 @@
         <li>Judge a Season
             <form action="/seasonview" method="get">
                 <select name="season" class="form-select-sm" id="season">
-                    {% for x in rows %}
+                    {% for x in seasons %}
                         <option value="{{ x['season_id'] }}">{{ x["season"].capitalize() }} {{ x["yearof"] }}</option>
                     {% endfor %}
                 </select>
@@ -22,7 +22,7 @@
         <li>Judge a Tournament
             <form action="/tournamentview" method="get">
                 <select name="tournament" class="form-select-sm" id="tournament">
-                    {% for y in cols %}
+                    {% for y in tournaments %}
                         <option value="{{ y['tournament_id'] }}">{{ y["tournament_name"].title() }} {{ y["discipline"].capitalize() }} Tournament on {{ y["tournament_date"].strftime('%m-%d-%Y') }}</option>
                     {% endfor %}
                 </select>

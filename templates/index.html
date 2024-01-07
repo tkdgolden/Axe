@@ -10,7 +10,7 @@
                 <li>Season
                     <form action="/season_stats_view" method="get">
                         <select name="season" id="season" class="form-select-sm">
-                            {% for x in rows %}
+                            {% for x in seasons %}
                                 <option value="{{ x['season_id'] }}">{{ x["season"] }} {{ x["yearof"] }} {{ x["discipline"] }}</option>
                             {% endfor %}
                         </select>
@@ -20,7 +20,7 @@
                 <li>Tournament
                     <form action="/tournament_stats_view" method="get">
                         <select name="tournament" id="tournament" class="form-select-sm">
-                            {% for x in cols %}
+                            {% for x in tournaments %}
                                 <option value="{{ x['tournament_id'] }}">{{ x["tournament_name"] }} {{ x["discipline"] }} tournament on {{ x["tournament_date"] }}</option>
                             {% endfor %}
                         </select>
@@ -53,8 +53,8 @@
                         <tbody>
                             {% for player in discipline %}
                                 <tr role="button" data-href="player_view?player_id={{ player[0] }}" class="table-row">
-                                    <th>{{ player[2] }}</th>
                                     <th>{{ player[1] }}</th>
+                                    <th>{{ player[2] }}</th>
                                     <td>{{ player[3] }}</td>
                                     <td>{{ player[4] }}</td>
                                     <td>{{ player[5] }}</td>
