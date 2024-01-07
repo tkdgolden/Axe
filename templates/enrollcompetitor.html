@@ -1,13 +1,14 @@
 <!--Form that asks for a competitor's first and last name.  Competitor must already exist.-->
 {% extends "layout.html" %}
 
+<!--Season or Tournament name:-->
+{% block judgepage %}
+<p>Add a new Competitor to the {{ result.title() }}.</p>
+<p><a href="/">Back to Judge Home</a></p>
+<p><a href="{{ returnlink }}">Back to {{ result }}</a></p>
+{% endblock %}
+
 {% block body %}
-
-<!--Judge name:-->
-<p>You are logged in as {{ session.name }}.</p>
-
-    <!--Season or Tournament name:-->
-    <h1>Add a new Competitor to the {{ result }}.</h1>
 
     <form action="/enrollcompetitor" method="post">
         <input autocomplete="off" autofocus name="firstname" placeholder="First Name" type="text">
@@ -15,7 +16,4 @@
         <input type="submit" value="Add">
     </form>
 
-    <p><a href="/">Back to Judge Home</a></p>
-
-    <p><a href="{{ returnlink }}">Back to {{ result }}</a></p>
 {% endblock %}

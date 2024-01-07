@@ -1,17 +1,18 @@
 <!--Form to create a new competitor-->
 {% extends "layout.html" %}
 
-{% block body %}
-<p>You are logged in as {{ session.name }}.</p>
+{% block judgepage %}
+    <h3>Create a new Competitor</h3>
+    
+    <p><a href="/">Back to Judge Home</a></p>
+{% endblock %}
 
-    <h1>Create a new Competitor:</h1>
+{% block body %}
 
     <form action="/newcompetitor" method="post">
         <input autocomplete="off" autofocus name="firstname" placeholder="First Name" type="text">
         <input autocomplete="off" name="lastname" placeholder="Last Name" type="text">
         <input type="submit" value="Create">
     </form>
-
-    <p><a href="/">Back to Judge Home</a></p>
 
 {% endblock %}

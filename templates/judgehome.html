@@ -2,41 +2,37 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <p>You are logged in as {{ session.name }}.</p>
-    
-    <a href="/logout">Log Out</a>
 
     <p>You can:</p>
 
     <ul>
-        <li><a href="/newjudge">Create New Judge Account</a></li>
-        <li><a href="/newcompetitor">Create New Competitor</a></li>
-        <li><a href="/newseason">Create New Season</a></li>
-        <li><a href="/newtournament">Create New Tournament</a></li>
-        
         <!--Drop down menu of available seasons-->
         <li>Judge a Season
             <form action="/seasonview" method="get">
-                <select name="season" id="season">
-                    {% for x in rows %}
-                        <option value="{{ x['season_id'] }}">{{ x["season"] }} {{ x["yearof"] }} {{ x["discipline"] }}</option>
+                <select name="season" class="form-select-sm" id="season">
+                    {% for x in seasons %}
+                        <option value="{{ x['season_id'] }}">{{ x["season"].capitalize() }} {{ x["yearof"] }}</option>
                     {% endfor %}
                 </select>
-                <input type="submit" value="Begin">
+                <button class="btn btn-sm btn-outline-primary" type="submit">Begin</button>
             </form>
         </li>
 
         <!--Drop down menu of available tournaments-->
         <li>Judge a Tournament
             <form action="/tournamentview" method="get">
-                <select name="tournament" id="tournament">
-                    {% for y in cols %}
-                        <option value="{{ y['tournament_id'] }}">{{ y["tournament_name"] }} {{ y["discipline"] }} tournament on {{ y["tournament_date"] }}</option>
+                <select name="tournament" class="form-select-sm" id="tournament">
+                    {% for y in tournaments %}
+                        <option value="{{ y['tournament_id'] }}">{{ y["tournament_name"].title() }} {{ y["discipline"].capitalize() }} Tournament on {{ y["tournament_date"].strftime('%m-%d-%Y') }}</option>
                     {% endfor %}
                 </select>
-                <input type="submit" value="Begin">
+                <button class="btn btn-sm btn-outline-primary" type="submit">Begin</button>
             </form>
         </li>
+        <li><a href="/newcompetitor">Create New Competitor</a></li>
+        <li><a href="/newseason">Create New Season</a></li>
+        <li><a href="/newtournament">Create New Tournament</a></li>
+        <li><a href="/newjudge">Create New Judge Account</a></li>
         <li><a href="/archive">Edit Archived Seasons and Tournaments</a></li>
     </ul>
 {% endblock %}

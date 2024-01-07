@@ -6,7 +6,10 @@
         <meta name="viewport" content="initial-scale=1, width=device-width">
         <title>Tap That AXE</title>
 
-        <!-- custom sytlesheet -->
+        <!-- custom stylesheet -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+
+        <!-- bootstrap custom color scheme -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
         
         <!-- adding jquery ... might not need both links...? -->
@@ -22,7 +25,21 @@
         <script type="text/javascript" src="static\js\jquery.bracket.min.js"></script>
     </head>
     <body>
-        <h1>Tap That Axe</h1>
+        <div class="navbar">
+            <a href="/" class="btn"><h1>Tap That Axe</h1></a>
+            <a href="/rules" class="btn"><h3>Info/ Rules</h3></a>
+            <h2>
+                {% block title %}{% endblock %}
+            </h2>
+            {% if not session['user_id'] %}
+                <a href="/login" class="btn btn-outline-success">Judge Log In</a>
+            {% else %}
+                {% block judgepage %}{% endblock %}
+                <p>You are logged in as {{ session.name }}.</p>
+                <a href="/logout">Log Out</a>
+            {% endif %}
+        </div>
+        <hr>
         {% block body %}{% endblock %}
     </body>
 </html>

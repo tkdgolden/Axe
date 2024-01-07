@@ -1,0 +1,83 @@
+<!--Description of gameplay & rules & scheduling-->
+{% extends "layout.html" %}
+{% block title %}Info{% endblock %}
+{% block body %}
+    <h1>Gameplay</h1>
+    <p>A match consists of 8 throws between two players, with 4 throws on each target. Throws are made from no closer than 12 feet from the target. For each throw, when players are on the throwing line and appear ready, the judge will announce the active bullseye for that throw. As soon as the active bullseye is announced, players may take their throws. Throws are scored, players retrieve their axes and return to the throwing line. After the fourth throw, player will switch sides and throw at the opposite target. </p>
+    <hr>
+    <h3>Scoring</h3>
+    <p>Each target consists of five bullseyes. The four corner bullseyes each have a ring around them. The center "reserve" bullseye does not. Blades are scored by the part at the surface of the wood, not what is buried underneath, or hanging above. When the blade is partially inside a ring, it is worth 1 point. When a blade is fully inside a ring, it is worth 2 points. When the blade is partially inside a bullseye, it is worth 3 points. When a blade is fully inside a bullseye it is worth 6 points. For each throw, one of the corner bullseyes is active, and the others are considered passive. The active bullseye and it's ring is scored as described above, then doubled. If a throw scores on a passive or reserve bullseye, the score simply is not doubled. </p>
+    <h4>Quick Points</h4>
+    <p>Points are also potentially awarded each throw if one thrower is noticably faster. (If one blade hits the target before their opponent's blade has left their hand.) If it is not a clear difference, neither player gets the "quick point" for that throw. </p>
+    <h4>Target</h4>
+    <img src="{{url_for('static', filename='Target Design.png')}}">
+    <hr>
+    <h3>Seasons</h3>
+    <p>There will be roughly two seasons per year, consisting of 4 quarters (roughtly one per month). Each quarter will have a number of series, based on the league attendance. The first series will always be hatchet, but subsequent ones may be other disciplines. In a perfect series, each player will play every other player exactly once. Based on attendance this may vary. </p>
+    <h3>Tournaments</h3>
+    <p>To be determined.</p>
+    <hr>
+    <h3>Tentative 2024 Schedule</h3>
+    <ul>
+        <li>Season I
+            <ul>Quarter 1
+                <li>Jan 14</li>
+                <li>Jan 21</li>
+                <li>Jan 28</li>
+            </ul>
+            <ul>Quarter 2
+                <li>Feb 11</li>
+                <li>Feb 18</li>
+                <li>Feb 25</li>
+            </ul>
+            <ul>Quarter 3
+                <li>Mar 3</li>
+                <li>Mar 10</li>
+            </ul>
+        </li>
+        <li>St. Patty's Day Tournament</li>
+        <li>
+            <ul>
+                <li>Mar 24</li>
+            </ul>
+            <ul>Quarter 4
+                <li>Apr 7</li>
+                <li>Apr 14</li>
+            </ul>
+        </li>
+        <li>WATL World's Watch Party Tournament</li>
+        <li>
+            <ul>
+                <li>Apr 28</li>
+            </ul>
+        </li>
+        <li>Cinco De Mayo Tournament</li>
+        <li>Memorial Day Tournament</li>
+        <li>International Axe Throwing Day Tournament</li>
+        <li>4th of July Tournament</li>
+        <li>Season II
+            <ul>Quarter 1
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+            <ul>Quarter 2
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+            <ul>Quarter 3
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+            <ul>Quarter 4
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </li>
+        <li>Turkey Throw Tournament</li>
+        <li>... More Holiday Tournaments</li>
+    </ul>
+{% endblock %}

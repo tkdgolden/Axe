@@ -6,3 +6,125 @@
     margin:0;
     float:right;
 }
+
+#box {
+    height: 100vh;
+    width: 95%;
+}
+
+#sliders {
+    position: fixed;
+    bottom: 0;
+}
+
+input[type="range" i] {
+    accent-color: #6f42c1;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+}
+
+.item {
+    flex-grow:1;
+}
+
+li {
+    margin: 10px;
+}
+
+.tab {
+    border: 1px solid #5e174a;
+    background-color: inherit;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.tab button {
+    background-color: #170229;
+    border-color:#6f42c1;
+    color: inherit;
+    padding: 8px 16px;
+    transition: 0.3s;
+}
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #5e174a;
+    border-top: none;
+}
+
+#hatchet_tab {
+    color: #ffc107;
+}
+
+#hatchet, #hatchet_tab:hover {
+    color:#170229;
+    background-color: #ffc107;
+}
+
+#knives, #knives_tab {
+    color: #ea39b8;
+}
+
+#knives, #knives_tab:hover {
+    color:#170229;
+    background-color: #ea39b8;
+}
+
+#bigaxe, #bigaxe_tab {
+    color: #32fbe2;
+}
+
+#bigaxe, #bigaxe_tab:hover {
+    color:#170229;
+    background-color: #32fbe2;
+}
+
+#duals, #duals_tab {
+    color: #6f42c1;
+}
+
+#duals, #duals_tab:hover {
+    color:#170229;
+    background-color: #6f42c1;
+}
+
+#cumulative_tab {
+    color: #3cf281;
+}
+
+#cumulative, #cumulative_tab:hover {
+    color:#170229;
+    background-color: #3cf281;
+}
+
+#tables {
+    flex-grow: 2;
+}
+
+#weeklymatchups th {
+    background-color: #007fce;
+    color:#5e174a;
+}
+
+.complete {
+    background-color: #3cf281 !important;
+}
+
+.begun {    
+    background-color: #ffc107 !important;
+}
+
+.pname {
+    color:#170229;
+}
+
+.head {
+    font-size:x-large;
+}

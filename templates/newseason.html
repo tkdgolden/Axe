@@ -1,32 +1,23 @@
 <!--Form to create a new season-->
 {% extends "layout.html" %}
 
-{% block body %}
-    <p>You are logged in as {{ session.name }}.</p>
+{% block judgepage %}
+    <h3>Create a new Season:</h3>
 
-    <h1>Create a new Season:</h1>
+    <p><a href="/">Back to Judge Home</a></p>
+{% endblock %}
+
+{% block body %}
 
     <form action="/newseason" method="post">
         <label for="season">Season:</label>
-        <select name="season" id="season">
-            <option value="spring">Spring</option>
-            <option value="summer">Summer</option>
-            <option value="fall">Fall</option>
-            <option value="winter">Winter</option>
-        </select>
-        <input type="number" min="2022" max="2099" step="1" value="2022" name="year">
-        <label for="discipline">Discipline:</label>
-        <select name="discipline" id="discipline">
-            <option value="hatchet">Hatchet</option>
-            <option value="bigaxe">Big Axe</option>
-            <option value="knives">Knives</option>
-            <option value="duals">Duals</option>
-        </select>
+        <input class="form-select-sm" type="text" name="season" id="season"></input>
+        <input class="form-select-sm" type="number" min="2022" max="2099" step="1" value="2022" name="year" id="year">
         <label for="startdate">Start Date:</label>
-        <input type="date" name="startdate" id="startdate" min="2022-08-08">
-        <input type="submit" value="Create">
+        <input class="form-select-sm" type="date" name="startdate" id="startdate" min="2022-08-08">
+        <input class="btn btn-sm btn-outline-primary" type="submit" value="Create">
     </form>
 
-    <p><a href="/">Back to Judge Home</a></p>
+
 
 {% endblock %}

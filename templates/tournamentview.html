@@ -1,18 +1,23 @@
 <!--Page displaying a judge's options within a tournament (enroll competitor, start match, view players, recent matches)-->
 {% extends "layout.html" %}
 
+{% block judgepage %}
+    <p>You are judging the {{ tournament_info["tournament_name"] }} {{ tournament_info['discipline'] }} Tournament on {{ tournament_info["tournament_date"] }}.</p>
+    <a href="/">Leave Tournament/ Back to Judge Homepage</a>
+{% endblock %}
+
 {% block body %}
-    <p>You are logged in as {{ session.name }}.    <a href="/logout">Log Out</a></p>
-    <p>You are judging the {{ cols["tournament_name"] }} {{ cols["discipline"] }} tournament on {{ cols["tournament_date"] }}.     <a href="/">Leave Tournament/ Back to Judge Homepage</a></p>
+
+
             
-    {% if cols["current_round"] %}
+    {% if tournament_info["current_round"] %}
         <h2>Upcoming Matches</h2>
             <p class="nextround">All matches for this round are complete.</p>
             <form action="/nextround" method="get" class="nextround">
                 <input type="submit" value="Next Round">
             </form>
         <form class="thisround" action="/editmatch" method="get">
-            <select multiple size="any number" name="match" id="match">
+            <select multiple size="any number" class="form-select-sm" name="match" id="match">
                 {% for each in match_info %}
                     {% if "match" in each %}
                         <option value="{{ each[1] }}">{{ match_info[match_info.index(each) + 1][1] }} {{ match_info[match_info.index(each) + 1][2]}} Vs. {{ match_info[match_info.index(each) + 2][1] }} {{ match_info[match_info.index(each) + 2][2]}}</option>
@@ -33,7 +38,7 @@
                     {% endif %}
                 {% endfor %}
             </select>
-            <input type="submit" value="Score a Match">
+            <input type="submit" value="Score a Match" class="btn btn-sm btn-outline-primary">
         </form>   
 
     {% else %}
@@ -63,7 +68,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if cols["enrollment_open"] == True %}
+    {% if tournament_info["enrollment_open"] == True %}
         <p><a href="/enrollcompetitor">Enroll a Competitor</a></p>
     {% endif %}
 

@@ -1,12 +1,16 @@
 <!--Form for JUDGES to log in-->
 {% extends "layout.html" %}
-
+{% block title %}Judge Login{% endblock %}
 {% block body %}
 
-    <form action="/login" method="post">
-        <input autocomplete="off" autofocus name="name" placeholder="Name" type="text">
-        <input autocomplete="off" name="password" placeholder="Password" type="text">
-        <input type="submit" value="Log In">
-    </form>
-    <p><a href="/">Back to Competitor View</a></p>
+<form action="/login" method="post" class="form-inline">
+    <div class="input-group">
+        <input autocomplete="off" id="name" autofocus name="name" placeholder="Name" type="text" class="form-control">
+        <input autocomplete="off" id="name" name="password" placeholder="Password" type="password" class="form-control">
+
+        <input type="submit" value="Log In" class="btn btn-sm btn-outline-primary form-control">
+    </div>
+
+</form>
+<p><a href="/">Back to Competitor View</a></p>
 {% endblock %}
