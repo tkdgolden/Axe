@@ -157,13 +157,13 @@ def select_tournament_discipline(sess):
 def insert_completed_match(winner, pAtotal, pBtotal, discipline, judge, ts, match_id):
     """ insert completed match info to database """
 
-    CUR.execute("""UPDATE matches SET winner_id = %(winner)s, player_1_total = %(pAtotal)s, player_2_total = %(pBtotal)s, discipline = %(discipline)s, judge_id = %(judge)s, date_time = %(ts)s WHERE match_id = %(match_id)s""", {'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts, 'match_id': match_id})
+    CUR.execute("""UPDATE matches SET winner_id = %(winner)s, player1total = %(pAtotal)s, player2total = %(pBtotal)s, discipline = %(discipline)s, judge_id = %(judge)s, dt = %(ts)s WHERE match_id = %(match_id)s""", {'winner': winner, 'pAtotal': pAtotal, 'pBtotal': pBtotal, 'discipline': discipline, 'judge': judge, 'ts': ts, 'match_id': match_id})
     conn.commit()
 
 def insert_player_scores(player, match_id, qt, sequence, tone, ttwo, tthree, tfour, tfive, tsix, tseven, teight, total, win):
     """ insert player scores into database """
 
-    CUR.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, sequence, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(player)s, %(match_id)s, %(qt)s, %(sequence)s, %(tone)s, %(ttwo)s, %(tthree)s, %(tfour)s, %(tfive)s, %(tsix)s, %(tseven)s, %(teight)s, %(total)s, %(win)s)""", {'player': player, 'match_id': match_id, 'qt': qt, 'sequence': sequence, 'tone': tone, 'ttwo': ttwo, 'tthree': tthree, 'tfour': tfour, 'tfive': tfive, 'tsix': tsix, 'tseven': tseven, 'teight': teight, 'total': total, 'win': win})
+    CUR.execute("""INSERT INTO scores (competitor_id, match_id, quick_points, seq, throw1, throw2, throw3, throw4, throw5, throw6, throw7, throw8, total, won) VALUES (%(player)s, %(match_id)s, %(qt)s, %(sequence)s, %(tone)s, %(ttwo)s, %(tthree)s, %(tfour)s, %(tfive)s, %(tsix)s, %(tseven)s, %(teight)s, %(total)s, %(win)s)""", {'player': player, 'match_id': match_id, 'qt': qt, 'sequence': sequence, 'tone': tone, 'ttwo': ttwo, 'tthree': tthree, 'tfour': tfour, 'tfive': tfive, 'tsix': tsix, 'tseven': tseven, 'teight': teight, 'total': total, 'win': win})
     conn.commit()
 
 def no_duplicate_tournament(name, discipline, date):
@@ -415,3 +415,38 @@ def select_scores_by_player_id_match_id(player_id, match_id):
     CUR.execute(""" SELECT * FROM scores WHERE competitor_id = %(player_id)s AND match_id = %(match_id)s """, {'player_id': player_id, 'match_id': match_id})
 
     return CUR.fetchall()
+
+def select_quarter_id_by_month_and_season_id(quarter_month, season_id):
+    """ returns quarter_id if one exists for the quarter_month and season_id """
+
+    CUR.execute(""" SELECT quarter_id FROM quarters WHERE month = %(quarter_month)s AND season_id = %(season_id)s """, {'quarter_month': quarter_month, 'season_id': season_id})
+
+    return CUR.fetchone()
+
+def insert_current_quarter(quarter_month, season_id, date):
+    """creates new quarter for the selected season """
+
+    CUR.execute(""" INSERT INTO quarters (month, season_id, start_date) VALUES (%(quarter_month)s, %(season_id)s, %(date)s)""", {'quarter_month': quarter_month, 'season_id':season_id, 'date': date})
+
+    conn.commit()
+
+def select_lap_id_by_lap_quarter(lap_count, quarter_id):
+    """ selects lap id from current lap count and quarter id"""
+
+    CUR.execute("""SELECT lap_id FROM laps WHERE counter = %(lap_count)s AND quarter_id = %(quarter_id)s """, {'lap_count': lap_count, 'quarter_id': quarter_id})
+
+    return CUR.fetchone()
+
+def insert_current_lap(lap_count, start_date, quarter_id, discipline):
+    """ creates a new lap for the selected quarter and season """
+
+    CUR.execute(""" INSERT INTO laps(counter, start_date, quarter_id, discipline) VALUES(%(lap_count)s, %(start_date)s, %(quarter_id)s, %(discipline)s) """, {'lap_count': lap_count, 'start_date': start_date, 'quarter_id': quarter_id, 'discipline': discipline})
+
+    conn.commit()
+
+def select_match_discipline(match_id):
+    """returns the discipline of a match"""
+
+    CUR.execute("""SELECT laps.discipline FROM laps JOIN matches ON matches.lap_id = laps.lap_id WHERE matches.match_id = %(match_id)s """, {'match_id': match_id})
+
+    return CUR.fetchone()

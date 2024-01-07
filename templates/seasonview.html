@@ -9,16 +9,16 @@
 {% extends "layout.html" %}
 
 {% block judgepage %}
-    <p>You are judging the {{ rows[0]["year_of"] }} {{ rows[0]["season"] }} {{ rows[0]["yearof"] }} {{ rows[0]["discipline"] }} season.</p>
+    <p>You are judging Season {{ rows[0]["season"] }} of {{ rows[0]["yearof"] }}.</p>
     <a href="/">Leave Season/ Back to Judge Homepage</a>
 {% endblock %}
 
 {% block body %}
     <form>
         <label for="quarter">Quarter:</label>
-        <input type="number" min="1" class="form-select-sm" max="4" step="1" value="{{ session['selected_quarter'] }}" name="quarter" id="quarter"/>
+        <input type="number" min="1" class="view form-select-sm" max="4" step="1" value="{{ session['selected_quarter'] }}" name="quarter" id="quarter"/>
         <label for="lap">Series:</label>
-        <input type="number" min="1" class="form-select-sm" max="3" step="1" value="{{ session['selected_lap'] }}" name="lap" id="lap"/>
+        <input type="number" min="1" class="view form-select-sm" max="3" step="1" value="{{ session['selected_lap'] }}" name="lap" id="lap"/>
     </form>
     <table id="weeklymatchups" class="table table-hover table-info display" style="width:95%">
         <thead>
@@ -55,7 +55,29 @@
         </tbody>
     </table>
     <a href="/enrollcompetitor">Enroll a Competitor</a>
-
+    <form action="/createquarter" method="post">
+        <label for="new_quarter">New Quarter:</label>
+        <input type="text" class="form-select-sm" name="new_quarter" id="new_quarter">
+        <label for="quarter_date">Start Date:</label>
+        <input type="date" class="form-select-sm" name="quarter_date" id="quarter_date">
+        <input id="season" name="season" hidden value="{{ rows[0]['season_id'] }}">
+        <button class="btn btn-sm btn-outline-primary" type="submit">Begin</button>
+    </form>
+    <form action="/createlap" method="post">
+        <label for="new_lap">New Series:</label>
+        <input type="text" class="form-select-sm" name="new_lap" id="new_lap">
+        <label for="lap_date">Start Date:</label>
+        <input type="date" class="form-select-sm" name="lap_date" id="lap_date">
+        <select name="quarter_id" class="form-select-sm" id="quarter_id">
+            {% for quarter in season_quarters %}
+                <p>{{ quarter['quarter_id'] }}</p>
+                <option value="{{ quarter['quarter_id'] }}">{{ quarter['month'] }}</option>
+            {% endfor %}
+        </select>
+        <label for="discipline">Discipline:</label>
+        <input type="text" class="form-select-sm" name="discipline" id="discipline">
+        <button class="btn btn-sm btn-outline-primary" type="submit">Begin</button>
+    </form>
     <script type="text/javascript" src="{{ url_for('static', filename='js/season.js') }}"></script>
 
 {% endblock %}

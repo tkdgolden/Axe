@@ -208,6 +208,8 @@ def seasonview():
     # get the selected quarter to be displayed
     if request.args.get("quarter"):
         quarter_month = request.args.get("quarter")
+    elif session["selected_quarter"]:
+        quarter_month = session["selected_quarter"]
     else:
         quarter_month = 1
     session["selected_quarter"] = quarter_month
@@ -215,6 +217,8 @@ def seasonview():
     # get the selected lap to be displayed
     if request.args.get("lap"):
         lap_count = request.args.get("lap")
+    elif session["selected_lap"]:
+        lap_count = session["selected_lap"]
     else:
         lap_count = 1
     session["selected_lap"] = lap_count
@@ -238,9 +242,45 @@ def seasonview():
         logged_matches = select_matches_by_lap_quarter_season(lap_count, quarter_month, sess)
     except:
         return errorpage(send_to="/", message="Could not retrieve season matches.")
-    print(logged_matches)
+    
+    season_quarters = select_season_quarters(sess)
+
     # send that info on to the page to be displayed
-    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches)
+    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, season_quarters=season_quarters)
+
+
+# create quarter
+@app.route("/createquarter", methods=["POST"])
+@login_required
+def createquarter():
+    sess = request.form.get("season")
+    quarter_month = request.form.get("new_quarter")
+    start_date = request.form.get("quarter_date")
+    session["selected_quarter"] = quarter_month
+
+    if select_quarter_id_by_month_and_season_id(quarter_month, sess) == None:
+        insert_current_quarter(quarter_month, sess, start_date)
+    else:
+        return errorpage(message="That quarter already exists", send_to="seasonview")
+    return redirect(f"/seasonview?season={sess}")
+
+
+# create lap
+@app.route("/createlap", methods=["POST"])
+@login_required
+def createlap():
+
+    lap_count = request.form.get("new_lap")
+    start_date = request.form.get("lap_date")
+    quarter_id = request.form.get("quarter_id")
+    discipline = request.form.get("discipline")
+    session["selected_lap"] = lap_count
+    sess = session["selected_season"]
+    if select_lap_id_by_lap_quarter(lap_count, quarter_id) == None:
+        insert_current_lap(lap_count, start_date, quarter_id, discipline)
+    else:
+        return errorpage(message="That lap already exists", send_to="seasonview")
+    return redirect(f"/seasonview?season={sess}")
 
 
 # create match used only from seasons, in tournaments matches are created when the round is created
@@ -268,14 +308,23 @@ def creatematch():
 
     # get session values to be stored
     sess = session["selected_season"]
-    quarter = session["selected_quarter"]
-    lap = session["selected_lap"]
+    if session["selected_quarter"]:
+        quarter = session["selected_quarter"]
+    else:
+        quarter = 1
+    if session["selected_lap"]:
+        lap = session["selected_lap"]
+    else:
+        lap = 1
 
     # get lap_id
-    lap_id = select_lap_id_by_lap_quarter_season(lap, quarter, sess)[0]
+    try:
+        lap_id = select_lap_id_by_lap_quarter_season(lap, quarter, sess)
+    except TypeError:
+        return errorpage(message="Be sure to create the appropriate Quarter and Series", send_to="seasonview")
 
     # insert into matches, returns primary key match id for use in scores inserts
-    session["match_id"] = insert_unscored_season_match(playerA, playerB, lap_id)
+    session["match_id"] = insert_unscored_season_match(playerA, playerB, lap_id[0])
 
     # send competitor info to scorematch form
     return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
@@ -405,7 +454,6 @@ def scorematch():
                 pAtotal += 1
             elif winner == session["array_competitor_ids"][1]:
                 pBtotal += 1
-
         # get player ids
         playerA = session["array_competitor_ids"][0]
         playerB = session["array_competitor_ids"][1]
@@ -419,8 +467,7 @@ def scorematch():
             pAwin = False
 
         # determine season or tournament, get discipline values
-        view, discipline = determine_discipline_season_or_tournament()
-        discipline = discipline[0]
+        view, discipline = determine_discipline_season_or_tournament(match_id)
         judge = session["user_id"]
 
         # three database inserts: one to matches, and one for each player into scores
@@ -502,9 +549,6 @@ def tournamentview():
 
     # calls refreshtournament function
     players, tournament, round = refreshtournament()
-    print(players)
-    print(tournament)
-    print(round)
 
 
     # cols is tournament info
