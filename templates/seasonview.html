@@ -14,11 +14,13 @@
 {% endblock %}
 
 {% block body %}
-    <form>
-        <label for="quarter">Quarter:</label>
-        <input type="number" min="1" class="view form-select-sm" max="4" step="1" value="{{ session['selected_quarter'] }}" name="quarter" id="quarter"/>
+    <form class="view">
         <label for="lap">Series:</label>
-        <input type="number" min="1" class="view form-select-sm" max="3" step="1" value="{{ session['selected_lap'] }}" name="lap" id="lap"/>
+        <select name="lap" class="form-select-sm" id="lap">
+            {% for lap in season_laps %}
+                <option data-quarter="{{ lap['month'] }}" data-lap="{{ lap['counter'] }}" data-id="{{ lap['lap_id'] }}" value="{{ lap['lap_id'] }}">Quarter {{ lap['month'] }} Series {{ lap['counter'] }} {{ lap['discipline'] }}</option>
+            {% endfor %}
+        </select>
     </form>
     <table id="weeklymatchups" class="table table-hover table-info display" style="width:95%">
         <thead>
@@ -68,9 +70,9 @@
         <input type="text" class="form-select-sm" name="new_lap" id="new_lap">
         <label for="lap_date">Start Date:</label>
         <input type="date" class="form-select-sm" name="lap_date" id="lap_date">
+        <label for="quarter_id">Quarter:</label>
         <select name="quarter_id" class="form-select-sm" id="quarter_id">
             {% for quarter in season_quarters %}
-                <p>{{ quarter['quarter_id'] }}</p>
                 <option value="{{ quarter['quarter_id'] }}">{{ quarter['month'] }}</option>
             {% endfor %}
         </select>

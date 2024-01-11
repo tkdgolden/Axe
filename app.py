@@ -209,20 +209,14 @@ def seasonview():
     if request.args.get("quarter"):
         quarter_month = request.args.get("quarter")
     else:
-        try:
-            quarter_month = session["selected_quarter"]
-        except KeyError:
-            quarter_month = 1
+        quarter_month = 1
     session["selected_quarter"] = quarter_month
 
     # get the selected lap to be displayed
     if request.args.get("lap"):
         lap_count = request.args.get("lap")
     else:
-        try:
-            lap_count = session["selected_lap"]
-        except KeyError:
-            lap_count = 1
+        lap_count = 1
     session["selected_lap"] = lap_count
 
     # get that season's info from database
@@ -246,9 +240,10 @@ def seasonview():
         return errorpage(send_to="/", message="Could not retrieve season matches.")
     
     season_quarters = select_season_quarters(sess)
+    season_laps = select_season_laps(sess)
 
     # send that info on to the page to be displayed
-    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, season_quarters=season_quarters)
+    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, season_quarters=season_quarters,season_laps=season_laps)
 
 
 # create quarter
