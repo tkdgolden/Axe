@@ -1,4 +1,9 @@
 $(document).ready(function () {
+    setInterval(function() {
+        window.location.reload();
+    }, 60000)
+
+
     var storedPlayers = JSON.parse(sessionStorage.getItem('absentPlayers'));
     var absentPlayers = [];
     storedPlayers.forEach(function(player) {
