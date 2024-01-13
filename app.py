@@ -236,6 +236,7 @@ def seasonview():
     # display completed matches
     try:
         logged_matches = select_matches_by_lap_quarter_season(lap_count, quarter_month, sess)
+        print(logged_matches)
     except:
         return errorpage(send_to="/", message="Could not retrieve season matches.")
     
@@ -243,7 +244,7 @@ def seasonview():
     season_laps = select_season_laps(sess)
 
     # send that info on to the page to be displayed
-    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, season_quarters=season_quarters,season_laps=season_laps)
+    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, season_quarters=season_quarters, season_laps=season_laps)
 
 
 # create quarter

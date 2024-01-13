@@ -1,5 +1,12 @@
 $(document).ready(function () {
+    var storedPlayers = JSON.parse(sessionStorage.getItem('absentPlayers'));
     var absentPlayers = [];
+    storedPlayers.forEach(function(player) {
+        absentPlayers.push(Number.parseInt(player));
+    })
+    absentPlayers.forEach(function(player) {
+        $(`.${player}`).addClass("table-active");
+    })
 
     $(".toprow").on("dblclick", function() {
         var playerId = $(this).data("player");
@@ -17,6 +24,7 @@ $(document).ready(function () {
         absentPlayers.forEach(function(pID) {
             $(`.${pID}`).addClass("table-active");
         });
+        sessionStorage.setItem('absentPlayers', JSON.stringify(absentPlayers));
     });
 
     var combinations = [];
