@@ -600,3 +600,21 @@ def render_player_stats():
     each_discipline_player_list.append(all_discipline_player_list)
 
     return(each_discipline_player_list)
+
+
+def wait_times(logged_matches):
+    """ returns an array of player_id and time since the most recent match in logged_matches """
+
+    player_time = {}
+
+    for match in logged_matches:
+        p1 = match["player_1_id"]
+        p2 = match["player_2_id"]
+        if match["dt"]:
+            this_diff = datetime.datetime.now() - match["dt"]
+            if (p1 not in player_time) or (player_time[p1] > this_diff):
+                player_time[p1] = this_diff
+            if (p2 not in player_time) or (player_time[p2] > this_diff):
+                player_time[p2] = this_diff
+    
+    return player_time

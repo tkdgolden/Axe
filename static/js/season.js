@@ -6,9 +6,11 @@ $(document).ready(function () {
 
     var storedPlayers = JSON.parse(sessionStorage.getItem('absentPlayers'));
     var absentPlayers = [];
-    storedPlayers.forEach(function(player) {
-        absentPlayers.push(Number.parseInt(player));
-    })
+    if(storedPlayers) {
+        storedPlayers.forEach(function(player) {
+            absentPlayers.push(Number.parseInt(player));
+        })
+    }
     absentPlayers.forEach(function(player) {
         $(`.${player}`).addClass("table-active");
     })
