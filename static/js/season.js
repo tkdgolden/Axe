@@ -1,5 +1,20 @@
 $(document).ready(function () {
+    setInterval(function() {
+        window.location.reload();
+    }, 60000)
+
+
+    var storedPlayers = JSON.parse(sessionStorage.getItem('absentPlayers'));
     var absentPlayers = [];
+    if(storedPlayers) {
+        storedPlayers.forEach(function(player) {
+            absentPlayers.push(Number.parseInt(player));
+        })
+    }
+    absentPlayers.forEach(function(player) {
+        $(`.${player}`).addClass("table-active");
+    })
+
 
     $(".toprow").on("dblclick", function() {
         var playerId = $(this).data("player");
@@ -17,6 +32,7 @@ $(document).ready(function () {
         absentPlayers.forEach(function(pID) {
             $(`.${pID}`).addClass("table-active");
         });
+        sessionStorage.setItem('absentPlayers', JSON.stringify(absentPlayers));
     });
 
     var combinations = [];

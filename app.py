@@ -242,8 +242,11 @@ def seasonview():
     season_quarters = select_season_quarters(sess)
     season_laps = select_season_laps(sess)
 
+    players_wait_times = wait_times(logged_matches)
+    print(players_wait_times)
+
     # send that info on to the page to be displayed
-    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, season_quarters=season_quarters,season_laps=season_laps)
+    return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, season_quarters=season_quarters, season_laps=season_laps, players_wait_times=players_wait_times)
 
 
 # create quarter

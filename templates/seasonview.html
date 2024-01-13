@@ -49,6 +49,17 @@
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
+                                {% if players_wait_times[player["competitor_id"]] %}
+                                    {% if players_wait_times[opponent["competitor_id"]] %}
+                                        <p>{{ (players_wait_times[player["competitor_id"]] + players_wait_times[opponent["competitor_id"]]).seconds // 60 }} minutes waiting</p>
+                                    {% else %}
+                                        <p>{{ players_wait_times[player["competitor_id"]].seconds // 60 }} minutes waiting</p>
+                                    {% endif %}
+                                {% else %}
+                                    {% if players_wait_times[opponent["competitor_id"]] %}
+                                        <p>{{ players_wait_times[opponent["competitor_id"]].seconds // 60 }} minutes waiting</p>
+                                    {% endif %}
+                                {% endif %}
                             </td>
                         {% endif %}
                     {% endfor %}
