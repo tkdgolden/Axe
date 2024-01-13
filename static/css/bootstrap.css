@@ -1943,7 +1943,7 @@ progress {
 }
 
 td.hover:not(.table-active, .complete, .begun), .table-hover tr:hover > :not(th, .table-active, .complete, .begun) {
-  --bs-table-color-state: var(--bs-table-hover-color);
+  --bs-table-color-state: #5e174a;
   --bs-table-bg-state: var(--bs-table-hover-bg);
 }
 
