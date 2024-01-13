@@ -431,6 +431,7 @@ caption {
 th {
   text-align: inherit;
   text-align: -webkit-match-parent;
+  --bs-table-color-state: var(--bs-secondary);
 }
 
 thead,
@@ -1880,10 +1881,15 @@ progress {
   vertical-align: top;
   border-color: var(--bs-table-border-color);
 }
-.table > :not(caption) > * > * {
+.table > :not(caption) > * > :not(.opponent) {
   padding: 0.5rem 0.5rem;
   color: var(--bs-table-color-state, var(--bs-table-color-type, var(--bs-table-color)));
   background-color: var(--bs-table-bg);
+  border-bottom-width: var(--bs-border-width);
+  box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+}
+.table > :not(caption) > * > * {
+  padding: 0.5rem 0.5rem;
   border-bottom-width: var(--bs-border-width);
   box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
 }
@@ -1997,17 +2003,17 @@ th.hover, .table-hover > tbody > tr:hover > th {
   --bs-table-active-bg: #1a0933;
   --bs-table-active-color: #fff;
   --bs-table-hover-bg: #ea39b8;
-  --bs-table-hover-color: #fff;
+  --bs-table-hover-color: #ec4dbf;
   color: #1a0933;
   border-color: var(--bs-table-border-color);
 }
 
 .table-warning {
-  --bs-table-color: #007fce;
+  --bs-table-color: #fff;
   --bs-table-bg: #ffc107;
   --bs-table-border-color: #ffc720;
   --bs-table-striped-bg: #ffc413;
-  --bs-table-striped-color: #007fce;
+  --bs-table-striped-color: #fff;
   --bs-table-active-bg: #ffc720;
   --bs-table-active-color: #fff;
   --bs-table-hover-bg: #ffc61a;
@@ -3168,7 +3174,7 @@ textarea.form-control-lg {
 }
 
 .btn-light {
-  --bs-btn-color: #170229;
+  --bs-btn-color: #fff;
   --bs-btn-bg: #44d9e8;
   --bs-btn-border-color: #44d9e8;
   --bs-btn-hover-color: #fff;

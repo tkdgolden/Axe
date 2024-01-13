@@ -108,9 +108,13 @@ li {
     flex-grow: 2;
 }
 
-#weeklymatchups th {
+#weeklymatchups th:not(.hover, .opponent) {
     background-color: #007fce;
     color:#5e174a;
+}
+
+#weeklymatcups th.hover {
+    color: #ec4dbf;
 }
 
 .complete {
@@ -164,4 +168,9 @@ li {
 
 .judge-home li {
     margin-top: 25px;
+}
+
+th.opponent {
+    background-color: #007fce;
+    color: #ffc107;
 }
