@@ -156,3 +156,12 @@ li {
     border-width: 1px;
     border-color: #007fce;
 }
+
+#season, #tournament {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.judge-home li {
+    margin-top: 25px;
+}

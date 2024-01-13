@@ -5,10 +5,11 @@
 
     <p>You can:</p>
 
-    <ul>
+    <ul class="judge-home">
         <!--Drop down menu of available seasons-->
-        <li>Judge a Season
+        <li>
             <form action="/seasonview" method="get">
+                <label for="season">Judge a Season: </label>
                 <select name="season" class="form-select-sm" id="season">
                     {% for x in seasons %}
                         <option value="{{ x['season_id'] }}">{{ x["season"].capitalize() }} {{ x["yearof"] }}</option>
@@ -19,8 +20,9 @@
         </li>
 
         <!--Drop down menu of available tournaments-->
-        <li>Judge a Tournament
+        <li>
             <form action="/tournamentview" method="get">
+                <label for="tournament">Judge a Tournament: </label>
                 <select name="tournament" class="form-select-sm" id="tournament">
                     {% for y in tournaments %}
                         <option value="{{ y['tournament_id'] }}">{{ y["tournament_name"].title() }} {{ y["discipline"].capitalize() }} Tournament on {{ y["tournament_date"].strftime('%m-%d-%Y') }}</option>
