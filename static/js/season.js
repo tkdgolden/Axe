@@ -1,7 +1,7 @@
 $(document).ready(function () {
     var absentPlayers = [];
 
-    $(".toprow").on("click", function() {
+    $(".toprow").on("dblclick", function() {
         var playerId = $(this).data("player");
         if ($(this).hasClass("table-active")) {
             absentPlayers = absentPlayers.filter(function(current) {
@@ -92,11 +92,78 @@ $(document).ready(function () {
                         }
                     });
                     showing.addClass("hover");
+
+                    const opponentElements = $("td").filter(function() {
+                        if ($(this).hasClass("table-active") === false) {
+                            if ($(this).hasClass(`${id}`) === true) {
+                                if ($(this).hasClass("complete") === false) {
+                                    return this;
+                                }
+                            }
+                        }
+                    })
+                    var opponentsClasses = [];
+                    $(opponentElements).each(function() {
+                        const elemClasses = $(this).attr("class").split(/\s+/);
+                        $(elemClasses).each(function(){
+                            if (Number.parseInt(this) !== id) {
+                                if (Number.parseInt(this)) {
+                                    opponentsClasses.push(Number.parseInt(this));
+                                } 
+                            }
+                        });
+                    });
+                    opponentsClasses.forEach(function(id) {
+                    $(`th.${id}`).filter(function() {
+                            $(this).toggleClass("opponent");
+                        });
+                    })
+                });
+            }
+        );
+        $(this).on("click",
+            function() {
+                playerIdClasses.forEach(function(eachId) {
+                    const id = parseInt(eachId);
+                    const withId = $(`.${id}`);
+                    const showing = withId.filter(function() {
+                        if ($(this).hasClass("table-active") === false) {
+                            return this;
+                        }
+                    });
+                    showing.toggleClass("hover");
+
+                    const opponentElements = $("td").filter(function() {
+                        if ($(this).hasClass("table-active") === false) {
+                            if ($(this).hasClass(`${id}`) === true) {
+                                if ($(this).hasClass("complete") === false) {
+                                    return this;
+                                }
+                            }
+                        }
+                    })
+                    var opponentsClasses = [];
+                    $(opponentElements).each(function() {
+                        const elemClasses = $(this).attr("class").split(/\s+/);
+                        $(elemClasses).each(function(){
+                            if (Number.parseInt(this) !== id) {
+                                if (Number.parseInt(this)) {
+                                    opponentsClasses.push(Number.parseInt(this));
+                                } 
+                            }
+                        });
+                    });
+                    opponentsClasses.forEach(function(id) {
+                    $(`th.${id}`).filter(function() {
+                            $(this).toggleClass("opponent");
+                        });
+                    })
                 });
             }
         );
         $(this).on("mouseout", function() {
             $("*").removeClass("hover");
-        })
+            $("*").removeClass("opponent");
+        });
     });
 });
