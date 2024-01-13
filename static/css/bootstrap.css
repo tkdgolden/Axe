@@ -431,7 +431,6 @@ caption {
 th {
   text-align: inherit;
   text-align: -webkit-match-parent;
-  --bs-table-color-state: var(--bs-secondary);
 }
 
 thead,
@@ -2004,11 +2003,11 @@ th.hover, .table-hover > tbody > tr:hover > th {
 }
 
 .table-warning {
-  --bs-table-color: #fff;
+  --bs-table-color: #007fce;
   --bs-table-bg: #ffc107;
   --bs-table-border-color: #ffc720;
   --bs-table-striped-bg: #ffc413;
-  --bs-table-striped-color: #fff;
+  --bs-table-striped-color: #007fce;
   --bs-table-active-bg: #ffc720;
   --bs-table-active-color: #fff;
   --bs-table-hover-bg: #ffc61a;
@@ -3169,7 +3168,7 @@ textarea.form-control-lg {
 }
 
 .btn-light {
-  --bs-btn-color: #fff;
+  --bs-btn-color: #170229;
   --bs-btn-bg: #44d9e8;
   --bs-btn-border-color: #44d9e8;
   --bs-btn-hover-color: #fff;

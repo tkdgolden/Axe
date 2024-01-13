@@ -2,10 +2,10 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // there are four targets on the target that will be "hot" on different throws of the round
-    options = ["RED A (Top Left)", "GREEN B (Top Right)", "BLUE C (Bottom Left)", "ORANGE D (Bottom Right)"];
+    const options = ["RED A (Top Left)", "GREEN B (Top Right)", "BLUE C (Bottom Left)", "ORANGE D (Bottom Right)"];
 
     // randomly ordering the numbers that refer to the indexes of the options array
-    usedNumbers = [];
+    var usedNumbers = [];
     for (let i = 0; i < 4; i++) {
         do {
             randomNumber = Math.floor(Math.random() * 4);
@@ -20,13 +20,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("t4").innerHTML = (options[usedNumbers[3]]);
 
     // recording the sequence
-    sequence = [options[usedNumbers[0]], (options[usedNumbers[1]]), (options[usedNumbers[2]]), (options[usedNumbers[3]])];
+    var sequence = [options[usedNumbers[0]], (options[usedNumbers[1]]), (options[usedNumbers[2]]), (options[usedNumbers[3]])];
     
     // repeating the above for throws 5-8
-    usedNumbers = [];
-    for (let i = 0; i < 4; i++) {
+    var usedNumbers = [];
+    for (var i = 0; i < 4; i++) {
         do {
-            randomNumber = Math.floor(Math.random() * 4);
+            var randomNumber = Math.floor(Math.random() * 4);
         } while (usedNumbers.includes(randomNumber));
         usedNumbers.push(randomNumber);
     }
@@ -36,55 +36,54 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("t8").innerHTML = (options[usedNumbers[3]]);
     sequence.push([options[usedNumbers[0]], (options[usedNumbers[1]]), (options[usedNumbers[2]]), (options[usedNumbers[3]])]);
     document.getElementById("sequence").value = sequence;
-    console.log(document.getElementById("sequence").value);
 
     // add up each players scores from the dropdowns and whether they got the quickpoint
     function calculateScores(){
-        p1sum = 0;
-        for (item of p1dropdowns){
+        var p1sum = 0;
+        for (var item of p1dropdowns){
             if(item.value){
                 if(!isNaN(item.value)){
                     p1sum += parseInt(item.value);
-                    here = item.parentNode.parentNode.getElementsByClassName('1q');
-                    for (each of here){
+                    var here = item.parentNode.parentNode.getElementsByClassName('1q');
+                    for (var each of here){
                         each.removeAttribute('disabled');
                     }
                 }
                 else{
-                    here = item.parentNode.parentNode.getElementsByClassName('1q');
-                    for (each of here){
+                    var here = item.parentNode.parentNode.getElementsByClassName('1q');
+                    for (var each of here){
                         each.checked = false;
                         each.setAttribute('disabled', true);
                     }
                 }
             }
         }
-        for (item of p1radios){
+        for (var item of p1radios){
             if(item.checked){
                 p1sum += 1;
             }
         }
         document.getElementById("p1score").innerHTML = p1sum;
-        p2sum = 0;
+        var p2sum = 0;
         for (item of p2dropdowns){
             if(item.value){
                 if(!isNaN(item.value)){
                     p2sum += parseInt(item.value);
-                    here = item.parentNode.parentNode.getElementsByClassName('2q');
-                    for (each of here){
+                    var here = item.parentNode.parentNode.getElementsByClassName('2q');
+                    for (var each of here){
                         each.removeAttribute('disabled');
                     }
                 }
                 else{
-                    here = item.parentNode.parentNode.getElementsByClassName('2q');
-                    for (each of here){
+                    var here = item.parentNode.parentNode.getElementsByClassName('2q');
+                    for (var each of here){
                         each.checked = false;
                         each.setAttribute('disabled', true);
                     }
                 }
             }
         }
-        for (item of p2radios){
+        for (var item of p2radios){
             if(item.checked){
                 p2sum += 1;
             }
@@ -93,18 +92,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // automatically recalculate scores when anything is changed
-    p1dropdowns = document.getElementsByClassName('1');
-    p2dropdowns = document.getElementsByClassName('2');
-    p1radios = document.getElementsByClassName("1q");
-    p2radios = document.getElementsByClassName("2q");
-    radios = document.querySelectorAll('input[type=radio]');
-    for (item of p1dropdowns){
+    const p1dropdowns = document.getElementsByClassName('1');
+    const p2dropdowns = document.getElementsByClassName('2');
+    const p1radios = document.getElementsByClassName("1q");
+    const p2radios = document.getElementsByClassName("2q");
+    const radios = document.querySelectorAll('input[type=radio]');
+    for (var item of p1dropdowns){
         item.onchange = calculateScores;
     }
-    for (item of p2dropdowns){
+    for (var item of p2dropdowns){
         item.onchange = calculateScores;
     }
-    for (item of radios){
+    for (var item of radios){
         item.onchange = calculateScores;
     }
     
@@ -125,6 +124,19 @@ function ShowRound(elem)
         }
     }
     document.getElementById(elem).setAttribute('style', 'display:inline');
+    document.getElementById(elem).innerText.includes("RED")
+    if (document.getElementById(elem).innerText.includes("RED")) {
+        document.getElementById(elem).style.color = "red";
+    }
+    else if (document.getElementById(elem).innerText.includes("GREEN")) {
+        document.getElementById(elem).style.color = "green";
+    }
+    else if (document.getElementById(elem).innerText.includes("BLUE")) {
+        document.getElementById(elem).style.color = "blue";
+    }
+    else if (document.getElementById(elem).innerText.includes("ORANGE")) {
+        document.getElementById(elem).style.color = "orange";
+    }
     document.getElementById(elem).previousElementSibling.setAttribute('style', 'display:none');
     document.getElementById(elem).parentNode.parentNode.firstElementChild.lastElementChild.classList.remove("wait");
     document.getElementById(elem).parentNode.parentNode.lastElementChild.lastElementChild.classList.remove("wait");
@@ -140,7 +152,7 @@ function CheckTie(){
     }
     if (document.getElementById("winner").value){
         forms = document.getElementsByTagName('form');
-        for (each of forms){
+        for (var each of forms){
             each.submit();
         }
     }

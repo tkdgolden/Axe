@@ -2,8 +2,7 @@
 {% extends "layout.html" %}
 
 {% block judgepage %}
-    <h2>Score a Match</h2>
-    <h3>{{ array_competitors[1] }} {{ array_competitors[2] }} Versus {{ array_competitors[4] }} {{ array_competitors[5] }}</h3>
+    <h3>Score Match: {{ array_competitors[1] }} {{ array_competitors[2] }} Versus {{ array_competitors[4] }} {{ array_competitors[5] }}</h3>
     <a href="/seasonview">Return to Season View</a>
 {% endblock %}
 
@@ -11,7 +10,7 @@
 
     <form action="/scorematch" method="POST" onsubmit="CheckTie()">
         <input type="hidden" id="sequence" name="sequence">
-        <table>
+        <table class="table table-warning table-score" id="table-score">
             <colgroup>
                 <col span="1" style="background-color: #ffc107">
                 <col span="3" style="background-color: #432874">
@@ -29,7 +28,7 @@
             <tbody>
                 <tr>
                     <td>
-                        <select name="p1t1" id="p1t1" class="1 wait" required>
+                        <select name="p1t1" id="p1t1" class="1 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -46,12 +45,12 @@
                         <p id="t1" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q1" class="1q" value="p1" style="accent-color:red;" disabled>
+                        <input type="radio" name="q1" class="1q" value="p1" style="accent-color:#ffc107;" disabled>
                         <input type="radio" name="q1" value="" style="accent-color:black">
-                        <input type="radio" name="q1" class="2q" value="p2" style="accent-color:blue" disabled>
+                        <input type="radio" name="q1" class="2q" value="p2" style="accent-color:#ec48bd" disabled>
                     </td>
                     <td>
-                        <select name="p2t1" id="p2t1" class="2 wait" required>
+                        <select name="p2t1" id="p2t1" class="2 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -63,7 +62,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <select name="p1t2" id="p1t2" class="1 wait" required>
+                        <select name="p1t2" id="p1t2" class="1 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -80,12 +79,12 @@
                         <p id="t2" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q2" class="1q" value="p1" style="accent-color:red" disabled>
+                        <input type="radio" name="q2" class="1q" value="p1" style="accent-color:#ffc107" disabled>
                         <input type="radio" name="q2" value="" style="accent-color:black">
-                        <input type="radio" name="q2" class="2q" value="p2" style="accent-color:blue" disabled>
+                        <input type="radio" name="q2" class="2q" value="p2" style="accent-color:#ec48bd" disabled>
                     </td>
                     <td>
-                        <select name="p2t2" id="p2t2" class="2 wait" required>
+                        <select name="p2t2" id="p2t2" class="2 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -97,7 +96,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <select name="p1t3" id="p1t3" class="1 wait" required>
+                        <select name="p1t3" id="p1t3" class="1 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -114,12 +113,12 @@
                         <p id="t3" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q3" class="1q" value="p1" style="accent-color:red" disabled>
+                        <input type="radio" name="q3" class="1q" value="p1" style="accent-color:#ffc107" disabled>
                         <input type="radio" name="q3" value="" style="accent-color:black">
-                        <input type="radio" name="q3" class="2q" value="p2" style="accent-color:blue" disabled>
+                        <input type="radio" name="q3" class="2q" value="p2" style="accent-color:#ec48bd" disabled>
                     </td>
                     <td>
-                        <select name="p2t3" id="p2t3" class="2 wait" required>
+                        <select name="p2t3" id="p2t3" class="2 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -131,7 +130,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <select name="p1t4" id="p1t4" class="1 wait" required>
+                        <select name="p1t4" id="p1t4" class="1 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -148,12 +147,12 @@
                         <p id="t4" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q4" class="1q" value="p1" style="accent-color:red" disabled>
+                        <input type="radio" name="q4" class="1q" value="p1" style="accent-color:#ffc107" disabled>
                         <input type="radio" name="q4" value="" style="accent-color:black">
-                        <input type="radio" name="q4" class="2q" value="p2" style="accent-color:blue" disabled>
+                        <input type="radio" name="q4" class="2q" value="p2" style="accent-color:#ec48bd" disabled>
                     </td>
                     <td>
-                        <select name="p2t4" id="p2t4" class="2 wait" required>
+                        <select name="p2t4" id="p2t4" class="2 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -165,7 +164,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <select name="p1t5" id="p1t5" class="1 wait" required>
+                        <select name="p1t5" id="p1t5" class="1 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -182,12 +181,12 @@
                         <p id="t5" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q5" class="1q" value="p1" style="accent-color:red" disabled>
+                        <input type="radio" name="q5" class="1q" value="p1" style="accent-color:#ffc107" disabled>
                         <input type="radio" name="q5" value="" style="accent-color:black">
-                        <input type="radio" name="q5" class="2q" value="p2" style="accent-color:blue" disabled>
+                        <input type="radio" name="q5" class="2q" value="p2" style="accent-color:#ec48bd" disabled>
                     </td>
                     <td>
-                        <select name="p2t5" id="p2t5" class="2 wait" required>
+                        <select name="p2t5" id="p2t5" class="2 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -199,7 +198,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <select name="p1t6" id="p1t6" class="1 wait" required>
+                        <select name="p1t6" id="p1t6" class="1 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -216,12 +215,12 @@
                         <p id="t6" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q6" class="1q" value="p1" style="accent-color:red" disabled>
+                        <input type="radio" name="q6" class="1q" value="p1" style="accent-color:#ffc107" disabled>
                         <input type="radio" name="q6" value="" style="accent-color:black">
-                        <input type="radio" name="q6" class="2q" value="p2" style="accent-color:blue" disabled>
+                        <input type="radio" name="q6" class="2q" value="p2" style="accent-color:#ec48bd" disabled>
                     </td>
                     <td>
-                        <select name="p2t6" id="p2t6" class="2 wait" required>
+                        <select name="p2t6" id="p2t6" class="2 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -233,7 +232,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <select name="p1t7" id="p1t7" class="1 wait" required>
+                        <select name="p1t7" id="p1t7" class="1 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -250,12 +249,12 @@
                         <p id="t7" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q7" class="1q" value="p1" style="accent-color:red" disabled>
+                        <input type="radio" name="q7" class="1q" value="p1" style="accent-color:#ffc107" disabled>
                         <input type="radio" name="q7" value="" style="accent-color:black">
-                        <input type="radio" name="q7" class="2q" value="p2" style="accent-color:blue" disabled>
+                        <input type="radio" name="q7" class="2q" value="p2" style="accent-color:#ec48bd" disabled>
                     </td>
                     <td>
-                        <select name="p2t7" id="p2t7" class="2 wait" required>
+                        <select name="p2t7" id="p2t7" class="2 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -267,7 +266,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <select name="p1t8" id="p1t8" class="1 wait" required>
+                        <select name="p1t8" id="p1t8" class="1 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -284,12 +283,12 @@
                         <p id="t8" style="display:none"></p>
                     </td>
                     <td>
-                        <input type="radio" name="q8" class="1q" value="p1" style="accent-color:red" disabled>
+                        <input type="radio" name="q8" class="1q" value="p1" style="accent-color:#ffc107" disabled>
                         <input type="radio" name="q8" value="" style="accent-color:black">
-                        <input type="radio" name="q8" class="2q" value="p2" style="accent-color:blue" disabled>
+                        <input type="radio" name="q8" class="2q" value="p2" style="accent-color:#ec48bd" disabled>
                     </td>
                     <td>
-                        <select name="p2t8" id="p2t8" class="2 wait" required>
+                        <select name="p2t8" id="p2t8" class="2 wait form-select-sm" required>
                             <option value="" disabled selected>Score</option>
                             <option value="D">Drop</option>
                             <option value="F">Fault</option>
@@ -306,7 +305,7 @@
             <option value="{{ array_competitors[0] }}">{{ array_competitors[1] }} {{ array_competitors[2] }}</option>
             <option value="{{ array_competitors[3] }}">{{ array_competitors[4] }} {{ array_competitors[5] }}</option>
         </select>
-        <input type="Submit" value="Submit Match Scores">
+        <input class="btn btn-light" type="Submit" value="Submit Match Scores">
     </form>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/scorematch.js') }}"></script>

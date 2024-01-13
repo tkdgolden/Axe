@@ -128,3 +128,31 @@ li {
 .head {
     font-size:x-large;
 }
+
+.table-score > :not(caption) > tr > :nth-child(1) {
+    --bs-table-bg: #ffc107;
+}
+  
+.table-score > :not(caption) > tr > :nth-child(2), .table-score > :not(caption) > tr > :nth-child(3), .table-score > :not(caption) > tr > :nth-child(4) {
+    --bs-table-color-type: var(--bs-table-striped-color);
+    --bs-table-bg-type: #1a0933;
+}
+  
+.table-score > :not(caption) > tr > :nth-child(5) {
+    --bs-table-bg: #ec48bd;
+}
+
+#playerstats th {
+    --bs-table-color-state: var(--bs-secondary);
+}
+
+#table-score th {
+    background-color: #1a0933;
+    color: #007fce;
+}
+
+#table-score thead {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #007fce;
+}
