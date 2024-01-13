@@ -8,6 +8,7 @@ $(document).ready(function () {
         $(`.${player}`).addClass("table-active");
     })
 
+
     $(".toprow").on("dblclick", function() {
         var playerId = $(this).data("player");
         if ($(this).hasClass("table-active")) {
