@@ -564,9 +564,18 @@ def select_tournament_match(match_id):
 
 
 def render_player_stats():
-    each_discipline_player_list = []
+    # def has_scores(player_info):
+    #     if player_info[games_played] == 0:
+    #         return False
+    #     else:
+    #         return True
+        
+
+    each_discipline_player_list = {}
+
     for discipline in disciplines:
         player_list = db.select_all_competitors()
+        filtered_player_list = []
         for each in player_list:
             player_id = each[0]
             output = db.select_competitor_average_games_by_discipline(player_id, discipline)
@@ -577,11 +586,11 @@ def render_player_stats():
                 win_rate = 0
             else:
                 win_rate = round((games_won / games_played), 2)
-            each.append(average)
-            each.append(win_rate)
-            each.append(games_played)
-            each.append(discipline)
-        each_discipline_player_list.append(player_list)
+                each.append(average)
+                each.append(win_rate)
+                each.append(games_played)
+                filtered_player_list.append(each)
+        each_discipline_player_list[discipline] = (filtered_player_list)
     all_discipline_player_list = db.select_all_competitors()
     for each in all_discipline_player_list:
         player_id = each[0]
@@ -596,8 +605,7 @@ def render_player_stats():
         each.append(average)
         each.append(win_rate)
         each.append(games_played)
-        each.append("cumulative")
-    each_discipline_player_list.append(all_discipline_player_list)
+    each_discipline_player_list["cumulative"] = (all_discipline_player_list)
 
     return(each_discipline_player_list)
 

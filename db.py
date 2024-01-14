@@ -455,7 +455,7 @@ def select_tournament_rounds(tournament_id):
 def select_season_matches(season_id):
     """ returns match info (players, winner, scores) from all matches in season by season id """
 
-    CUR.execute("""SELECT matches.match_id, matches.player_1_id, matches.player_2_id, matches.winner_id, matches.discipline, matches.dt, matches.player1total, matches.player2total FROM matches LEFT JOIN laps ON matches.lap_id = laps.lap_id INNER JOIN quarters ON laps.quarter_id = quarters.quarter_id INNER JOIN seasons ON quarters.season_id = seasons.season_id WHERE seasons.season_id = %(season_id)s AND matches.winner_id IS NOT NULL""", {'season_id':season_id})
+    CUR.execute("""SELECT matches.match_id, matches.player_1_id, matches.player_2_id, matches.winner_id, matches.discipline, matches.dt, matches.player1total, matches.player2total FROM matches LEFT JOIN laps ON matches.lap_id = laps.lap_id INNER JOIN quarters ON laps.quarter_id = quarters.quarter_id INNER JOIN seasons ON quarters.season_id = seasons.season_id WHERE seasons.season_id = %(season_id)s AND matches.winner_id IS NOT NULL ORDER BY matches.dt ASC""", {'season_id':season_id})
 
     return CUR.fetchall()
 

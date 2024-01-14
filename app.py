@@ -34,10 +34,9 @@ def index():
     # not logged in:
     if session.get("user_id") is None:
         each_discipline_player_list = render_player_stats()
-
         seasons, tournaments = select_season_tournament()
 
-        return render_template("index.html", each_discipline_player_list=each_discipline_player_list, seasons=seasons, tournaments=tournaments)
+        return render_template("index.html", each_discipline_player_list=each_discipline_player_list, seasons=seasons, tournaments=tournaments, disciplines=disciplines)
 
     # logged in:
     # loads seasons and tournaments for dropdowns in judge home page
