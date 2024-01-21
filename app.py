@@ -289,7 +289,9 @@ def creatematch():
         if request.form.get("p1") == request.form.get("p2"):
             return errorpage(message="Must select two different players", send_to="seasonview")
         session["array_competitor_ids"] = [request.form.get("p1"), request.form.get("p2")]
-
+    else:
+        session["array_competitor_ids"] = request.args.getlist("competitor_selection")[0].strip("[]").split(",")
+    print(session["array_competitor_ids"])
     # make an array with those competitors and their information from competitor database table
     array_competitors = []
     for each in session["array_competitor_ids"]:
