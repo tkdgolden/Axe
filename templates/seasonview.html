@@ -67,6 +67,7 @@
             {% endfor %}
         </tbody>
     </table>
+    <hr>
     <a href="/enrollcompetitor">Enroll a Competitor</a>
     <form action="/createquarter" method="post">
         <label for="new_quarter">New Quarter:</label>
@@ -90,6 +91,21 @@
         <label for="discipline">Discipline:</label>
         <input type="text" class="form-select-sm" name="discipline" id="discipline">
         <button class="btn btn-sm btn-outline-primary" type="submit">Begin</button>
+    </form>
+    <hr>
+    <h3>Sandbox:</h3>
+    <form action="/creatematch" method="post">
+        <select name="p1" class="form-select-sm" id="p1">
+            {% for player in players %}
+                <option value="{{ player.competitor_id }}">{{ player.competitor_first_name }} {{ player.competitor_last_name }}</option>
+            {% endfor %}
+        </select>
+        <select name="p2" class="form-select-sm" id="p2">
+            {% for player in players %}
+                <option value="{{ player.competitor_id }}">{{ player.competitor_first_name }} {{ player.competitor_last_name }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-sm btn-outline-primary" type="submit">Score Match</button>
     </form>
     <script type="text/javascript" src="{{ url_for('static', filename='js/season.js') }}"></script>
 

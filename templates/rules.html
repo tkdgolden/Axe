@@ -7,11 +7,72 @@
     <hr>
     <h3>Scoring</h3>
     <p>Each target consists of five bullseyes. The four corner bullseyes each have a ring around them. The center "reserve" bullseye does not. Blades are scored by the part at the surface of the wood, not what is buried underneath, or hanging above. When the blade is partially inside a ring, it is worth 1 point. When a blade is fully inside a ring, it is worth 2 points. When the blade is partially inside a bullseye, it is worth 3 points. When a blade is fully inside a bullseye it is worth 6 points. For each throw, one of the corner bullseyes is active, and the others are considered passive. The active bullseye and it's ring is scored as described above, then doubled. If a throw scores on a passive or reserve bullseye, the score simply is not doubled. </p>
+    <table class="table table-striped table-dark display" >
+        <thead>
+            <tr>
+                <th></th>
+                <th>
+                    Ring
+                </th>
+                <th></th>
+                <th>
+                    Bull
+                </th>
+                <th></th>
+            </tr>
+            <tr>
+                <th></th>
+                <th>Passive</th>
+                <th>Active</th>
+                <th>Passive</th>
+                <th>Active</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>
+                    Slop
+                </th>
+                <td>
+                    1
+                </td>
+                <td>
+                    2
+                </td>
+                <td>
+                    3
+                </td>
+                <td>
+                    6
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    True
+                </th>
+                <td>
+                    2
+                </td>
+                <td>
+                    4
+                </td>
+                <td>
+                    6
+                </td>
+                <td>
+                    12
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>If there is a penline drawn, it belongs to the bullseye, and is considered part of the bullseye. Therefore, as a blade comes into the line, breaking the line is within the bullseye. For determining if the blade is "true" and contained within the bullseye, a broken line, but no part of the blade on the outside of the line will be considered "true". </p>
     <h4>Quick Points</h4>
     <p>Points are also potentially awarded each throw if one thrower is noticably faster. (If one blade hits the target before their opponent's blade has left their hand.) If it is not a clear difference, neither player gets the "quick point" for that throw. </p>
     <h4>Target</h4>
     <img src="{{url_for('static', filename='Target Design.png')}}">
     <hr>
+    <h4>Sudden Death</h4>
+    <p>In the case of a tie, another throw is made with the reserve bullseye active. The throws are scored and the higher score on this sudden death throw recieves the win. If necessary, the sudden death will repeat until there is a score difference. The sudden death throw does not count towards the match's point totals. </p>
     <h3>Seasons</h3>
     <p>There will be roughly two seasons per year, consisting of 4 quarters (roughtly one per month). Each quarter will have a number of series, based on the league attendance. The first series will always be hatchet, but subsequent ones may be other disciplines. In a perfect series, each player will play every other player exactly once. Based on attendance this may vary. </p>
     <h3>Tournaments</h3>
@@ -80,4 +141,14 @@
         <li>Turkey Throw Tournament</li>
         <li>... More Holiday Tournaments</li>
     </ul>
+    <h3>Pricing</h3>
+    <p>Subject to change.</p>
+    <h4>Season:</h4>
+    <ul>
+        <li>$25 per week</li>
+        <li>$60 per month   ($15 savings)</li>
+        <li>$200 per season ($100 savings)</li>
+    </ul>
+    <h4>Tournament:</h4>
+    <p>TBD</p>
 {% endblock %}

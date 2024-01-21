@@ -137,6 +137,14 @@ def select_season_competitors(sess):
     return CUR.fetchall()
 
 
+def select_lap_competitors(lap):
+    """ selects all competitors who participated in current lap """
+
+    CUR.execute("""SELECT * FROM competitors LEFT JOIN matches ON competitors.competitor_id = matches.player_1_id LEFT JOIN matches ON competitors.competitor_id = matches.player_2_id WHERE matches.lap_id = %(lap)s""", {'lap': lap})
+
+    return CUR.fetchall()
+
+
 def select_competitor_by_id(id):
     """ selects row of competitor by id """
 
@@ -368,9 +376,17 @@ def select_competitor_average_games_by_discipline(player_id, discipline):
 
 
 def select_competitor_season_average(player_id, season_id):
-    """ returns player average score by player id """
+    """ returns player average season score by player id """
 
     CUR.execute("""SELECT ROUND(AVG(total), 2), COUNT(*) FROM scores JOIN matches ON scores.match_id = matches.match_id INNER JOIN laps ON laps.lap_id = matches.lap_id INNER JOIN quarters ON quarters.quarter_id = laps.quarter_id INNER JOIN seasons ON seasons.season_id = quarters.season_id WHERE scores.competitor_id = %(player_id)s AND seasons.season_id = %(season_id)s""", {'player_id': player_id, 'season_id': season_id})
+
+    return CUR.fetchall()
+
+
+def select_competitor_lap_average(player_id, lap_id):
+    """ returns player average lap score by player_id """
+
+    CUR.execute("""SELECT ROUND(AVG(total), 2), COUNT(*) FROM scores JOIN matches ON scores.match_id = matches.match_id WHERE scores.competitor_id = %(player_id)s AND matches.lap_id = %(lap_id)s""", {'player_id': player_id, 'lap_id': lap_id})
 
     return CUR.fetchall()
 
@@ -392,9 +408,16 @@ def select_competitor_wins_by_discipline(player_id, discipline):
 
 
 def select_competitor_season_wins(player_id, season_id):
-    """ returns number of games a player has won """
+    """ returns number of games a player has won in a given season """
 
     CUR.execute("""SELECT COUNT(*) FROM matches INNER JOIN laps ON laps.lap_id = matches.lap_id INNER JOIN quarters ON quarters.quarter_id = laps.quarter_id INNER JOIN seasons ON seasons.season_id = quarters.season_id WHERE matches.winner_id = %(player_id)s AND seasons.season_id = %(season_id)s""", {'player_id': player_id, 'season_id': season_id})
+
+    return CUR.fetchall()[0][0]
+
+def select_competitor_lap_wins(player_id, lap_id):
+    """ returns number of games a player has won in a given lap """
+
+    CUR.execute("""SELECT COUNT(*) FROM matches WHERE winner_id = %(player_id)s AND lap_id = %(lap_id)s""", {'player_id': player_id, 'lap_id': lap_id})
 
     return CUR.fetchall()[0][0]
 
@@ -418,7 +441,7 @@ def select_season_laps(season_id):
 def select_competitor_matches(player_id):
     """ returns match info (players, winner, scores) for each match the player has been in by player id """
 
-    CUR.execute("""SELECT * FROM matches WHERE (player_1_id = %(player_id)s OR player_2_id = %(player_id)s) AND winner_id IS NOT NULL""", {'player_id': player_id})
+    CUR.execute("""SELECT * FROM matches WHERE (player_1_id = %(player_id)s OR player_2_id = %(player_id)s) AND winner_id IS NOT NULL ORDER BY dt DESC""", {'player_id': player_id})
     matches = CUR.fetchall()
     list_matches = []
     for each in matches:
@@ -432,6 +455,7 @@ def select_competitor_matches(player_id):
         p2_name = CUR.fetchone()
         each_dict['player_2_name'] = f"{p2_name['competitor_first_name']} {p2_name['competitor_last_name']}"
         list_matches.append(each_dict)
+
 
     return list_matches
 
@@ -456,6 +480,14 @@ def select_season_matches(season_id):
     """ returns match info (players, winner, scores) from all matches in season by season id """
 
     CUR.execute("""SELECT matches.match_id, matches.player_1_id, matches.player_2_id, matches.winner_id, matches.discipline, matches.dt, matches.player1total, matches.player2total FROM matches LEFT JOIN laps ON matches.lap_id = laps.lap_id INNER JOIN quarters ON laps.quarter_id = quarters.quarter_id INNER JOIN seasons ON quarters.season_id = seasons.season_id WHERE seasons.season_id = %(season_id)s AND matches.winner_id IS NOT NULL ORDER BY matches.dt ASC""", {'season_id':season_id})
+
+    return CUR.fetchall()
+
+
+def select_lap_matches(lap_id):
+    """ returns match info (players, winner, scores) from all matches in a lap by lap_id """
+
+    CUR.execute("""SELECT match_id, player_1_id, player_2_id, winner_id, discipline, dt, player1total, player2total FROM matches WHERE lap_id = %(lap_id)s AND winner_id IS NOT NULL ORDER BY dt DESC""", {'lap_id':lap_id})
 
     return CUR.fetchall()
 
