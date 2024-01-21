@@ -241,7 +241,6 @@ def seasonview():
     season_laps = select_season_laps(sess)
 
     players_wait_times = wait_times(logged_matches)
-    print(players_wait_times)
 
     # send that info on to the page to be displayed
     return render_template("seasonview.html", rows=rows, players=players, logged_matches=logged_matches, season_quarters=season_quarters, season_laps=season_laps, players_wait_times=players_wait_times)
@@ -282,15 +281,15 @@ def createlap():
 
 
 # create match used only from seasons, in tournaments matches are created when the round is created
-@app.route("/creatematch")
+@app.route("/creatematch", methods=["GET", "POST"])
 @login_required
 def creatematch():
 
-    # make sure there is a valid season selected
-    if session["selected_season"]:
-        session["array_competitor_ids"] = request.args.getlist("competitor_selection")[0].strip("[]").split(",")
-    else:
-        return errorpage(send_to="/", message="Create match is only for seasons.")
+    if request.method == "POST":
+        if request.form.get("p1") == request.form.get("p2"):
+            return errorpage(message="Must select two different players", send_to="seasonview")
+        session["array_competitor_ids"] = [request.form.get("p1"), request.form.get("p2")]
+
     # make an array with those competitors and their information from competitor database table
     array_competitors = []
     for each in session["array_competitor_ids"]:
@@ -298,7 +297,6 @@ def creatematch():
         array_competitors.append(competitor["competitor_id"])
         array_competitors.append(competitor["competitor_first_name"])
         array_competitors.append(competitor["competitor_last_name"])
-
 
     # get player ids
     playerA = session["array_competitor_ids"][0]
@@ -318,11 +316,11 @@ def creatematch():
     # get lap_id
     try:
         lap_id = select_lap_id_by_lap_quarter_season(lap, quarter, sess)
+        # insert into matches, returns primary key match id for use in scores inserts
+        session["match_id"] = insert_unscored_season_match(playerA, playerB, lap_id[0])
     except TypeError:
-        return errorpage(message="Be sure to create the appropriate Quarter and Series", send_to="seasonview")
-
-    # insert into matches, returns primary key match id for use in scores inserts
-    session["match_id"] = insert_unscored_season_match(playerA, playerB, lap_id[0])
+        # insert into matches, returns primary key match id for use in scores inserts
+        session["match_id"] = insert_unscored_season_match(playerA, playerB)
 
     # send competitor info to scorematch form
     return render_template("scorematch.html", array_competitors=array_competitors, possible_scores=possible_scores)
@@ -930,4 +928,30 @@ def season_stats_view():
         each.append(player_1_name)
         each.append(player_2_name)
 
-    return render_template("season_stats_view.html", player_list=player_list, match_list=match_list, season_info=season_info, quarters_info=quarters_info, laps_info=laps_info)
+    if request.args.get("lap"):
+        lap_counter = request.args.get("lap")
+        quarter_counter = request.args.get("quarter")
+        lap_id = None
+        for each in laps_info:
+            if each["counter"] == int(lap_counter) and each["month"] == int(quarter_counter):
+                lap_id = each["lap_id"]
+        selected_player_list = player_list
+        for each in selected_player_list:
+            player_id = each[0]
+            output = select_competitor_lap_average(player_id, lap_id)
+            average = output[0][0]
+            games_played = output[0][1]
+            games_won = select_competitor_lap_wins(player_id, lap_id)
+            win_rate = 0
+            if (games_played > 0):
+                win_rate = round((games_won / games_played), 2)
+            each.append(average)
+            each.append(win_rate)
+            each.append(games_played)
+        selected_match_list = select_lap_matches(lap_id)
+    else:
+        selected_player_list = None
+        selected_match_list = None
+
+
+    return render_template("season_stats_view.html", player_list=player_list, match_list=match_list, season_info=season_info, quarters_info=quarters_info, laps_info=laps_info, selected_player_list=selected_player_list, selected_match_list=selected_match_list)

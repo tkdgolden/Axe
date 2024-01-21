@@ -1,6 +1,6 @@
 $(document).ready(function () {
-    $('#player_stats').DataTable({
-        order: [[3, 'desc']]
+    $('#playerstats').DataTable({
+        order: [[2, 'desc']]
     });
 
     $("#playerstats").on("click", "tr[role=\"button\"]", function () {
@@ -11,8 +11,15 @@ $(document).ready(function () {
         window.location = $(this).data("href");
     });
 
-
     $("#matches").on("click", "tr[role=\"button\"]", function () {
+        window.location = $(this).data("href");
+    });
+
+    $("#selected_seasonstats").on("click", "tr[role=\"button\"]", function () {
+        window.location = $(this).data("href");
+    });
+
+    $("#selected_matches").on("click", "tr[role=\"button\"]", function () {
         window.location = $(this).data("href");
     });
 
@@ -37,5 +44,15 @@ $(document).ready(function () {
         $(`#${discipline}`).css("display", "block");
         evt.target.classList.add("active");
     }
+
+    $(".view").change(function() {
+        const quarter = $("#lap option:selected").data("quarter");
+        const lap = $("#lap option:selected").data("lap");
+        const lap_id = $("#lap option:selected").data("id");
+        sessionStorage.setItem("season_lap", lap_id);        const season = new URLSearchParams(window.location.search).get('season');
+        window.location = `season_stats_view?season=${season}&quarter=${quarter}&lap=${lap}`;
+    });
+
+    $(`#lap option[value=${sessionStorage.getItem("season_lap")}]`).attr('selected', 'true');
 });
 

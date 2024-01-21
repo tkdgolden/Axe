@@ -47,7 +47,62 @@
             {% endfor %}
         </tbody>
     </table>
-
+    <hr>
+    <form class="view">
+        <label for="lap">Series:</label>
+        <select name="lap" class="form-select-sm" id="lap">
+            {% for lap in laps_info %}
+                <option data-quarter="{{ lap['month'] }}" data-lap="{{ lap['counter'] }}" data-id="{{ lap['lap_id'] }}" value="{{ lap['lap_id'] }}">Quarter {{ lap['month'] }} Series {{ lap['counter'] }} {{ lap['discipline'] }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    {% if selected_player_list and selected_match_list %}
+    <!-- <table id="selected_seasonstats" class="table table-dark display table-hover" style="width:95%">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Lap Average</th>
+                <th>Lap Win Ratio</th>
+                <th>Games Played this Lap</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for each in selected_player_list %}
+                <tr role="button" data-href="player_view?player_id={{ each[0] }}">
+                    <th>{{ each[1] }}</th>
+                    <th>{{ each[2] }}</th>
+                    <td>{{ each[6] }}</td>
+                    <td>{{ each[7] }}</td>
+                    <td>{{ each[8] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr> -->
+    <table id="selected_matches" class="table table-dark display table-hover" style="width:95%">
+        <thead>
+            <tr>
+                <th>Most Recent Matches</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in selected_match_list %}
+                <tr role="button" data-href="match_view?match_id={{ match['match_id'] }}">
+                    <td>
+                        {{ match[8] }} WON 
+                        {% if match['winner_id'] == match['player_1_id'] %} 
+                            {{ match['player1total'] }} to {{ match['player2total'] }} against {{ match[10] }}
+                        {% else %} 
+                            {{ match['player2total'] }} to {{ match['player1total'] }} against {{ match[9] }}
+                        {% endif %} 
+                        on {{ match['dt'].strftime('%m-%d-%Y') }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
     <script type="text/javascript" src="{{ url_for('static', filename='js/statview.js') }}"></script>
 
 {% endblock %}
