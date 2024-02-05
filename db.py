@@ -375,6 +375,30 @@ def select_competitor_average_games_by_discipline(player_id, discipline):
     return CUR.fetchall()
 
 
+def select_competitor_stats_by_discipline(discipline):
+    """ returns player name, average, number of games and number of wins by discipline """
+
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id WHERE matches.discipline ILIKE %(discipline)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'discipline':discipline})
+
+    return CUR.fetchall()
+
+
+def select_cumulative_competitor_stats():
+    """ returns player name, average, cumulative number of games and number of wins """
+
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""")
+
+    return CUR.fetchall()
+
+
+def select_competitor_stats_by_lap(lap_id):
+    """ returns player name, average, number of games and number of wins by lap """
+
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id WHERE matches.lap_id = %(lap_id)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'lap_id':lap_id})
+
+    return CUR.fetchall()
+
+
 def select_competitor_season_average(player_id, season_id):
     """ returns player average season score by player id """
 
