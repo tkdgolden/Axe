@@ -19,7 +19,15 @@ $(document).ready(function () {
         window.location = $(this).data("href");
     });
 
+    $(".clickable-players").on("click", "tr[role=\"button\"]", function () {
+        window.location = $(this).data("href");
+    });
+
     $("#selected_matches").on("click", "tr[role=\"button\"]", function () {
+        window.location = $(this).data("href");
+    });
+
+    $(".clickable-matches").on("click", "tr[role=\"button\"]", function () {
         window.location = $(this).data("href");
     });
 
@@ -30,6 +38,8 @@ $(document).ready(function () {
     $('.dataTables_filter').css("display", "none");
 
     $('#hatchet').css("display", "block");
+
+    $('#season_view').css("display", "block");
 
     $('.tablinks').on("click", function(evt) {
         var discipline = evt.target.dataset.discipline;

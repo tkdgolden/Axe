@@ -1,54 +1,172 @@
 <!--Index page when NOT LOGGED IN for purposes of COMPETITOR viewing of results not judges-->
 {% extends "layout.html" %}
-{% block title %}{{ season_info['season'].capitalize() }} {{ season_info['yearof'] }} Season{% endblock %}
+{% block title %}Season {{ season_info[0][6].capitalize() }}{% endblock %}
 {% block body %}
-    <table id="seasonstats" class="table table-dark display table-hover" style="width:95%">
-        <thead>
-            <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Season Average</th>
-                <th>Season Win Ratio</th>
-                <th>Games Played this Season</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for each in player_list %}
-                <tr role="button" data-href="player_view?player_id={{ each[0] }}">
-                    <th>{{ each[1] }}</th>
-                    <th>{{ each[2] }}</th>
-                    <td>{{ each[6] }}</td>
-                    <td>{{ each[7] }}</td>
-                    <td>{{ each[8] }}</td>
-                </tr>
+    <div class="item" id="season_stats">
+        <div class="tab">
+            <button data-discipline="season_view" id="season_tab" class="tablinks btn btn-outline-primary">Season Stats</button>
+            {% for quarter in quarter_names %}
+                <button data-discipline="q{{ quarter[0] }}" id="{{ quarter[0] }}" class="tablinks btn btn-outline-primary">Quarter {{ quarter[1] }} Stats</button>
             {% endfor %}
-        </tbody>
-    </table>
-    <hr>
-    <table id="matches" class="table table-dark display table-hover" style="width:95%">
-        <thead>
-            <tr>
-                <th>Most Recent Matches</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for match in match_list %}
-                <tr role="button" data-href="match_view?match_id={{ match['match_id'] }}">
-                    <td>
-                        {{ match[8] }} WON 
-                        {% if match['winner_id'] == match['player_1_id'] %} 
-                            {{ match['player1total'] }} to {{ match['player2total'] }} against {{ match[10] }}
-                        {% else %} 
-                            {{ match['player2total'] }} to {{ match['player1total'] }} against {{ match[9] }}
-                        {% endif %} 
-                        on {{ match['dt'].strftime('%m-%d-%Y') }}
-                    </td>
-                </tr>
+            {% for lap in season_info %}
+                <button data-discipline="l{{ lap[0] }}" id="{{ lap[0] }}" class="tablinks btn btn-outline-primary">Quarter {{ lap[5] }} Series {{ lap[4] }} Stats</button>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+        <div class="tabcontent" id="season_view">
+            <h3>Stats By Season</h3>
+            <table id="season_stats" class="table table-striped table-dark display table-hover clickable-players" style="width:95%">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Average Score</th>
+                        <th>Win Ratio</th>
+                        <th>Games Played</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in season_stats %}
+                        <tr role="button" data-href="player_view?player_id={{ player[0] }}" class="table-row">
+                            <th>{{ player[1] }}</th>
+                            <th>{{ player[2] }}</th>
+                            <td>{{ player[3] }}</td>
+                            <td>{{ (player[5] / player[4]) | round(2) }}</td>
+                            <td>{{ player[4] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <hr>
+            <h3>All Season Matches</h3>
+            <table id="matches" class="table table-dark display table-hover clickable-matches" style="width:95%">
+                <thead>
+                    <tr>
+                        <th></th><th></th><th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in matches_season %}
+                        <tr role="button" data-href="match_view?match_id={{ match[0] }}">
+                            <td>
+                                {{ match[0] }}
+                            </td>
+                            <td>
+                                <b>{{ match[1] }} {{ match[2] }} ({{ match[7] }}) VS {{ match[3] }} {{ match[4] }} ({{ match[8] }})</b>
+                            </td>
+                            <td>
+                                on {{ match[9].strftime('%m-%d-%Y') }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% for quarter in quarter_info %}
+            <div class="tabcontent" id="q{{ quarter }}">
+                <h3>Quarter {{ quarter }} Averages</h3>
+                <table id="q{{ quarter }}_stats" class="table table-striped table-dark display table-hover clickable-players" style="width:95%">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Average Score</th>
+                            <th>Win Ratio</th>
+                            <th>Games Played</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in quarter_info[quarter] %}
+                            <tr role="button" data-href="player_view?player_id={{ player[0] }}" class="table-row">
+                                <th>{{ player[1] }}</th>
+                                <th>{{ player[2] }}</th>
+                                <td>{{ player[3] }}</td>
+                                <td>{{ (player[5] / player[4]) | round(2) }}</td>
+                                <td>{{ player[4] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <hr>
+                <h3>Quarter {{ quarter }} Matches</h3>
+                <table id="q{{ quarter }}_matches" class="table table-dark display table-hover clickable-matches" style="width:95%">
+                    <thead>
+                        <tr>
+                            <th></th><th></th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in matches_quarters[quarter] %}
+                            <tr role="button" data-href="match_view?match_id={{ match[0] }}">
+                                <td>
+                                    {{ match[0] }}
+                                </td>
+                                <td>
+                                    <b>{{ match[1] }} {{ match[2] }} ({{ match[7] }}) VS {{ match[3] }} {{ match[4] }} ({{ match[8] }})</b>
+                                </td>
+                                <td>
+                                    on {{ match[9].strftime('%m-%d-%Y') }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+        {% for lap in lap_info %}
+            <div class="tabcontent" id="l{{ lap }}">
+                <h3>Series {{ lap }} Averages</h3>
+                <table id="l{{ lap }}_stats" class="table table-striped table-dark display table-hover clickable-players" style="width:95%">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Average Score</th>
+                            <th>Win Ratio</th>
+                            <th>Games Played</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in lap_info[lap] %}
+                            <tr role="button" data-href="player_view?player_id={{ player[0] }}" class="table-row">
+                                <th>{{ player[1] }}</th>
+                                <th>{{ player[2] }}</th>
+                                <td>{{ player[3] }}</td>
+                                <td>{{ (player[5] / player[4]) | round(2) }}</td>
+                                <td>{{ player[4] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <hr>
+                <h3>Series {{ lap }} Matches</h3>
+                <table id="l{{ lap }}_matches" class="table table-dark display table-hover clickable-matches" style="width:95%">
+                    <thead>
+                        <tr>
+                            <th></th><th></th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in matches_laps[lap] %}
+                            <tr role="button" data-href="match_view?match_id={{ match[0] }}">
+                                <td>
+                                    {{ match[0] }}
+                                </td>
+                                <td>
+                                    <b>{{ match[1] }} {{ match[2] }} ({{ match[7] }}) VS {{ match[3] }} {{ match[4] }} ({{ match[8] }})</b>
+                                </td>
+                                <td>
+                                    on {{ match[9].strftime('%m-%d-%Y') }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+
     <hr>
-    <form class="view">
+<!--     <form class="view">
         <label for="lap">Series:</label>
         <select name="lap" class="form-select-sm" id="lap">
             {% for lap in laps_info %}
@@ -56,7 +174,7 @@
             {% endfor %}
         </select>
     </form>
-    {% if selected_player_list and selected_match_list %}
+    {% if selected_player_list and selected_match_list %} -->
     <!-- <table id="selected_seasonstats" class="table table-dark display table-hover" style="width:95%">
         <thead>
             <tr>
@@ -80,7 +198,7 @@
         </tbody>
     </table>
     <hr> -->
-    <table id="selected_matches" class="table table-dark display table-hover" style="width:95%">
+<!--     <table id="selected_matches" class="table table-dark display table-hover" style="width:95%">
         <thead>
             <tr>
                 <th>Most Recent Matches</th>
@@ -102,7 +220,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% endif %}
+    {% endif %} -->
     <script type="text/javascript" src="{{ url_for('static', filename='js/statview.js') }}"></script>
 
 {% endblock %}

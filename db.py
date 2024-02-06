@@ -399,6 +399,54 @@ def select_competitor_stats_by_lap(lap_id):
     return CUR.fetchall()
 
 
+def select_competitor_stats_by_quarter(quarter_id):
+    """ returns player name, average, number of games and number of wins by quarter """
+
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id LEFT JOIN laps ON matches.lap_id = laps.lap_id WHERE laps.quarter_id = %(quarter_id)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'quarter_id':quarter_id})
+
+    return CUR.fetchall()
+
+
+def select_competitor_stats_by_season(season_id):
+    """ returns player name, average, number of games and number of wins by quarter """
+
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id LEFT JOIN laps ON matches.lap_id = laps.lap_id JOIN quarters ON quarters.quarter_id = laps.quarter_id WHERE quarters.season_id = %(season_id)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'season_id':season_id})
+
+    return CUR.fetchall()
+
+
+def select_season_info(season_id):
+    """ returns laps, quarters, disciplines, start dates, lap counters, quarter months, season name for a given season_id """
+
+    CUR.execute("""SELECT laps.lap_id, quarters.quarter_id, laps.discipline, laps.start_date, laps.counter, quarters.month, seasons.season FROM laps JOIN quarters ON laps.quarter_id = quarters.quarter_id JOIN seasons ON quarters.season_id = seasons.season_id WHERE seasons.season_id = %(season_id)s""", {'season_id':season_id})
+
+    return CUR.fetchall()
+
+
+def select_match_info_by_lap(lap_id):
+    """ returns player names, winner name, player totals for all matches in a given lap """
+
+    CUR.execute("""SELECT matches.match_id, p1.competitor_first_name, p1.competitor_last_name, p2.competitor_first_name, p2.competitor_last_name, w.competitor_first_name, w.competitor_last_name, matches.player1total, matches.player2total, matches.dt FROM matches JOIN competitors p1 ON p1.competitor_id = matches.player_1_id JOIN competitors p2 ON p2.competitor_id = matches.player_2_id JOIN competitors w ON w.competitor_id = matches.winner_id WHERE matches.lap_id = %(lap_id)s""", {'lap_id':lap_id})
+    
+    return CUR.fetchall()
+
+
+def select_match_info_by_quarter(quarter_id):
+    """ returns player names, winner name, player totals for all matches in a given quarter """
+
+    CUR.execute("""SELECT matches.match_id, p1.competitor_first_name, p1.competitor_last_name, p2.competitor_first_name, p2.competitor_last_name, w.competitor_first_name, w.competitor_last_name, matches.player1total, matches.player2total, matches.dt FROM matches JOIN competitors p1 ON p1.competitor_id = matches.player_1_id JOIN competitors p2 ON p2.competitor_id = matches.player_2_id JOIN competitors w ON w.competitor_id = matches.winner_id JOIN laps ON matches.lap_id = laps.lap_id WHERE laps.quarter_id = %(quarter_id)s""", {'quarter_id':quarter_id})
+    
+    return CUR.fetchall()
+
+
+def select_match_info_by_season(season_id):
+    """ returns match_id, player names, winner name, player totals for all matches in a given season """
+
+    CUR.execute("""SELECT matches.match_id, p1.competitor_first_name, p1.competitor_last_name, p2.competitor_first_name, p2.competitor_last_name, w.competitor_first_name, w.competitor_last_name, matches.player1total, matches.player2total, matches.dt FROM matches JOIN competitors p1 ON p1.competitor_id = matches.player_1_id JOIN competitors p2 ON p2.competitor_id = matches.player_2_id JOIN competitors w ON w.competitor_id = matches.winner_id JOIN laps ON matches.lap_id = laps.lap_id JOIN quarters ON quarters.quarter_id = laps.quarter_id WHERE quarters.season_id = %(season_id)s""", {'season_id':season_id})
+    
+    return CUR.fetchall()
+
+
 def select_competitor_season_average(player_id, season_id):
     """ returns player average season score by player id """
 
