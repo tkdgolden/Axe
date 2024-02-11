@@ -291,7 +291,6 @@ def creatematch():
         session["array_competitor_ids"] = [request.form.get("p1"), request.form.get("p2")]
     else:
         session["array_competitor_ids"] = request.args.getlist("competitor_selection")[0].strip("[]").split(",")
-    print(session["array_competitor_ids"])
     # make an array with those competitors and their information from competitor database table
     array_competitors = []
     for each in session["array_competitor_ids"]:
@@ -903,7 +902,6 @@ def season_stats_view():
         return errorpage(send_to="/", message="You must select a season.")
 
     season_info = select_season_info(season_id)
-    print(season_info)
 
     lap_info = {}
     quarters = []
@@ -924,10 +922,6 @@ def season_stats_view():
         quarter_info[quarter] = quarter_stats
         quarter_matches = select_match_info_by_quarter(quarter)
         matches_quarters[quarter] = quarter_matches
-    print(lap_info)
-    print(quarter_info)
-    print(matches_laps)
-    print(matches_quarters)
     season_stats = select_competitor_stats_by_season(season_id)
     matches_season = select_match_info_by_season(season_id)
 

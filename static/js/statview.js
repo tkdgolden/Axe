@@ -3,6 +3,10 @@ $(document).ready(function () {
         order: [[2, 'desc']]
     });
 
+    $('.clickable-matches').DataTable({
+        order: [[0, 'desc']]
+    });
+
     $("#playerstats").on("click", "tr[role=\"button\"]", function () {
         window.location = $(this).data("href");
     });
