@@ -291,7 +291,6 @@ def creatematch():
         session["array_competitor_ids"] = [request.form.get("p1"), request.form.get("p2")]
     else:
         session["array_competitor_ids"] = request.args.getlist("competitor_selection")[0].strip("[]").split(",")
-    print(session["array_competitor_ids"])
     # make an array with those competitors and their information from competitor database table
     array_competitors = []
     for each in session["array_competitor_ids"]:
@@ -902,58 +901,28 @@ def season_stats_view():
     else:
         return errorpage(send_to="/", message="You must select a season.")
 
-    season_info = select_season(season_id)
-    quarters_info = select_season_quarters(season_id)
-    laps_info = select_season_laps(season_id)
-    player_list = select_season_competitors(season_id)
+    season_info = select_season_info(season_id)
 
-    match_list = select_season_matches(season_id)
+    lap_info = {}
+    quarters = []
+    matches_laps = {}
+    quarter_names = []
+    for lap in season_info:
+        if lap[1] not in quarters:
+            quarters.append(lap[1])
+            quarter_names.append([lap[1], lap[5]])
+        lap_stats = select_competitor_stats_by_lap(lap[0])
+        lap_info[lap[0]] = lap_stats
+        lap_matches = select_match_info_by_lap(lap[0])
+        matches_laps[lap[0]] = lap_matches
+    quarter_info = {}
+    matches_quarters = {}
+    for quarter in quarters:
+        quarter_stats = select_competitor_stats_by_quarter(quarter)
+        quarter_info[quarter] = quarter_stats
+        quarter_matches = select_match_info_by_quarter(quarter)
+        matches_quarters[quarter] = quarter_matches
+    season_stats = select_competitor_stats_by_season(season_id)
+    matches_season = select_match_info_by_season(season_id)
 
-    for each in player_list:
-        player_id = each[0]
-        output = select_competitor_season_average(player_id, season_id)
-        average = output[0][0]
-        games_played = output[0][1]
-        games_won = select_competitor_season_wins(player_id, season_id)
-        win_rate = 0
-        if (games_played > 0):
-            win_rate = round((games_won / games_played), 2)
-        each.append(average)
-        each.append(win_rate)
-        each.append(games_played)
-
-    for each in match_list:
-        winner_name = player_name_from_id(each['winner_id'])
-        player_1_name = player_name_from_id(each['player_1_id'])
-        player_2_name = player_name_from_id(each["player_2_id"])
-        each.append(winner_name)
-        each.append(player_1_name)
-        each.append(player_2_name)
-
-    if request.args.get("lap"):
-        lap_counter = request.args.get("lap")
-        quarter_counter = request.args.get("quarter")
-        lap_id = None
-        for each in laps_info:
-            if each["counter"] == int(lap_counter) and each["month"] == int(quarter_counter):
-                lap_id = each["lap_id"]
-        selected_player_list = player_list
-        for each in selected_player_list:
-            player_id = each[0]
-            output = select_competitor_lap_average(player_id, lap_id)
-            average = output[0][0]
-            games_played = output[0][1]
-            games_won = select_competitor_lap_wins(player_id, lap_id)
-            win_rate = 0
-            if (games_played > 0):
-                win_rate = round((games_won / games_played), 2)
-            each.append(average)
-            each.append(win_rate)
-            each.append(games_played)
-        selected_match_list = select_lap_matches(lap_id)
-    else:
-        selected_player_list = None
-        selected_match_list = None
-
-
-    return render_template("season_stats_view.html", player_list=player_list, match_list=match_list, season_info=season_info, quarters_info=quarters_info, laps_info=laps_info, selected_player_list=selected_player_list, selected_match_list=selected_match_list)
+    return render_template("season_stats_view.html", season_info=season_info, lap_info=lap_info, quarter_info=quarter_info, matches_laps=matches_laps, matches_quarters=matches_quarters, matches_season=matches_season, season_stats=season_stats, quarter_names=quarter_names)
