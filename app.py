@@ -1,5 +1,5 @@
 # flask framework for lots of things that make apps easy
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, url_for
 # to store session variables
 from flask_session import Session
 
@@ -198,7 +198,7 @@ def seasonview():
     if request.args.get("season"):
         sess = request.args.get("season")
         session["selected_season"] = sess
-    elif session["selected_season"]:
+    elif "selected_season" in session:
         sess = session["selected_season"]
     else:
         return errorpage(send_to="/", message="You must select a season.")
@@ -206,6 +206,8 @@ def seasonview():
     # get the selected quarter to be displayed
     if request.args.get("quarter"):
         quarter_month = request.args.get("quarter")
+    elif "selected_quarter" in session:
+        quarter_month = session["selected_quarter"]
     else:
         quarter_month = 1
     session["selected_quarter"] = quarter_month
@@ -213,6 +215,8 @@ def seasonview():
     # get the selected lap to be displayed
     if request.args.get("lap"):
         lap_count = request.args.get("lap")
+    elif "selected_lap" in session:
+        lap_count = session["selected_lap"]
     else:
         lap_count = 1
     session["selected_lap"] = lap_count
@@ -220,6 +224,7 @@ def seasonview():
     # get that season's info from database
     try:
         rows = select_current_season(sess)
+        print(sess, rows)
         if not rows:
             return helpers.errorpage(send_to="/", message="You must select a valid season.")
     except:
@@ -485,7 +490,7 @@ def scorematch():
 
         # redirect to current season/ tournament
         if (view == 'season'):
-            return redirect("seasonview")
+            return redirect(url_for("seasonview", season=session["selected_season"], **request.args))
         elif (view == 'tournament'):
             return redirect("tournamentview")
 

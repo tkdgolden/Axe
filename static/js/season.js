@@ -84,7 +84,8 @@ $(document).ready(function () {
         const quarter = $("#lap option:selected").data("quarter");
         const lap = $("#lap option:selected").data("lap");
         const lap_id = $("#lap option:selected").data("id");
-        sessionStorage.setItem("season_lap", lap_id);        const season = new URLSearchParams(window.location.search).get('season');
+        sessionStorage.setItem("season_lap", lap_id);        
+        let season = new URLSearchParams(window.location.search).get('season');
         window.location = `seasonview?season=${season}&quarter=${quarter}&lap=${lap}`;
     });
 
