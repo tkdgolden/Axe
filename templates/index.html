@@ -48,6 +48,7 @@
                                 <th>Average Score</th>
                                 <th>Win Ratio</th>
                                 <th>Games Played</th>
+                                <th>Player's Highest Score</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -58,6 +59,7 @@
                                     <td>{{ player[3] }}</td>
                                     <td>{{ (player[5] / player[4]) | round(2) }}</td>
                                     <td>{{ player[4] }}</td>
+                                    <td>{{ player[6] }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

@@ -378,7 +378,7 @@ def select_competitor_average_games_by_discipline(player_id, discipline):
 def select_competitor_stats_by_discipline(discipline):
     """ returns player name, average, number of games and number of wins by discipline """
 
-    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id WHERE matches.discipline ILIKE %(discipline)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'discipline':discipline})
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true), MAX(scores.total) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id WHERE matches.discipline ILIKE %(discipline)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'discipline':discipline})
 
     return CUR.fetchall()
 
@@ -386,7 +386,7 @@ def select_competitor_stats_by_discipline(discipline):
 def select_cumulative_competitor_stats():
     """ returns player name, average, cumulative number of games and number of wins """
 
-    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""")
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true), MAX(scores.total) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""")
 
     return CUR.fetchall()
 
@@ -394,7 +394,7 @@ def select_cumulative_competitor_stats():
 def select_competitor_stats_by_lap(lap_id):
     """ returns player name, average, number of games and number of wins by lap """
 
-    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id WHERE matches.lap_id = %(lap_id)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'lap_id':lap_id})
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true), MAX(scores.total) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id WHERE matches.lap_id = %(lap_id)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'lap_id':lap_id})
 
     return CUR.fetchall()
 
@@ -402,7 +402,7 @@ def select_competitor_stats_by_lap(lap_id):
 def select_competitor_stats_by_quarter(quarter_id):
     """ returns player name, average, number of games and number of wins by quarter """
 
-    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id LEFT JOIN laps ON matches.lap_id = laps.lap_id WHERE laps.quarter_id = %(quarter_id)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'quarter_id':quarter_id})
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true), MAX(scores.total) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id LEFT JOIN laps ON matches.lap_id = laps.lap_id WHERE laps.quarter_id = %(quarter_id)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'quarter_id':quarter_id})
 
     return CUR.fetchall()
 
@@ -410,7 +410,7 @@ def select_competitor_stats_by_quarter(quarter_id):
 def select_competitor_stats_by_season(season_id):
     """ returns player name, average, number of games and number of wins by quarter """
 
-    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id LEFT JOIN laps ON matches.lap_id = laps.lap_id JOIN quarters ON quarters.quarter_id = laps.quarter_id WHERE quarters.season_id = %(season_id)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'season_id':season_id})
+    CUR.execute("""SELECT competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name, ROUND(AVG(scores.total), 2), COUNT(*), COUNT(*) FILTER (WHERE scores.won = true), MAX(scores.total) FROM scores LEFT JOIN matches ON scores.match_id = matches.match_id LEFT JOIN competitors ON scores.competitor_id = competitors.competitor_id LEFT JOIN laps ON matches.lap_id = laps.lap_id JOIN quarters ON quarters.quarter_id = laps.quarter_id WHERE quarters.season_id = %(season_id)s GROUP BY competitors.competitor_id, competitors.competitor_first_name, competitors.competitor_last_name""", {'season_id':season_id})
 
     return CUR.fetchall()
 
