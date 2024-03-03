@@ -848,10 +848,12 @@ def player_view():
     average = output[0][0]
     games_played = output[0][1]
     games_won = select_competitor_wins(player_id)
+    highscore = select_competitor_highscore(player_id)
     win_rate = round((games_won / games_played), 2)
     player_stats.append(average)
     player_stats.append(win_rate)
     player_stats.append(games_played)
+    player_stats.append(highscore)
 
     match_list = select_competitor_matches(player_id)
 

@@ -470,6 +470,13 @@ def select_competitor_wins(player_id):
 
     return CUR.fetchall()[0][0]
 
+def select_competitor_highscore(player_id):
+    """ returns max game score for a player """
+
+    CUR.execute("""SELECT max(total) FROM scores WHERE competitor_id = %(player_id)s""", {'player_id':player_id})
+
+    return CUR.fetchall()[0][0]
+
 
 def select_competitor_wins_by_discipline(player_id, discipline):
     """ returns number of games a player has won within a given discipline """
