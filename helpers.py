@@ -513,7 +513,7 @@ def inactive_season_tournament():
 
     seasonarchive = []
     for each in rows:
-        enddate = each[3] + datetime.timedelta(days=70)
+        enddate = each[3] + datetime.timedelta(days=190)
         if (enddate < today):
             seasonarchive.append(each)
 
