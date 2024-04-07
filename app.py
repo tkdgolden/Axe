@@ -490,7 +490,7 @@ def scorematch():
 
         # redirect to current season/ tournament
         if (view == 'season'):
-            return redirect(url_for("seasonview", season=session["selected_season"], **request.args))
+            return redirect(url_for("seasonview", season=session["selected_season"], quarter=session["selected_quarter"], lap=session["selected_lap"] **request.args))
         elif (view == 'tournament'):
             return redirect("tournamentview")
 
