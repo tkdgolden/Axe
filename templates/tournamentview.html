@@ -16,7 +16,6 @@
             <form action="/nextround" method="get" class="nextround">
                 <input type="submit" value="Next Round">
             </form>
-            <p>{{ match_info }}</p>
         <form class="thisround" action="/editmatch" method="get">
             <select multiple size="any number" class="form-select-sm" name="match" id="match">
                 {% for each in match_info %}

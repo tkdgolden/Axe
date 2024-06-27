@@ -143,7 +143,6 @@ def build_bracket(player_list, match_list, round_list, first_round_found, first_
                 else:
                     for y in match_list:
                         if y["match_id"] == each["matches"][matches_count]:
-                            print(y)
                             p1total = y["player1total"]
                             p2total = y["player2total"]
                             if (p1total == None or p2total == None):
@@ -270,8 +269,6 @@ def create_first_round(sorted_players, tournament_id):
     player_count = len(sorted_players)
     tournament_id = tournament_id
 
-    print(sorted_players)
-
     if player_count < 2:
         return errorpage(send_to="tournamentview", message="Tournaments must include at least two players.")
 
@@ -341,7 +338,6 @@ def create_first_round(sorted_players, tournament_id):
                 if sorted_players[each]:
                     player_two = sorted_players[each]
                     try:
-                        print(player_one, player_two, tournament_id)
                         match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
                     except:
                         return errorpage(send_to="tournamentview", message="Could not create match.")
@@ -463,20 +459,15 @@ def create_next_round(sorted_players, tournament_id):
     bye_array = []
     matches_array = []
     which_round = None
-
-    print(sorted_players)
     
     for each in sorted_players:
-        print(each)
         match_id = None
         if player_one is None:
             player_one = each
         else:
             player_two = each
             try:
-                print(player_one, player_two, tournament_id)
                 match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
-                print(match_id)
             except:
                 return errorpage(send_to="tournamentview", message="Could not create match.")
             bye_array.append(0)
@@ -499,7 +490,6 @@ def create_next_round(sorted_players, tournament_id):
 
     # insert round entry to database
     try:
-        print(matches_array, bye_array)
         round_id = db.insert_round(tournament_id, matches_array, bye_array, which_round)
     except:
         return errorpage(send_to="tournamentview", message="Could not create round.")
@@ -592,7 +582,6 @@ def active_season_tournament():
         rows.remove(each)
     for each in tournamentarchive:
         cols.remove(each)
-    print(rows, cols)
     return rows, cols
 
 def no_duplicate_judge(name):

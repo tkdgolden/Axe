@@ -224,7 +224,6 @@ def seasonview():
     # get that season's info from database
     try:
         rows = select_current_season(sess)
-        print(sess, rows)
         if not rows:
             return helpers.errorpage(send_to="/", message="You must select a valid season.")
     except:
@@ -551,8 +550,6 @@ def tournamentview():
 
     # calls refreshtournament function
     players, tournament, round = refreshtournament()
-
-    print(round)
 
     # cols is tournament info
     tournament_info = tournament
