@@ -474,7 +474,9 @@ def create_next_round(sorted_players, tournament_id):
         else:
             player_two = each
             try:
+                print(player_one, player_two, tournament_id)
                 match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
+                print(match_id)
             except:
                 return errorpage(send_to="tournamentview", message="Could not create match.")
             bye_array.append(0)
@@ -497,6 +499,7 @@ def create_next_round(sorted_players, tournament_id):
 
     # insert round entry to database
     try:
+        print(matches_array, bye_array)
         round_id = db.insert_round(tournament_id, matches_array, bye_array, which_round)
     except:
         return errorpage(send_to="tournamentview", message="Could not create round.")
