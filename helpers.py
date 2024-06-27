@@ -551,10 +551,9 @@ def no_duplicate_judge(name):
 def select_winner(match_id):
     """ returns winner id from match id """
 
-    match = db.select_match_by_id(match_id)
-    relevant = filter(lambda x: x in ['winner_id'], match)
+    winner = db.select_winner_by_match(match_id)
 
-    return relevant
+    return winner
 
 
 def select_tournament_match(match_id):
