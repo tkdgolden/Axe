@@ -21,21 +21,19 @@
             <select multiple size="any number" class="form-select-sm" name="match" id="match">
                 {% for each in match_info %}
                     {% if "match" in each %}
-                        {% if not "completed" in each %}
-                            <option value="{{ each[1] }}">{{ match_info[match_info.index(each) + 1][1] }} {{ match_info[match_info.index(each) + 1][2]}} Vs. {{ match_info[match_info.index(each) + 2][1] }} {{ match_info[match_info.index(each) + 2][2]}}</option>
-                            <script>
-                                const list = document.querySelectorAll(".nextround");
-                                for (var i = 0; i < list.length; i++) {
-                                    list[i].hidden = true;
-                                }
-                            </script>
-                        {% endif %}
+                        <option value="{{ each[1] }}">{{ match_info[match_info.index(each) + 1][1] }} {{ match_info[match_info.index(each) + 1][2]}} Vs. {{ match_info[match_info.index(each) + 2][1] }} {{ match_info[match_info.index(each) + 2][2]}}</option>
+                        <script>
+                            const list = document.querySelectorAll(".nextround");
+                            for (var i = 0; i < list.length; i++) {
+                                list[i].hidden = true;
+                            }
+                        </script>
                     {% endif %}
                     {% if "completed" in each %}
                         <script>
                             list = document.querySelectorAll(".nextround");
                             for (var i = 0; i < list.length; i++) {
-                                list[i].hidden = true;
+                                list[i].hidden = false;
                             }
                         </script>
                     {% endif %}
