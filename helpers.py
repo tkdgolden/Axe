@@ -463,8 +463,11 @@ def create_next_round(sorted_players, tournament_id):
     bye_array = []
     matches_array = []
     which_round = None
+
+    print(sorted_players)
     
     for each in sorted_players:
+        print(each)
         match_id = None
         if player_one is None:
             player_one = sorted_players[each]
