@@ -481,8 +481,8 @@ def create_next_round(sorted_players, tournament_id):
                 return errorpage(send_to="tournamentview", message="Could not create match.")
             bye_array.append(0)
             matches_array.append(match_id)
-        player_one = None
-        player_two = None
+            player_one = None
+            player_two = None
 
     if len(sorted_players) == 2:
         which_round = "A"
