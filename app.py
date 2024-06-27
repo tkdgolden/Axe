@@ -633,9 +633,6 @@ def tournamentview():
                         iteration += 1
                 count += 1
 
-        if (count == 0):
-            return redirect("/nextround")
-
     # send info to page to be displayed
     return render_template("tournamentview.html", tournament_info=tournament_info, players=players, match_info=match_info)
 
