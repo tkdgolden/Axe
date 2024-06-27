@@ -553,7 +553,7 @@ def tournamentview():
     players, tournament, round = refreshtournament()
 
     print(round)
-    
+
     # cols is tournament info
     tournament_info = tournament
     match_info = []
@@ -632,6 +632,9 @@ def tournamentview():
                         match_info.append(player_info)
                         iteration += 1
                 count += 1
+
+        if (count == 0):
+            return redirect("/nextround")
 
     # send info to page to be displayed
     return render_template("tournamentview.html", tournament_info=tournament_info, players=players, match_info=match_info)
