@@ -270,6 +270,8 @@ def createround(sorted_players, tournament_id):
     player_count = len(sorted_players)
     tournament_id = tournament_id
 
+    print(sorted_players)
+
     if player_count < 2:
         return errorpage(send_to="tournamentview", message="Tournaments must include at least two players.")
 
