@@ -56,6 +56,14 @@ def select_match_by_id(match_id):
     return CUR.fetchone()
 
 
+def select_winner_by_match(match_id):
+    """ return winner id from match id """
+
+    CUR.execute(""" SELECT winner_id FROM matches WHERE match_id = %(match_id)s """, {'match_id': match_id})
+
+    return CUR.fetchone() 
+
+
 def select_matches_by_season(season_id):
     """ selects matches from current season """
 
