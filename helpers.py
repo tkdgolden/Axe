@@ -482,17 +482,17 @@ def create_next_round(sorted_players, tournament_id):
         player_one = None
         player_two = None
 
-    if sorted_players.length == 2:
+    if len(sorted_players) == 2:
         which_round = "A"
-    elif sorted_players.length == 4:
+    elif len(sorted_players) == 4:
         which_round = "B"
-    elif sorted_players.length == 8:
+    elif len(sorted_players) == 8:
         which_round = "C"
-    elif sorted_players.length == 16:
+    elif len(sorted_players) == 16:
         which_round = "D"
-    elif sorted_players.length == 32:
+    elif len(sorted_players) == 32:
         which_round = "E"
-    elif sorted_players.length == 64:
+    elif len(sorted_players) == 64:
         which_round = "F"
 
     # insert round entry to database
