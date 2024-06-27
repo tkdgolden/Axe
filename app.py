@@ -723,7 +723,8 @@ def nextround():
             player_id_array.append(winner_id)
             count += 1
 
-    return createround(player_id_array, tournament)
+    createround(player_id_array, tournament)
+    return tournamentview()
 
 
 @app.route("/editmatch")
