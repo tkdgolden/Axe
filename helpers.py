@@ -470,9 +470,9 @@ def create_next_round(sorted_players, tournament_id):
         print(each)
         match_id = None
         if player_one is None:
-            player_one = sorted_players[each]
+            player_one = each
         else:
-            player_two = sorted_players[each]
+            player_two = each
             try:
                 match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
             except:
