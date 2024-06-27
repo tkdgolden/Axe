@@ -717,7 +717,7 @@ def nextround():
         else:
             match = previous_round_info[2][count]
             try:
-                winner_id = select_winner(match)
+                winner_id = select_winner(match)[0]
             except:
                 return errorpage(send_to="tournamentview", message="Could not sort players.")
             player_id_array.append(winner_id)
