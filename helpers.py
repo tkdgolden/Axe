@@ -339,6 +339,7 @@ def createround(sorted_players, tournament_id):
                 if sorted_players[each]:
                     player_two = sorted_players[each]
                     try:
+                        print(player_one, player_two, tournament_id)
                         match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
                     except:
                         return errorpage(send_to="tournamentview", message="Could not create match.")
