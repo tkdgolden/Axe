@@ -257,7 +257,7 @@ def build_bracket(player_list, match_list, round_list, first_round_found, first_
 
 # takes a list of sorted players and a tournament and places player into matches, gives them byes appropriately
 @login_required
-def createround(sorted_players, tournament_id):
+def create_first_round(sorted_players, tournament_id):
 
     # clears session info
     session["selected_season"] = None
@@ -455,6 +455,55 @@ def createround(sorted_players, tournament_id):
         return errorpage(send_to="tournamentview", message="Could not save current round.")
     session["current_round"] = round_id
 
+
+# creates empty matches based on in order, perfect player number
+def create_next_round(sorted_players, tournament_id):
+    player_one = None
+    player_two = None
+    bye_array = []
+    matches_array = []
+    which_round = None
+    
+    for each in sorted_players:
+        match_id = None
+        if player_one is None:
+            player_one = sorted_players[each]
+        else:
+            player_two = sorted_players[each]
+            try:
+                match_id = db.insert_unscored_tournament_match(player_one, player_two, tournament_id)
+            except:
+                return errorpage(send_to="tournamentview", message="Could not create match.")
+            bye_array.append(0)
+            matches_array.append(match_id)
+        player_one = None
+        player_two = None
+
+    if sorted_players.length == 2:
+        which_round = "A"
+    elif sorted_players.length == 4:
+        which_round = "B"
+    elif sorted_players.length == 8:
+        which_round = "C"
+    elif sorted_players.length == 16:
+        which_round = "D"
+    elif sorted_players.length == 32:
+        which_round = "E"
+    elif sorted_players.length == 64:
+        which_round = "F"
+
+    # insert round entry to database
+    try:
+        round_id = db.insert_round(tournament_id, matches_array, bye_array, which_round)
+    except:
+        return errorpage(send_to="tournamentview", message="Could not create round.")
+
+    # set the current round in the tounament info and session
+    try:
+        db.set_current_round(round_id, tournament_id)
+    except:
+        return errorpage(send_to="tournamentview", message="Could not save current round.")
+    session["current_round"] = round_id
     
 
 # updates tournament data for a variety of routes

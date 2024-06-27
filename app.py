@@ -686,7 +686,7 @@ def begintournament():
         return errorpage(send_to="/", message="Could not lock enrollment.")
 
     # create the first round
-    createround(sorted_players, tournament_id)
+    create_first_round(sorted_players, tournament_id)
 
     return tournamentview()
 
@@ -723,7 +723,7 @@ def nextround():
             player_id_array.append(winner_id)
             count += 1
 
-    createround(player_id_array, tournament)
+    create_next_round(player_id_array, tournament)
     return tournamentview()
 
 
