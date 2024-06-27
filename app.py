@@ -552,7 +552,8 @@ def tournamentview():
     # calls refreshtournament function
     players, tournament, round = refreshtournament()
 
-
+    print(round)
+    
     # cols is tournament info
     tournament_info = tournament
     match_info = []
